@@ -1,0 +1,116 @@
+name: Release
+
+# Bir sürüm tag'i push edildiğinde tetiklenir: git tag v1.0.0 && git push origin v1.0.0
+# İstersen Actions sekmesinden manuel de tetikleyebilirsin (workflow_dispatch).
+on:
+  push:
+    tags:
+      - "v*.*.*"
+  workflow_dispatch:
+
+env:
+  FLUTTER_VERSION: "3.24.5" # projenle aynı sürüme sabitle (flutter --version ile kontrol et)
+
+jobs:
+  build-windows:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: subosito/flutter-action@v2
+        with:
+          flutter-version: ${{ env.FLUTTER_VERSION }}
+          channel: stable
+
+      - name: Enable Windows desktop
+        run: flutter config --enable-windows-desktop
+
+      - name: Get packages
+        run: flutter pub get
+
+      - name: Build Windows release
+        run: flutter build windows --release
+
+      - name: Zip the exe bundle
+        run: |
+          Compress-Archive -Path build\windows\x64\runner\Release\* -DestinationPath nolbir-windows.zip
+        shell: pwsh
+
+      - name: Build .msix
+        run: |
+          dart pub global activate msix
+          dart run msix:create
+        # pubspec.yaml içinde msix_config bloğu olmalı (bir önceki mesajdaki örnek gibi)
+
+      - name: Upload Windows artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: windows-artifacts
+          path: |
+            nolbir-windows.zip
+            build/windows/x64/runner/Release/*.msix
+
+  build-linux:
+    runs-on: ubuntu-24.04 # senin lokal Ubuntu 24.04 ile birebir aynı ortam
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: subosito/flutter-action@v2
+        with:
+          flutter-version: ${{ env.FLUTTER_VERSION }}
+          channel: stable
+
+      - name: Install Linux build dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y clang cmake ninja-build pkg-config \
+            libgtk-3-dev liblzma-dev libstdc++-12-dev
+
+      - name: Enable Linux desktop
+        run: flutter config --enable-linux-desktop
+
+      - name: Get packages
+        run: flutter pub get
+
+      - name: Build Linux release
+        run: flutter build linux --release
+
+      - name: Install flutter_distributor
+        run: dart pub global activate flutter_distributor
+
+      - name: Package .deb
+        run: |
+          export PATH="$PATH":"$HOME/.pub-cache/bin"
+          flutter_distributor package --platform linux --targets deb
+
+      - name: Package .AppImage
+        run: |
+          export PATH="$PATH":"$HOME/.pub-cache/bin"
+          flutter_distributor package --platform linux --targets appimage
+
+      - name: Upload Linux artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: linux-artifacts
+          path: |
+            dist/**/*.deb
+            dist/**/*.AppImage
+
+  release:
+    needs: [build-windows, build-linux]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download all artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: artifacts
+
+      - name: Publish GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            artifacts/windows-artifacts/*
+            artifacts/linux-artifacts/**/*
+          generate_release_notes: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
