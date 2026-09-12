@@ -34,7 +34,7 @@ jobs:
 
       - name: Build .msix
         run: |
-          dart pub global activate msix
+          dart pub add --dev msix
           dart run msix:create
         # pubspec.yaml içinde msix_config bloğu olmalı (bir önceki mesajdaki örnek gibi)
 
