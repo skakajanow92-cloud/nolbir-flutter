@@ -35,7 +35,7 @@ jobs:
       - name: Build .msix
         run: |
           dart pub add --dev msix
-          dart run msix:create
+          dart run msix:create --install-certificate false
         # pubspec.yaml içinde msix_config bloğu olmalı (bir önceki mesajdaki örnek gibi)
 
       - name: Upload Windows artifacts
