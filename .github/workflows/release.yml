@@ -73,6 +73,16 @@ jobs:
       - name: Install flutter_distributor
         run: dart pub global activate flutter_distributor
 
+      - name: Install appimagetool
+        run: |
+          wget -q https://github.com/AppImage/appimagekit/releases/download/continuous/appimagetool-x86_64.AppImage -O appimagetool.AppImage
+          chmod +x appimagetool.AppImage
+          # FUSE runner'da kurulu olmadığından AppImage'i doğrudan çalıştırmak yerine
+          # extract edip binary'yi PATH'e alıyoruz.
+          ./appimagetool.AppImage --appimage-extract
+          sudo mv squashfs-root /opt/appimagetool
+          sudo ln -s /opt/appimagetool/AppRun /usr/local/bin/appimagetool
+
       - name: Package .deb
         run: |
           export PATH="$PATH":"$HOME/.pub-cache/bin"
