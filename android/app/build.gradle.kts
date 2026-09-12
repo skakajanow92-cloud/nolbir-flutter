@@ -3,8 +3,8 @@ import java.io.FileInputStream
 
 plugins {
     id("com.android.application")
-    id("kotlin-android")
-    // The Flutter Gradle Plugin must be applied after the Android and Kotlin Gradle plugins.
+    // "kotlin-android" kaldırıldı — AGP 9'un built-in Kotlin desteği
+    // Kotlin dosyalarını otomatik derliyor, ayrı eklentiye gerek yok.
     id("dev.flutter.flutter-gradle-plugin")
 }
 
@@ -27,9 +27,11 @@ android {
         targetCompatibility = JavaVersion.VERSION_11
     }
 
-    kotlinOptions {
-        jvmTarget = JavaVersion.VERSION_11.toString()
-    }
+    // "kotlinOptions { jvmTarget = ... }" bloğu kaldırıldı — bu, ayrı
+    // Kotlin eklentisinin (org.jetbrains.kotlin.android) DSL'iydi. AGP 9'un
+    // built-in Kotlin desteği, hedef JVM sürümünü yukarıdaki
+    // compileOptions'tan otomatik alıyor. Kotlin derleme ayarlarını
+    // özelleştirmen gerekirse yeni sözdizimi farklıdır (bkz. AGP 9 release notes).
 
     defaultConfig {
         // TODO: Specify your own unique Application ID (https://developer.android.com/studio/build/application-id.html).
