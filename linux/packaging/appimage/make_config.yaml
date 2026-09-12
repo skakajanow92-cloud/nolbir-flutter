@@ -1,6 +1,9 @@
-app_id: com.nolbir.wallet
-publisher_name: Nolbir
 display_name: Nolbir
-create_desktop_icon: true
-locales:
-  - en
+generic_name: Wallet
+categories:
+  - Finance
+  - Office
+keywords:
+  - wallet
+  - finance
+startup_notify: true
