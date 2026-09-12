@@ -1,5 +1,6 @@
 display_name: Nolbir
 generic_name: Wallet
+icon: android/app/src/main/res/mipmap-hdpi/ic_launcher.png
 categories:
   - Finance
   - Office
