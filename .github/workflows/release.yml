@@ -96,8 +96,101 @@ jobs:
             dist/**/*.deb
             dist/**/*.AppImage
 
+  build-android:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: subosito/flutter-action@v2
+        with:
+          flutter-version: ${{ env.FLUTTER_VERSION }}
+          channel: stable
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: "temurin"
+          java-version: "17"
+
+      - name: Get packages
+        run: flutter pub get
+
+      # ---- İmzalama için gizli anahtarlar ----
+      # Repo Settings > Secrets and variables > Actions içine ekle:
+      #   ANDROID_KEYSTORE_BASE64  -> `base64 -i upload-keystore.jks | pbcopy` (mac) veya `base64 upload-keystore.jks` (linux)
+      #   ANDROID_STORE_PASSWORD
+      #   ANDROID_KEY_PASSWORD
+      #   ANDROID_KEY_ALIAS
+      # android/app/build.gradle içinde signingConfigs.release bu key.properties'i okumalı
+      # (bkz. Flutter resmi dokümanı: "Build and release an Android app")
+      - name: Decode keystore
+        run: echo "${{ secrets.ANDROID_KEYSTORE_BASE64 }}" | base64 --decode > android/app/upload-keystore.jks
+
+      - name: Create key.properties
+        run: |
+          cat <<EOF > android/key.properties
+          storePassword=${{ secrets.ANDROID_STORE_PASSWORD }}
+          keyPassword=${{ secrets.ANDROID_KEY_PASSWORD }}
+          keyAlias=${{ secrets.ANDROID_KEY_ALIAS }}
+          storeFile=upload-keystore.jks
+          EOF
+
+      - name: Build APK
+        run: flutter build apk --release --split-per-abi
+
+      - name: Build AAB (Play Store)
+        run: flutter build appbundle --release
+
+      - name: Upload Android artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: android-artifacts
+          path: |
+            build/app/outputs/flutter-apk/*.apk
+            build/app/outputs/bundle/release/*.aab
+
+  build-macos:
+    runs-on: macos-14
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: subosito/flutter-action@v2
+        with:
+          flutter-version: ${{ env.FLUTTER_VERSION }}
+          channel: stable
+
+      - name: Enable macOS desktop
+        run: flutter config --enable-macos-desktop
+
+      - name: Get packages
+        run: flutter pub get
+
+      - name: Build macOS release
+        run: flutter build macos --release
+
+      - name: Zip the .app bundle
+        run: |
+          cd build/macos/Build/Products/Release
+          zip -r "$OLDPWD/nolbir-macos.zip" *.app
+
+      # Not: Bu .dmg imzasız/notarize edilmemiş olur; kullanıcı ilk açılışta
+      # Gatekeeper uyarısı görebilir. Notarization için Apple Developer ID
+      # sertifikası + `xcrun notarytool` adımı eklenmesi gerekir (ayrı secrets ister).
+      - name: Create .dmg
+        run: |
+          hdiutil create -volname "Nolbir" \
+            -srcfolder "build/macos/Build/Products/Release" \
+            -ov -format UDZO nolbir-macos.dmg
+
+      - name: Upload macOS artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: macos-artifacts
+          path: |
+            nolbir-macos.zip
+            nolbir-macos.dmg
+
   release:
-    needs: [build-windows, build-linux]
+    needs: [build-windows, build-linux, build-android, build-macos]
     runs-on: ubuntu-latest
     steps:
       - name: Download all artifacts
@@ -111,6 +204,8 @@ jobs:
           files: |
             artifacts/windows-artifacts/*
             artifacts/linux-artifacts/**/*
+            artifacts/android-artifacts/**/*
+            artifacts/macos-artifacts/*
           generate_release_notes: true
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
