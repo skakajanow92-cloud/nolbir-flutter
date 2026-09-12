@@ -1,3 +1,17 @@
+buildscript {
+    repositories {
+        google()
+        mavenCentral()
+    }
+    dependencies {
+        // AGP 9'un built-in Kotlin desteği varsayılan olarak 2.2.10 kullanıyor,
+        // ama Flutter en az 2.2.20 istiyor. Bu satır o sürümü zorluyor.
+        classpath("org.jetbrains.kotlin:kotlin-gradle-plugin") {
+            version { strictly("2.3.0") }
+        }
+    }
+}
+
 allprojects {
     repositories {
         google()
