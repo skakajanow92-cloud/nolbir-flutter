@@ -3,8 +3,7 @@ import 'cart.dart';
 /// FeedCard tipleri için "koleksiyona kaydedilebilir" opsiyonel yeteneği.
 /// Bir kart türü koleksiyona eklenebilir olmak istiyorsa sadece bu arayüzü
 /// implemente eder — merkezi bir switch'e dokunmasına gerek yoktur.
-/// Implemente etmeyen kart türleri (ör. CartSummaryCard'ın kendisi hariç
-/// tuttuğun ileride eklenecek türler) otomatik olarak generic bir önizleme
+/// Implemente etmeyen kart türleri otomatik olarak generic bir önizleme
 /// alır (bkz. collection_item_builder.dart).
 abstract interface class Collectible {
   /// Koleksiyon listesinde gösterilecek başlık ve önizleme URL'i.
@@ -48,6 +47,8 @@ class ProductCard extends FeedCard implements Collectible {
   final String imageUrl;
   final double price;
   final String currency;
+
+  /// "Sepete ekle" basılınca hangi sepete gideceğini belirler.
   final CartType cartType;
 
   const ProductCard({
@@ -86,17 +87,50 @@ class ProfileHeaderCard extends FeedCard implements Collectible {
   final String avatarUrl;
   final String bio;
   final int followerCount;
+  final String firstName;
+  final String lastName;
+  final String country;
+  final String gender;
 
   const ProfileHeaderCard({
     required String id,
     required this.username,
     required this.avatarUrl,
     required this.bio,
+    required this.firstName,
+    required this.lastName,
+    required this.country,
+    required this.gender,
     this.followerCount = 0,
   }) : super(id);
 
+  String get fullName => "$firstName $lastName".trim();
+
+  ProfileHeaderCard copyWith({
+    String? username,
+    String? avatarUrl,
+    String? bio,
+    String? firstName,
+    String? lastName,
+    String? country,
+    String? gender,
+    int? followerCount,
+  }) {
+    return ProfileHeaderCard(
+      id: id,
+      username: username ?? this.username,
+      avatarUrl: avatarUrl ?? this.avatarUrl,
+      bio: bio ?? this.bio,
+      firstName: firstName ?? this.firstName,
+      lastName: lastName ?? this.lastName,
+      country: country ?? this.country,
+      gender: gender ?? this.gender,
+      followerCount: followerCount ?? this.followerCount,
+    );
+  }
+
   @override
-  (String, String) toCollectionPreview() => (username, avatarUrl);
+  (String, String) toCollectionPreview() => (fullName, avatarUrl);
 }
 
 class UserPostCard extends FeedCard implements Collectible {
@@ -114,9 +148,6 @@ class UserPostCard extends FeedCard implements Collectible {
 }
 
 /// Kullanıcının dolu her sepeti için profil akışında gösterilen özet kart.
-/// Bilerek `Collectible` implemente ediyor (eski switch'teki davranışla
-/// birebir aynı) ama pratikte SaveToCollectionButton bu kartla hiç
-/// kullanılmıyor — ileride kullanılırsa diye hazır bekliyor.
 class CartSummaryCard extends FeedCard implements Collectible {
   final CartType cartType;
   final int itemCount;
@@ -138,7 +169,7 @@ class CartSummaryCard extends FeedCard implements Collectible {
 class CollectionItemCard extends FeedCard implements Collectible {
   final String title;
   final String previewUrl;
-  final FeedCard originalCard;
+  final FeedCard originalCard; // koleksiyona eklenen orijinal kart referansı
 
   const CollectionItemCard({
     required String id,

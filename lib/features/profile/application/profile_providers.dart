@@ -19,22 +19,18 @@ class ProfileFeed extends _$ProfileFeed {
     final repo = ref.watch(profileRepositoryProvider);
     final posts = await repo.fetchProfileFeed("current_user");
 
-    // Kullanıcının dolu her sepeti (market, eczane, bilet, sigorta ...)
-    // profil akışına birer CartSummaryCard olarak ekleniyor. `allCartsProvider`
-    // izlendiği için herhangi bir sepete ekleme yapıldığında (discovery
-    // tab'ından "Sepete ekle") bu liste otomatik güncellenir — manuel
-    // refresh gerekmez.
     final carts = await ref.watch(allCartsProvider.future);
     final cartCards = carts
-        .map((cart) => CartSummaryCard(
-              id: "cart_${cart.cartType.id}",
-              cartType: cart.cartType,
-              itemCount: cart.itemCount,
-              subtotal: cart.subtotal,
-            ))
+        .map(
+          (cart) => CartSummaryCard(
+            id: "cart_${cart.cartType.id}",
+            cartType: cart.cartType,
+            itemCount: cart.itemCount,
+            subtotal: cart.subtotal,
+          ),
+        )
         .toList();
 
-    // Sıralama: profil başlığı -> sepetler -> paylaşımlar
     final header = posts.whereType<ProfileHeaderCard>();
     final otherPosts = posts.where((c) => c is! ProfileHeaderCard);
 
@@ -46,12 +42,25 @@ class ProfileFeed extends _$ProfileFeed {
     await future;
   }
 
-  /// CreatePostSheet'ten (kamera/galeri/dosya) seçilen medyayı yeni bir
-  /// paylaşım kartı olarak profile ekler.
   Future<void> addPost(FeedCard post) async {
     final repo = ref.read(profileRepositoryProvider);
     await repo.addPost(post);
     final current = state.value ?? [];
     state = AsyncData([...current, post]);
+  }
+
+  /// "Temel Bilgiler" kartı düzenlendiğinde çağrılır.
+  ///
+  /// NOT (bilinçli, geçici tasarım kararı): Şu an sadece yerel state
+  /// güncelleniyor — repository'ye persist etme (gerçek backend/API çağrısı)
+  /// bilerek bu adıma dahil edilmedi. Görsel arayüzü tam teşekküllü
+  /// tamamladıktan sonra buraya `repo.updateHeader(...)` gibi bir çağrı
+  /// eklenecek; o zamana kadar düzenlemeler sayfa yenilenince (provider
+  /// invalidate/refresh) kaybolur.
+  void updateHeader(ProfileHeaderCard updated) {
+    final current = state.value ?? [];
+    state = AsyncData([
+      for (final c in current) c is ProfileHeaderCard ? updated : c,
+    ]);
   }
 }
