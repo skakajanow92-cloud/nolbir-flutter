@@ -28,6 +28,12 @@ jobs:
         run: flutter pub get
 
       - name: Build Windows release
+        env:
+          # Bazı eklentiler (permission_handler_windows gibi) hâlâ eski
+          # deneysel coroutine header'ını kullanıyor; yeni MSVC bunu hata
+          # sayıyor. Bu ortam değişkeni cl.exe'ye otomatik iletilir ve
+          # tüm alt projeler (üçüncü parti eklentiler dahil) için geçerli olur.
+          CL: /D_SILENCE_EXPERIMENTAL_COROUTINE_DEPRECATION_WARNINGS
         run: flutter build windows --release
 
       - name: Zip the exe bundle
@@ -62,7 +68,7 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y clang cmake ninja-build pkg-config \
-            libgtk-3-dev liblzma-dev libstdc++-12-dev
+            libgtk-3-dev liblzma-dev libstdc++-12-dev libmpv-dev mpv
 
       - name: Enable Linux desktop
         run: flutter config --enable-linux-desktop

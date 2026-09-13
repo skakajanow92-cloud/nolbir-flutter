@@ -13,7 +13,9 @@ if (keystorePropertiesFile.exists()) {
 
 android {
     namespace "com.example.nolbir"
-    compileSdk flutter.compileSdkVersion
+    // permission_handler_android en az SDK 37 istiyor; flutter.compileSdkVersion
+    // henüz 36'da kaldığı için elle 37'ye sabitliyoruz.
+    compileSdk 37
     ndkVersion flutter.ndkVersion
 
     compileOptions {
