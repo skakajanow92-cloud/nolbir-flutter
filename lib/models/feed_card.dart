@@ -1,5 +1,6 @@
 import 'cart.dart';
 import 'wallet.dart';
+import 'insurance.dart';
 
 /// FeedCard tipleri için "koleksiyona kaydedilebilir" opsiyonel yeteneği.
 /// Bir kart türü koleksiyona eklenebilir olmak istiyorsa sadece bu arayüzü
@@ -168,6 +169,20 @@ class WalletProfileCard extends FeedCard implements Collectible {
 
   @override
   (String, String) toCollectionPreview() => ("Cüzdan Profili", "");
+}
+
+/// Üçüncü profil modülü: kullanıcının farklı şirketlerden aldığı aktif
+/// sigorta poliçeleri. Diğer profil modüllerinden tamamen bağımsız.
+class InsuranceProfileCard extends FeedCard implements Collectible {
+  final List<InsurancePolicy> policies;
+
+  const InsuranceProfileCard({required String id, this.policies = const []})
+    : super(id);
+
+  int get activeCount => policies.where((p) => p.isActive).length;
+
+  @override
+  (String, String) toCollectionPreview() => ("Sigorta Profili", "");
 }
 
 /// Kullanıcının dolu her sepeti için profil akışında gösterilen özet kart.

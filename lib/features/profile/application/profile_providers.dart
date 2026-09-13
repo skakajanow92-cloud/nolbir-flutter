@@ -31,17 +31,22 @@ class ProfileFeed extends _$ProfileFeed {
         )
         .toList();
 
-    // Sıralama: kimlik -> cüzdan -> diğer paylaşımlar -> sepet özetleri.
-    // NOT: Bu elle yazılmış sıralama geçici — modül sayısı arttıkça
-    // (bankacılık, sağlık, seyahat...) genel bir "profil modülü registry"
-    // sistemine taşınacak, o zaman bu fonksiyon büyümeyecek.
+    // Sıralama: kimlik -> cüzdan -> sigorta -> diğer paylaşımlar -> sepet özetleri.
+    // NOT: 3 modülde bile bu "her modül için bir whereType" yaklaşımı
+    // uzamaya başladı — bir sonraki modülde (ör. seyahat) genel bir
+    // "profil modülü registry" sistemine geçmeyi düşün (sabit sıralı bir
+    // liste + her modülün kendi FeedCard tipini döndüren bir provider).
     final header = posts.whereType<ProfileHeaderCard>();
     final wallet = posts.whereType<WalletProfileCard>();
+    final insurance = posts.whereType<InsuranceProfileCard>();
     final otherPosts = posts.where(
-      (c) => c is! ProfileHeaderCard && c is! WalletProfileCard,
+      (c) =>
+          c is! ProfileHeaderCard &&
+          c is! WalletProfileCard &&
+          c is! InsuranceProfileCard,
     );
 
-    return [...header, ...wallet, ...otherPosts, ...cartCards];
+    return [...header, ...wallet, ...insurance, ...otherPosts, ...cartCards];
   }
 
   Future<void> refresh() async {

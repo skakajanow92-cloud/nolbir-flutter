@@ -3,6 +3,7 @@ import '../../../models/feed_card.dart';
 import 'profile_header_card_view.dart';
 import 'user_post_card_view.dart';
 import 'wallet_profile_card_view.dart';
+import 'insurance_profile_card_view.dart';
 
 void registerProfileCardViews() {
   CardViewRegistry.register<ProfileHeaderCard>(
@@ -12,6 +13,10 @@ void registerProfileCardViews() {
   CardViewRegistry.register<WalletProfileCard>(
     (context, card, isActive) =>
         WalletProfileCardView(card: card as WalletProfileCard),
+  );
+  CardViewRegistry.register<InsuranceProfileCard>(
+    (context, card, isActive) =>
+        InsuranceProfileCardView(card: card as InsuranceProfileCard),
   );
   CardViewRegistry.register<UserPostCard>(
     (context, card, isActive) => UserPostCardView(card: card as UserPostCard),
