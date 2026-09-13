@@ -1,14 +1,10 @@
 import '../../models/feed_card.dart';
 
 CollectionItemCard toCollectionItem(FeedCard card) {
-  String title;
-  String previewUrl;
-
-  if (card is Collectible) {
-    (title, previewUrl) = card.toCollectionPreview();
-  } else {
-    (title, previewUrl) = _fallbackPreview(card);
-  }
+  final (String title, String previewUrl) = switch (card) {
+    Collectible c => c.toCollectionPreview(),
+    _ => _fallbackPreview(card),
+  };
 
   return CollectionItemCard(
     id: "col_${card.id}",
