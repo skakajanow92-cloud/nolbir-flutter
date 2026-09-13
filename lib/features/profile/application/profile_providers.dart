@@ -31,10 +31,17 @@ class ProfileFeed extends _$ProfileFeed {
         )
         .toList();
 
+    // Sıralama: kimlik -> cüzdan -> diğer paylaşımlar -> sepet özetleri.
+    // NOT: Bu elle yazılmış sıralama geçici — modül sayısı arttıkça
+    // (bankacılık, sağlık, seyahat...) genel bir "profil modülü registry"
+    // sistemine taşınacak, o zaman bu fonksiyon büyümeyecek.
     final header = posts.whereType<ProfileHeaderCard>();
-    final otherPosts = posts.where((c) => c is! ProfileHeaderCard);
+    final wallet = posts.whereType<WalletProfileCard>();
+    final otherPosts = posts.where(
+      (c) => c is! ProfileHeaderCard && c is! WalletProfileCard,
+    );
 
-    return [...header, ...cartCards, ...otherPosts];
+    return [...header, ...wallet, ...otherPosts, ...cartCards];
   }
 
   Future<void> refresh() async {

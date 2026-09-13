@@ -1,4 +1,5 @@
 import 'cart.dart';
+import 'wallet.dart';
 
 /// FeedCard tipleri için "koleksiyona kaydedilebilir" opsiyonel yeteneği.
 /// Bir kart türü koleksiyona eklenebilir olmak istiyorsa sadece bu arayüzü
@@ -145,6 +146,28 @@ class UserPostCard extends FeedCard implements Collectible {
 
   @override
   (String, String) toCollectionPreview() => (caption, mediaUrl);
+}
+
+/// İkinci profil modülü: kullanıcının farklı bankalardaki hesapları ve
+/// kredi kartları. Diğer profil modüllerinden (Temel Bilgiler vb.)
+/// tamamen bağımsız — kendi rengi, kendi görünümü, kendi veri kaynağı
+/// olacak (bkz. wallet_profile_card_view.dart).
+class WalletProfileCard extends FeedCard implements Collectible {
+  final List<BankAccount> accounts;
+  final List<BankCreditCard> creditCards;
+
+  const WalletProfileCard({
+    required String id,
+    this.accounts = const [],
+    this.creditCards = const [],
+  }) : super(id);
+
+  // NOT: Şimdilik tüm hesapların TRY olduğu varsayılıyor — çoklu para
+  // birimi toplamı (döviz kuru çevrimi) backend adımında ele alınacak.
+  double get totalBalance => accounts.fold(0.0, (sum, a) => sum + a.balance);
+
+  @override
+  (String, String) toCollectionPreview() => ("Cüzdan Profili", "");
 }
 
 /// Kullanıcının dolu her sepeti için profil akışında gösterilen özet kart.
