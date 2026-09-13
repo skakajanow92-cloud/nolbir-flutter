@@ -2,11 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:media_kit/media_kit.dart';
 import 'app/main_scaffold.dart';
+import 'app/card_registrations.dart';
 
 void main() {
-  // media_kit'in native video motorunu (mpv tabanlı) başlatır.
-  // Player()/VideoController oluşturmadan önce mutlaka çağrılmalı.
+  
   MediaKit.ensureInitialized();
+  registerAllCardViews(); // tüm kart görünümlerini burada, tek seferde kaydet
   runApp(const ProviderScope(child: MyApp()));
 }
 
