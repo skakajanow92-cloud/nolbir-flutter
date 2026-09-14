@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../../models/feed_card/feed_card.dart';
 import '../../../models/career.dart';
+import '../../../core/widgets/page_aware_scroll_view.dart';
 
 /// Kariyer/CV Profili — sekizinci profil modülü.
 ///
@@ -39,7 +40,7 @@ class CareerProfileCardView extends StatelessWidget {
           ),
         ),
         child: SafeArea(
-          child: SingleChildScrollView(
+          child: PageAwareScrollView(
             padding: const EdgeInsets.only(bottom: 24),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -60,7 +61,8 @@ class CareerProfileCardView extends StatelessWidget {
                           padding: const EdgeInsets.symmetric(horizontal: 20),
                           scrollDirection: Axis.horizontal,
                           itemCount: experiences.length,
-                          separatorBuilder: (_, __) => const SizedBox(width: 12),
+                          separatorBuilder: (_, _) =>
+                              const SizedBox(width: 12),
                           itemBuilder: (_, i) =>
                               _ExperienceMiniCard(experience: experiences[i]),
                         ),
@@ -76,7 +78,8 @@ class CareerProfileCardView extends StatelessWidget {
                           padding: const EdgeInsets.symmetric(horizontal: 20),
                           scrollDirection: Axis.horizontal,
                           itemCount: educations.length,
-                          separatorBuilder: (_, __) => const SizedBox(width: 12),
+                          separatorBuilder: (_, _) =>
+                              const SizedBox(width: 12),
                           itemBuilder: (_, i) =>
                               _EducationMiniCard(education: educations[i]),
                         ),
@@ -87,12 +90,16 @@ class CareerProfileCardView extends StatelessWidget {
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 20),
                   child: card.skills.isEmpty
-                      ? const Text("Henüz yetenek eklenmedi",
-                          style: TextStyle(color: Colors.white38, fontSize: 13))
+                      ? const Text(
+                          "Henüz yetenek eklenmedi",
+                          style: TextStyle(color: Colors.white38, fontSize: 13),
+                        )
                       : Wrap(
                           spacing: 8,
                           runSpacing: 8,
-                          children: card.skills.map((s) => _SkillChip(skill: s)).toList(),
+                          children: card.skills
+                              .map((s) => _SkillChip(skill: s))
+                              .toList(),
                         ),
                 ),
               ],
@@ -116,17 +123,27 @@ class _Header extends StatelessWidget {
       children: [
         const Row(
           children: [
-            Icon(Icons.work_outline,
-                color: CareerProfileCardView.moduleAccent, size: 20),
+            Icon(
+              Icons.work_outline,
+              color: CareerProfileCardView.moduleAccent,
+              size: 20,
+            ),
             SizedBox(width: 8),
-            Text("Kariyer", style: TextStyle(color: Colors.white54, fontSize: 14)),
+            Text(
+              "Kariyer",
+              style: TextStyle(color: Colors.white54, fontSize: 14),
+            ),
           ],
         ),
         const SizedBox(height: 6),
         Text(
           headline.isNotEmpty ? headline : "Kariyer bilgisi eklenmedi",
           style: const TextStyle(
-              color: Colors.white, fontSize: 24, fontWeight: FontWeight.w700, height: 1.15),
+            color: Colors.white,
+            fontSize: 24,
+            fontWeight: FontWeight.w700,
+            height: 1.15,
+          ),
         ),
         if (current != null) ...[
           const SizedBox(height: 6),
@@ -148,9 +165,14 @@ class _SectionLabel extends StatelessWidget {
   Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 20),
-      child: Text(text,
-          style: const TextStyle(
-              color: Colors.white70, fontSize: 15, fontWeight: FontWeight.w600)),
+      child: Text(
+        text,
+        style: const TextStyle(
+          color: Colors.white70,
+          fontSize: 15,
+          fontWeight: FontWeight.w600,
+        ),
+      ),
     );
   }
 }
@@ -165,7 +187,10 @@ class _EmptyHint extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 20),
       child: Align(
         alignment: Alignment.centerLeft,
-        child: Text(text, style: const TextStyle(color: Colors.white38, fontSize: 13)),
+        child: Text(
+          text,
+          style: const TextStyle(color: Colors.white38, fontSize: 13),
+        ),
       ),
     );
   }
@@ -195,34 +220,52 @@ class _ExperienceMiniCard extends StatelessWidget {
               Icon(Icons.apartment_outlined, color: color, size: 16),
               const SizedBox(width: 6),
               Expanded(
-                child: Text(experience.company,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    style: const TextStyle(
-                        color: Colors.white70, fontSize: 12, fontWeight: FontWeight.w600)),
+                child: Text(
+                  experience.company,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: const TextStyle(
+                    color: Colors.white70,
+                    fontSize: 12,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
               ),
               if (experience.isCurrent) const _CurrentBadge(),
             ],
           ),
           const SizedBox(height: 6),
-          Text(experience.title,
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-              style: const TextStyle(
-                  color: Colors.white, fontSize: 15, fontWeight: FontWeight.w700)),
+          Text(
+            experience.title,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            style: const TextStyle(
+              color: Colors.white,
+              fontSize: 15,
+              fontWeight: FontWeight.w700,
+            ),
+          ),
           const SizedBox(height: 4),
-          Text(experience.employmentType.label,
-              style: TextStyle(color: color, fontSize: 11, fontWeight: FontWeight.w600)),
+          Text(
+            experience.employmentType.label,
+            style: TextStyle(
+              color: color,
+              fontSize: 11,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
           const Spacer(),
           Text(
             "${_formatMonth(experience.startDate)} - "
             "${experience.endDate != null ? _formatMonth(experience.endDate!) : 'Günümüz'}",
             style: const TextStyle(color: Colors.white70, fontSize: 12),
           ),
-          Text(experience.location,
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-              style: const TextStyle(color: Colors.white38, fontSize: 11)),
+          Text(
+            experience.location,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            style: const TextStyle(color: Colors.white38, fontSize: 11),
+          ),
         ],
       ),
     );
@@ -240,9 +283,14 @@ class _CurrentBadge extends StatelessWidget {
         color: const Color(0xFF7FD98A).withValues(alpha: 0.22),
         borderRadius: BorderRadius.circular(20),
       ),
-      child: const Text("Devam ediyor",
-          style: TextStyle(
-              color: Color(0xFF7FD98A), fontSize: 9, fontWeight: FontWeight.w600)),
+      child: const Text(
+        "Devam ediyor",
+        style: TextStyle(
+          color: Color(0xFF7FD98A),
+          fontSize: 9,
+          fontWeight: FontWeight.w600,
+        ),
+      ),
     );
   }
 }
@@ -268,16 +316,23 @@ class _EducationMiniCard extends StatelessWidget {
         children: [
           Icon(Icons.school_outlined, color: color, size: 18),
           const SizedBox(height: 8),
-          Text(education.school,
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-              style: const TextStyle(
-                  color: Colors.white, fontWeight: FontWeight.w700, fontSize: 14)),
+          Text(
+            education.school,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            style: const TextStyle(
+              color: Colors.white,
+              fontWeight: FontWeight.w700,
+              fontSize: 14,
+            ),
+          ),
           const SizedBox(height: 2),
-          Text("${education.degree} · ${education.fieldOfStudy}",
-              maxLines: 2,
-              overflow: TextOverflow.ellipsis,
-              style: const TextStyle(color: Colors.white70, fontSize: 12)),
+          Text(
+            "${education.degree} · ${education.fieldOfStudy}",
+            maxLines: 2,
+            overflow: TextOverflow.ellipsis,
+            style: const TextStyle(color: Colors.white70, fontSize: 12),
+          ),
           const Spacer(),
           Text(
             "${education.startDate.year} - "
@@ -302,12 +357,16 @@ class _SkillChip extends StatelessWidget {
         color: CareerProfileCardView.moduleAccent.withValues(alpha: 0.16),
         borderRadius: BorderRadius.circular(20),
         border: Border.all(
-            color: CareerProfileCardView.moduleAccent.withValues(alpha: 0.4)),
+          color: CareerProfileCardView.moduleAccent.withValues(alpha: 0.4),
+        ),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Text(skill.name, style: const TextStyle(color: Colors.white, fontSize: 13)),
+          Text(
+            skill.name,
+            style: const TextStyle(color: Colors.white, fontSize: 13),
+          ),
           const SizedBox(width: 8),
           SizedBox(
             width: 36,
@@ -343,8 +402,18 @@ Color _companyColor(String seed) {
 
 String _formatMonth(DateTime d) {
   const months = [
-    "Oca", "Şub", "Mar", "Nis", "May", "Haz",
-    "Tem", "Ağu", "Eyl", "Eki", "Kas", "Ara",
+    "Oca",
+    "Şub",
+    "Mar",
+    "Nis",
+    "May",
+    "Haz",
+    "Tem",
+    "Ağu",
+    "Eyl",
+    "Eki",
+    "Kas",
+    "Ara",
   ];
   return "${months[d.month - 1]} ${d.year}";
 }

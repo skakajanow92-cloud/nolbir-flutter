@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../../models/feed_card/feed_card.dart';
 import '../../../models/engagement.dart';
+import '../../../core/widgets/page_aware_scroll_view.dart';
 
 /// Etkileşim Analizi Profili — yedinci profil modülü.
 ///
@@ -37,7 +38,7 @@ class EngagementProfileCardView extends StatelessWidget {
           ),
         ),
         child: SafeArea(
-          child: SingleChildScrollView(
+          child: PageAwareScrollView(
             padding: const EdgeInsets.only(bottom: 24),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -54,7 +55,8 @@ class EngagementProfileCardView extends StatelessWidget {
                 ),
                 const SizedBox(height: 24),
                 _SectionLabel(
-                    text: "Referanslar & Tavsiyeler (${card.referrals.length})"),
+                  text: "Referanslar & Tavsiyeler (${card.referrals.length})",
+                ),
                 const SizedBox(height: 10),
                 SizedBox(
                   height: 128,
@@ -64,14 +66,17 @@ class EngagementProfileCardView extends StatelessWidget {
                           padding: const EdgeInsets.symmetric(horizontal: 20),
                           scrollDirection: Axis.horizontal,
                           itemCount: card.referrals.length,
-                          separatorBuilder: (_, __) => const SizedBox(width: 12),
+                          separatorBuilder: (_, __) =>
+                              const SizedBox(width: 12),
                           itemBuilder: (_, i) =>
                               _ReferralMiniCard(referral: card.referrals[i]),
                         ),
                 ),
                 const SizedBox(height: 24),
                 _SectionLabel(
-                    text: "En Çok Tartışılan Gönderiler (${card.topDiscussions.length})"),
+                  text:
+                      "En Çok Tartışılan Gönderiler (${card.topDiscussions.length})",
+                ),
                 const SizedBox(height: 10),
                 SizedBox(
                   height: 140,
@@ -81,9 +86,11 @@ class EngagementProfileCardView extends StatelessWidget {
                           padding: const EdgeInsets.symmetric(horizontal: 20),
                           scrollDirection: Axis.horizontal,
                           itemCount: card.topDiscussions.length,
-                          separatorBuilder: (_, __) => const SizedBox(width: 12),
-                          itemBuilder: (_, i) =>
-                              _DiscussionMiniCard(discussion: card.topDiscussions[i]),
+                          separatorBuilder: (_, __) =>
+                              const SizedBox(width: 12),
+                          itemBuilder: (_, i) => _DiscussionMiniCard(
+                            discussion: card.topDiscussions[i],
+                          ),
                         ),
                 ),
               ],
@@ -106,10 +113,16 @@ class _Header extends StatelessWidget {
       children: [
         const Row(
           children: [
-            Icon(Icons.insights_outlined,
-                color: EngagementProfileCardView.moduleAccent, size: 20),
+            Icon(
+              Icons.insights_outlined,
+              color: EngagementProfileCardView.moduleAccent,
+              size: 20,
+            ),
             SizedBox(width: 8),
-            Text("Etkileşim", style: TextStyle(color: Colors.white54, fontSize: 14)),
+            Text(
+              "Etkileşim",
+              style: TextStyle(color: Colors.white54, fontSize: 14),
+            ),
           ],
         ),
         const SizedBox(height: 6),
@@ -119,23 +132,36 @@ class _Header extends StatelessWidget {
             Text(
               "${summary.followerCount}",
               style: const TextStyle(
-                  color: Colors.white, fontSize: 30, fontWeight: FontWeight.w700, height: 1.1),
+                color: Colors.white,
+                fontSize: 30,
+                fontWeight: FontWeight.w700,
+                height: 1.1,
+              ),
             ),
             const SizedBox(width: 6),
             const Padding(
               padding: EdgeInsets.only(bottom: 5),
-              child: Text("takipçi", style: TextStyle(color: Colors.white38, fontSize: 13)),
+              child: Text(
+                "takipçi",
+                style: TextStyle(color: Colors.white38, fontSize: 13),
+              ),
             ),
             const SizedBox(width: 16),
             Text(
               "${summary.followingCount}",
               style: const TextStyle(
-                  color: Colors.white70, fontSize: 20, fontWeight: FontWeight.w600),
+                color: Colors.white70,
+                fontSize: 20,
+                fontWeight: FontWeight.w600,
+              ),
             ),
             const SizedBox(width: 6),
             const Padding(
               padding: EdgeInsets.only(bottom: 3),
-              child: Text("takip", style: TextStyle(color: Colors.white38, fontSize: 13)),
+              child: Text(
+                "takip",
+                style: TextStyle(color: Colors.white38, fontSize: 13),
+              ),
             ),
           ],
         ),
@@ -180,15 +206,24 @@ class _StatChip extends StatelessWidget {
         color: EngagementProfileCardView.moduleAccent.withValues(alpha: 0.14),
         borderRadius: BorderRadius.circular(14),
         border: Border.all(
-            color: EngagementProfileCardView.moduleAccent.withValues(alpha: 0.35)),
+          color: EngagementProfileCardView.moduleAccent.withValues(alpha: 0.35),
+        ),
       ),
       child: Column(
         children: [
-          Text(value,
-              style: const TextStyle(
-                  color: Colors.white, fontSize: 16, fontWeight: FontWeight.w700)),
+          Text(
+            value,
+            style: const TextStyle(
+              color: Colors.white,
+              fontSize: 16,
+              fontWeight: FontWeight.w700,
+            ),
+          ),
           const SizedBox(height: 2),
-          Text(label, style: const TextStyle(color: Colors.white54, fontSize: 11)),
+          Text(
+            label,
+            style: const TextStyle(color: Colors.white54, fontSize: 11),
+          ),
         ],
       ),
     );
@@ -203,9 +238,14 @@ class _SectionLabel extends StatelessWidget {
   Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 20),
-      child: Text(text,
-          style: const TextStyle(
-              color: Colors.white70, fontSize: 15, fontWeight: FontWeight.w600)),
+      child: Text(
+        text,
+        style: const TextStyle(
+          color: Colors.white70,
+          fontSize: 15,
+          fontWeight: FontWeight.w600,
+        ),
+      ),
     );
   }
 }
@@ -220,7 +260,10 @@ class _EmptyHint extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 20),
       child: Align(
         alignment: Alignment.centerLeft,
-        child: Text(text, style: const TextStyle(color: Colors.white38, fontSize: 13)),
+        child: Text(
+          text,
+          style: const TextStyle(color: Colors.white38, fontSize: 13),
+        ),
       ),
     );
   }
@@ -250,27 +293,42 @@ class _ReferralMiniCard extends StatelessWidget {
               Icon(_iconFor(referral.type), color: color, size: 16),
               const SizedBox(width: 6),
               Expanded(
-                child: Text("@${referral.fromUsername}",
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    style: const TextStyle(
-                        color: Colors.white, fontWeight: FontWeight.w600, fontSize: 13)),
+                child: Text(
+                  "@${referral.fromUsername}",
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontWeight: FontWeight.w600,
+                    fontSize: 13,
+                  ),
+                ),
               ),
             ],
           ),
           const SizedBox(height: 6),
-          Text(referral.type.label,
-              style: TextStyle(color: color, fontSize: 11, fontWeight: FontWeight.w600)),
+          Text(
+            referral.type.label,
+            style: TextStyle(
+              color: color,
+              fontSize: 11,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
           if (referral.note != null) ...[
             const SizedBox(height: 6),
-            Text(referral.note!,
-                maxLines: 2,
-                overflow: TextOverflow.ellipsis,
-                style: const TextStyle(color: Colors.white70, fontSize: 12)),
+            Text(
+              referral.note!,
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
+              style: const TextStyle(color: Colors.white70, fontSize: 12),
+            ),
           ],
           const Spacer(),
-          Text(_formatDate(referral.date),
-              style: const TextStyle(color: Colors.white38, fontSize: 11)),
+          Text(
+            _formatDate(referral.date),
+            style: const TextStyle(color: Colors.white38, fontSize: 11),
+          ),
         ],
       ),
     );
@@ -296,18 +354,25 @@ class _DiscussionMiniCard extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(discussion.postCaption,
-              maxLines: 2,
-              overflow: TextOverflow.ellipsis,
-              style: const TextStyle(
-                  color: Colors.white, fontWeight: FontWeight.w700, fontSize: 14)),
+          Text(
+            discussion.postCaption,
+            maxLines: 2,
+            overflow: TextOverflow.ellipsis,
+            style: const TextStyle(
+              color: Colors.white,
+              fontWeight: FontWeight.w700,
+              fontSize: 14,
+            ),
+          ),
           const Spacer(),
           Row(
             children: [
               Icon(Icons.mode_comment_outlined, color: color, size: 14),
               const SizedBox(width: 4),
-              Text("${discussion.commentCount} yorum",
-                  style: const TextStyle(color: Colors.white70, fontSize: 12)),
+              Text(
+                "${discussion.commentCount} yorum",
+                style: const TextStyle(color: Colors.white70, fontSize: 12),
+              ),
             ],
           ),
           const SizedBox(height: 4),
@@ -315,13 +380,17 @@ class _DiscussionMiniCard extends StatelessWidget {
             children: [
               Icon(Icons.forum_outlined, color: color, size: 14),
               const SizedBox(width: 4),
-              Text("${discussion.replyCount} tartışma",
-                  style: const TextStyle(color: Colors.white70, fontSize: 12)),
+              Text(
+                "${discussion.replyCount} tartışma",
+                style: const TextStyle(color: Colors.white70, fontSize: 12),
+              ),
             ],
           ),
           const SizedBox(height: 4),
-          Text("${_formatCompact(discussion.impressionCount)} izlenim",
-              style: const TextStyle(color: Colors.white38, fontSize: 11)),
+          Text(
+            "${_formatCompact(discussion.impressionCount)} izlenim",
+            style: const TextStyle(color: Colors.white38, fontSize: 11),
+          ),
         ],
       ),
     );
@@ -329,10 +398,10 @@ class _DiscussionMiniCard extends StatelessWidget {
 }
 
 IconData _iconFor(ReferralType type) => switch (type) {
-      ReferralType.mention => Icons.alternate_email,
-      ReferralType.recommendation => Icons.thumb_up_outlined,
-      ReferralType.share => Icons.ios_share,
-    };
+  ReferralType.mention => Icons.alternate_email,
+  ReferralType.recommendation => Icons.thumb_up_outlined,
+  ReferralType.share => Icons.ios_share,
+};
 
 // Kişi/gönderi başına sabit, elle seçilmiş uyumlu bir palet (bkz. diğer
 // modüllerdeki aynı yaklaşım).

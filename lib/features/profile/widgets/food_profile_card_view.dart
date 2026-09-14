@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../../models/feed_card/feed_card.dart';
 import '../../../models/food.dart';
+import '../../../core/widgets/page_aware_scroll_view.dart';
 
 /// Yemek Profili — altıncı profil modülü.
 ///
@@ -42,7 +43,7 @@ class FoodProfileCardView extends StatelessWidget {
           ),
         ),
         child: SafeArea(
-          child: SingleChildScrollView(
+          child: PageAwareScrollView(
             padding: const EdgeInsets.only(bottom: 24),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -58,8 +59,10 @@ class FoodProfileCardView extends StatelessWidget {
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 20),
                   child: card.favoriteFoods.isEmpty
-                      ? const Text("Henüz favori yemek eklenmedi",
-                          style: TextStyle(color: Colors.white38, fontSize: 13))
+                      ? const Text(
+                          "Henüz favori yemek eklenmedi",
+                          style: TextStyle(color: Colors.white38, fontSize: 13),
+                        )
                       : Wrap(
                           spacing: 8,
                           runSpacing: 8,
@@ -69,7 +72,9 @@ class FoodProfileCardView extends StatelessWidget {
                         ),
                 ),
                 const SizedBox(height: 24),
-                _SectionLabel(text: "Favori Mekanlar (${card.favoriteRestaurants.length})"),
+                _SectionLabel(
+                  text: "Favori Mekanlar (${card.favoriteRestaurants.length})",
+                ),
                 const SizedBox(height: 10),
                 SizedBox(
                   height: 128,
@@ -79,13 +84,17 @@ class FoodProfileCardView extends StatelessWidget {
                           padding: const EdgeInsets.symmetric(horizontal: 20),
                           scrollDirection: Axis.horizontal,
                           itemCount: card.favoriteRestaurants.length,
-                          separatorBuilder: (_, __) => const SizedBox(width: 12),
-                          itemBuilder: (_, i) =>
-                              _RestaurantMiniCard(restaurant: card.favoriteRestaurants[i]),
+                          separatorBuilder: (_, _) =>
+                              const SizedBox(width: 12),
+                          itemBuilder: (_, i) => _RestaurantMiniCard(
+                            restaurant: card.favoriteRestaurants[i],
+                          ),
                         ),
                 ),
                 const SizedBox(height: 24),
-                _SectionLabel(text: "Düzenli Siparişlerim (${card.recurringOrders.length})"),
+                _SectionLabel(
+                  text: "Düzenli Siparişlerim (${card.recurringOrders.length})",
+                ),
                 const SizedBox(height: 10),
                 SizedBox(
                   height: 108,
@@ -95,13 +104,16 @@ class FoodProfileCardView extends StatelessWidget {
                           padding: const EdgeInsets.symmetric(horizontal: 20),
                           scrollDirection: Axis.horizontal,
                           itemCount: card.recurringOrders.length,
-                          separatorBuilder: (_, __) => const SizedBox(width: 12),
+                          separatorBuilder: (_, _) =>
+                              const SizedBox(width: 12),
                           itemBuilder: (_, i) =>
                               _OrderMiniCard(order: card.recurringOrders[i]),
                         ),
                 ),
                 const SizedBox(height: 24),
-                _SectionLabel(text: "Kafe Kartlarım (${card.loyaltyCards.length})"),
+                _SectionLabel(
+                  text: "Kafe Kartlarım (${card.loyaltyCards.length})",
+                ),
                 const SizedBox(height: 10),
                 SizedBox(
                   height: 128,
@@ -111,9 +123,11 @@ class FoodProfileCardView extends StatelessWidget {
                           padding: const EdgeInsets.symmetric(horizontal: 20),
                           scrollDirection: Axis.horizontal,
                           itemCount: card.loyaltyCards.length,
-                          separatorBuilder: (_, __) => const SizedBox(width: 12),
-                          itemBuilder: (_, i) =>
-                              _LoyaltyMiniCard(loyaltyCard: card.loyaltyCards[i]),
+                          separatorBuilder: (_, _) =>
+                              const SizedBox(width: 12),
+                          itemBuilder: (_, i) => _LoyaltyMiniCard(
+                            loyaltyCard: card.loyaltyCards[i],
+                          ),
                         ),
                 ),
               ],
@@ -136,17 +150,27 @@ class _Header extends StatelessWidget {
       children: [
         const Row(
           children: [
-            Icon(Icons.restaurant_menu_outlined,
-                color: FoodProfileCardView.moduleAccent, size: 20),
+            Icon(
+              Icons.restaurant_menu_outlined,
+              color: FoodProfileCardView.moduleAccent,
+              size: 20,
+            ),
             SizedBox(width: 8),
-            Text("Yemek", style: TextStyle(color: Colors.white54, fontSize: 14)),
+            Text(
+              "Yemek",
+              style: TextStyle(color: Colors.white54, fontSize: 14),
+            ),
           ],
         ),
         const SizedBox(height: 6),
         Text(
           "$placeCount favori mekan",
           style: const TextStyle(
-              color: Colors.white, fontSize: 30, fontWeight: FontWeight.w700, height: 1.1),
+            color: Colors.white,
+            fontSize: 30,
+            fontWeight: FontWeight.w700,
+            height: 1.1,
+          ),
         ),
       ],
     );
@@ -161,9 +185,14 @@ class _SectionLabel extends StatelessWidget {
   Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 20),
-      child: Text(text,
-          style: const TextStyle(
-              color: Colors.white70, fontSize: 15, fontWeight: FontWeight.w600)),
+      child: Text(
+        text,
+        style: const TextStyle(
+          color: Colors.white70,
+          fontSize: 15,
+          fontWeight: FontWeight.w600,
+        ),
+      ),
     );
   }
 }
@@ -178,7 +207,10 @@ class _EmptyHint extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 20),
       child: Align(
         alignment: Alignment.centerLeft,
-        child: Text(text, style: const TextStyle(color: Colors.white38, fontSize: 13)),
+        child: Text(
+          text,
+          style: const TextStyle(color: Colors.white38, fontSize: 13),
+        ),
       ),
     );
   }
@@ -196,7 +228,8 @@ class _FoodChip extends StatelessWidget {
         color: FoodProfileCardView.moduleAccent.withValues(alpha: 0.16),
         borderRadius: BorderRadius.circular(20),
         border: Border.all(
-            color: FoodProfileCardView.moduleAccent.withValues(alpha: 0.4)),
+          color: FoodProfileCardView.moduleAccent.withValues(alpha: 0.4),
+        ),
       ),
       child: Text(
         food.cuisine != null ? "${food.name} · ${food.cuisine}" : food.name,
@@ -226,20 +259,29 @@ class _RestaurantMiniCard extends StatelessWidget {
         children: [
           Icon(Icons.storefront_outlined, color: color, size: 18),
           const Spacer(),
-          Text(restaurant.name,
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-              style: const TextStyle(
-                  color: Colors.white, fontWeight: FontWeight.w600, fontSize: 14)),
+          Text(
+            restaurant.name,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            style: const TextStyle(
+              color: Colors.white,
+              fontWeight: FontWeight.w600,
+              fontSize: 14,
+            ),
+          ),
           const SizedBox(height: 2),
-          Text(restaurant.cuisine,
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-              style: const TextStyle(color: Colors.white70, fontSize: 12)),
-          Text(restaurant.location,
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-              style: const TextStyle(color: Colors.white38, fontSize: 11)),
+          Text(
+            restaurant.cuisine,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            style: const TextStyle(color: Colors.white70, fontSize: 12),
+          ),
+          Text(
+            restaurant.location,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            style: const TextStyle(color: Colors.white38, fontSize: 11),
+          ),
         ],
       ),
     );
@@ -269,23 +311,39 @@ class _OrderMiniCard extends StatelessWidget {
               Icon(Icons.repeat, color: color, size: 16),
               const SizedBox(width: 6),
               Expanded(
-                child: Text(order.restaurantName,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    style: const TextStyle(
-                        color: Colors.white70, fontSize: 12, fontWeight: FontWeight.w600)),
+                child: Text(
+                  order.restaurantName,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: const TextStyle(
+                    color: Colors.white70,
+                    fontSize: 12,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
               ),
             ],
           ),
           const SizedBox(height: 6),
-          Text(order.orderDescription,
-              maxLines: 2,
-              overflow: TextOverflow.ellipsis,
-              style: const TextStyle(
-                  color: Colors.white, fontSize: 14, fontWeight: FontWeight.w700)),
+          Text(
+            order.orderDescription,
+            maxLines: 2,
+            overflow: TextOverflow.ellipsis,
+            style: const TextStyle(
+              color: Colors.white,
+              fontSize: 14,
+              fontWeight: FontWeight.w700,
+            ),
+          ),
           const Spacer(),
-          Text(order.frequency,
-              style: TextStyle(color: color, fontSize: 11, fontWeight: FontWeight.w600)),
+          Text(
+            order.frequency,
+            style: TextStyle(
+              color: color,
+              fontSize: 11,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
         ],
       ),
     );
@@ -316,13 +374,22 @@ class _LoyaltyMiniCard extends StatelessWidget {
           Row(
             children: [
               Expanded(
-                child: Text(loyaltyCard.cafeName,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    style: const TextStyle(
-                        color: Colors.white, fontWeight: FontWeight.w600, fontSize: 13)),
+                child: Text(
+                  loyaltyCard.cafeName,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontWeight: FontWeight.w600,
+                    fontSize: 13,
+                  ),
+                ),
               ),
-              const Icon(Icons.local_cafe_outlined, color: Colors.white70, size: 16),
+              const Icon(
+                Icons.local_cafe_outlined,
+                color: Colors.white70,
+                size: 16,
+              ),
             ],
           ),
           const Spacer(),
@@ -345,14 +412,19 @@ class _LoyaltyMiniCard extends StatelessWidget {
             Text(
               "%${loyaltyCard.discountPercent!.toStringAsFixed(0)} indirim",
               style: const TextStyle(
-                  color: Colors.white, fontSize: 15, fontWeight: FontWeight.w700),
+                color: Colors.white,
+                fontSize: 15,
+                fontWeight: FontWeight.w700,
+              ),
             ),
           if (loyaltyCard.rewardDescription != null) ...[
             const SizedBox(height: 4),
-            Text(loyaltyCard.rewardDescription!,
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-                style: const TextStyle(color: Colors.white54, fontSize: 11)),
+            Text(
+              loyaltyCard.rewardDescription!,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: const TextStyle(color: Colors.white54, fontSize: 11),
+            ),
           ],
         ],
       ),
