@@ -6,6 +6,7 @@ import 'user_post_card_view.dart';
 import 'wallet_profile_card_view.dart';
 import 'insurance_profile_card_view.dart';
 import 'travel_profile_card_view.dart';
+import 'accommodation_profile_card_view.dart';
 
 void registerProfileCardViews() {
   CardViewRegistry.register<ProfileHeaderCard>(
@@ -31,6 +32,12 @@ void registerProfileCardViews() {
         TravelProfileCardView(card: card as TravelProfileCard),
   );
   ProfileModuleOrder.register<TravelProfileCard>();
+
+  CardViewRegistry.register<AccommodationProfileCard>(
+    (context, card, isActive) =>
+        AccommodationProfileCardView(card: card as AccommodationProfileCard),
+  );
+  ProfileModuleOrder.register<AccommodationProfileCard>();
 
   CardViewRegistry.register<UserPostCard>(
     (context, card, isActive) => UserPostCardView(card: card as UserPostCard),
