@@ -19,23 +19,27 @@ final discoveryRepositoryProvider = DiscoveryRepositoryProvider._();
 /// geçerken burada `overrideWithValue` ile mock/gerçek repository'yi
 /// değiştirebilirsin — geri kalan hiçbir şeye dokunmadan.
 
-final class DiscoveryRepositoryProvider extends $FunctionalProvider<
-    DiscoveryRepository,
-    DiscoveryRepository,
-    DiscoveryRepository> with $Provider<DiscoveryRepository> {
+final class DiscoveryRepositoryProvider
+    extends
+        $FunctionalProvider<
+          DiscoveryRepository,
+          DiscoveryRepository,
+          DiscoveryRepository
+        >
+    with $Provider<DiscoveryRepository> {
   /// Repository'yi enjekte eden provider. Test ederken veya gerçek API'ye
   /// geçerken burada `overrideWithValue` ile mock/gerçek repository'yi
   /// değiştirebilirsin — geri kalan hiçbir şeye dokunmadan.
   DiscoveryRepositoryProvider._()
-      : super(
-          from: null,
-          argument: null,
-          retry: null,
-          name: r'discoveryRepositoryProvider',
-          isAutoDispose: true,
-          dependencies: null,
-          $allTransitiveDependencies: null,
-        );
+    : super(
+        from: null,
+        argument: null,
+        retry: null,
+        name: r'discoveryRepositoryProvider',
+        isAutoDispose: true,
+        dependencies: null,
+        $allTransitiveDependencies: null,
+      );
 
   @override
   String debugGetCreateSourceHash() => _$discoveryRepositoryHash();
@@ -43,8 +47,8 @@ final class DiscoveryRepositoryProvider extends $FunctionalProvider<
   @$internal
   @override
   $ProviderElement<DiscoveryRepository> $createElement(
-          $ProviderPointer pointer) =>
-      $ProviderElement(pointer);
+    $ProviderPointer pointer,
+  ) => $ProviderElement(pointer);
 
   @override
   DiscoveryRepository create(Ref ref) {
@@ -76,15 +80,15 @@ final class DiscoveryFeedProvider
   /// Orta tab'ın state'i: kart listesi + sayfalama.
   /// `VerticalCardFeed.onReachEnd` bu notifier'ın `loadMore()` metodunu çağırır.
   DiscoveryFeedProvider._()
-      : super(
-          from: null,
-          argument: null,
-          retry: null,
-          name: r'discoveryFeedProvider',
-          isAutoDispose: true,
-          dependencies: null,
-          $allTransitiveDependencies: null,
-        );
+    : super(
+        from: null,
+        argument: null,
+        retry: null,
+        name: r'discoveryFeedProvider',
+        isAutoDispose: true,
+        dependencies: null,
+        $allTransitiveDependencies: null,
+      );
 
   @override
   String debugGetCreateSourceHash() => _$discoveryFeedHash();
@@ -105,11 +109,14 @@ abstract class _$DiscoveryFeed extends $AsyncNotifier<List<FeedCard>> {
   @override
   WhenComplete runBuild() {
     final ref = this.ref as $Ref<AsyncValue<List<FeedCard>>, List<FeedCard>>;
-    final element = ref.element as $ClassProviderElement<
-        AnyNotifier<AsyncValue<List<FeedCard>>, List<FeedCard>>,
-        AsyncValue<List<FeedCard>>,
-        Object?,
-        Object?>;
+    final element =
+        ref.element
+            as $ClassProviderElement<
+              AnyNotifier<AsyncValue<List<FeedCard>>, List<FeedCard>>,
+              AsyncValue<List<FeedCard>>,
+              Object?,
+              Object?
+            >;
     return element.handleCreate(ref, build);
   }
 }

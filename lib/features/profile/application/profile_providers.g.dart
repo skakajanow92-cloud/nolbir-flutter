@@ -12,20 +12,24 @@ part of 'profile_providers.dart';
 @ProviderFor(profileRepository)
 final profileRepositoryProvider = ProfileRepositoryProvider._();
 
-final class ProfileRepositoryProvider extends $FunctionalProvider<
-    ProfileRepository,
-    ProfileRepository,
-    ProfileRepository> with $Provider<ProfileRepository> {
+final class ProfileRepositoryProvider
+    extends
+        $FunctionalProvider<
+          ProfileRepository,
+          ProfileRepository,
+          ProfileRepository
+        >
+    with $Provider<ProfileRepository> {
   ProfileRepositoryProvider._()
-      : super(
-          from: null,
-          argument: null,
-          retry: null,
-          name: r'profileRepositoryProvider',
-          isAutoDispose: true,
-          dependencies: null,
-          $allTransitiveDependencies: null,
-        );
+    : super(
+        from: null,
+        argument: null,
+        retry: null,
+        name: r'profileRepositoryProvider',
+        isAutoDispose: true,
+        dependencies: null,
+        $allTransitiveDependencies: null,
+      );
 
   @override
   String debugGetCreateSourceHash() => _$profileRepositoryHash();
@@ -33,8 +37,8 @@ final class ProfileRepositoryProvider extends $FunctionalProvider<
   @$internal
   @override
   $ProviderElement<ProfileRepository> $createElement(
-          $ProviderPointer pointer) =>
-      $ProviderElement(pointer);
+    $ProviderPointer pointer,
+  ) => $ProviderElement(pointer);
 
   @override
   ProfileRepository create(Ref ref) {
@@ -65,15 +69,15 @@ final class ProfileFeedProvider
   /// Şu an sabit "mevcut kullanıcı" — auth katmanı eklenince
   /// gerçek userId buradan (örn. authStateProvider) okunacak.
   ProfileFeedProvider._()
-      : super(
-          from: null,
-          argument: null,
-          retry: null,
-          name: r'profileFeedProvider',
-          isAutoDispose: true,
-          dependencies: null,
-          $allTransitiveDependencies: null,
-        );
+    : super(
+        from: null,
+        argument: null,
+        retry: null,
+        name: r'profileFeedProvider',
+        isAutoDispose: true,
+        dependencies: null,
+        $allTransitiveDependencies: null,
+      );
 
   @override
   String debugGetCreateSourceHash() => _$profileFeedHash();
@@ -83,7 +87,7 @@ final class ProfileFeedProvider
   ProfileFeed create() => ProfileFeed();
 }
 
-String _$profileFeedHash() => r'd26e29e1368728e0d75bfda43600efd715de7fae';
+String _$profileFeedHash() => r'831482af06ddd83cd3b7632d0c1725e71a320cda';
 
 /// Şu an sabit "mevcut kullanıcı" — auth katmanı eklenince
 /// gerçek userId buradan (örn. authStateProvider) okunacak.
@@ -94,11 +98,14 @@ abstract class _$ProfileFeed extends $AsyncNotifier<List<FeedCard>> {
   @override
   WhenComplete runBuild() {
     final ref = this.ref as $Ref<AsyncValue<List<FeedCard>>, List<FeedCard>>;
-    final element = ref.element as $ClassProviderElement<
-        AnyNotifier<AsyncValue<List<FeedCard>>, List<FeedCard>>,
-        AsyncValue<List<FeedCard>>,
-        Object?,
-        Object?>;
+    final element =
+        ref.element
+            as $ClassProviderElement<
+              AnyNotifier<AsyncValue<List<FeedCard>>, List<FeedCard>>,
+              AsyncValue<List<FeedCard>>,
+              Object?,
+              Object?
+            >;
     return element.handleCreate(ref, build);
   }
 }

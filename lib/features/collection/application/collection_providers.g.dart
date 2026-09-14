@@ -12,20 +12,24 @@ part of 'collection_providers.dart';
 @ProviderFor(collectionRepository)
 final collectionRepositoryProvider = CollectionRepositoryProvider._();
 
-final class CollectionRepositoryProvider extends $FunctionalProvider<
-    CollectionRepository,
-    CollectionRepository,
-    CollectionRepository> with $Provider<CollectionRepository> {
+final class CollectionRepositoryProvider
+    extends
+        $FunctionalProvider<
+          CollectionRepository,
+          CollectionRepository,
+          CollectionRepository
+        >
+    with $Provider<CollectionRepository> {
   CollectionRepositoryProvider._()
-      : super(
-          from: null,
-          argument: null,
-          retry: null,
-          name: r'collectionRepositoryProvider',
-          isAutoDispose: true,
-          dependencies: null,
-          $allTransitiveDependencies: null,
-        );
+    : super(
+        from: null,
+        argument: null,
+        retry: null,
+        name: r'collectionRepositoryProvider',
+        isAutoDispose: true,
+        dependencies: null,
+        $allTransitiveDependencies: null,
+      );
 
   @override
   String debugGetCreateSourceHash() => _$collectionRepositoryHash();
@@ -33,8 +37,8 @@ final class CollectionRepositoryProvider extends $FunctionalProvider<
   @$internal
   @override
   $ProviderElement<CollectionRepository> $createElement(
-          $ProviderPointer pointer) =>
-      $ProviderElement(pointer);
+    $ProviderPointer pointer,
+  ) => $ProviderElement(pointer);
 
   @override
   CollectionRepository create(Ref ref) {
@@ -66,15 +70,15 @@ final class CollectionFeedProvider
   /// Sağ tab'ın state'i. Diğer tab'lardan farkı: kullanıcı burada
   /// veriyi değiştirebiliyor (ekle/çıkar), sadece okumuyor.
   CollectionFeedProvider._()
-      : super(
-          from: null,
-          argument: null,
-          retry: null,
-          name: r'collectionFeedProvider',
-          isAutoDispose: true,
-          dependencies: null,
-          $allTransitiveDependencies: null,
-        );
+    : super(
+        from: null,
+        argument: null,
+        retry: null,
+        name: r'collectionFeedProvider',
+        isAutoDispose: true,
+        dependencies: null,
+        $allTransitiveDependencies: null,
+      );
 
   @override
   String debugGetCreateSourceHash() => _$collectionFeedHash();
@@ -95,14 +99,23 @@ abstract class _$CollectionFeed
   @$mustCallSuper
   @override
   WhenComplete runBuild() {
-    final ref = this.ref
-        as $Ref<AsyncValue<List<CollectionItemCard>>, List<CollectionItemCard>>;
-    final element = ref.element as $ClassProviderElement<
-        AnyNotifier<AsyncValue<List<CollectionItemCard>>,
-            List<CollectionItemCard>>,
-        AsyncValue<List<CollectionItemCard>>,
-        Object?,
-        Object?>;
+    final ref =
+        this.ref
+            as $Ref<
+              AsyncValue<List<CollectionItemCard>>,
+              List<CollectionItemCard>
+            >;
+    final element =
+        ref.element
+            as $ClassProviderElement<
+              AnyNotifier<
+                AsyncValue<List<CollectionItemCard>>,
+                List<CollectionItemCard>
+              >,
+              AsyncValue<List<CollectionItemCard>>,
+              Object?,
+              Object?
+            >;
     return element.handleCreate(ref, build);
   }
 }

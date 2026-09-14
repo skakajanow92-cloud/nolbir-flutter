@@ -16,15 +16,15 @@ final class CartRepositoryProvider
     extends $FunctionalProvider<CartRepository, CartRepository, CartRepository>
     with $Provider<CartRepository> {
   CartRepositoryProvider._()
-      : super(
-          from: null,
-          argument: null,
-          retry: null,
-          name: r'cartRepositoryProvider',
-          isAutoDispose: true,
-          dependencies: null,
-          $allTransitiveDependencies: null,
-        );
+    : super(
+        from: null,
+        argument: null,
+        retry: null,
+        name: r'cartRepositoryProvider',
+        isAutoDispose: true,
+        dependencies: null,
+        $allTransitiveDependencies: null,
+      );
 
   @override
   String debugGetCreateSourceHash() => _$cartRepositoryHash();
@@ -57,20 +57,25 @@ final allCartsProvider = AllCartsProvider._();
 
 /// Profil akışında gösterilecek sepet özetleri (dolu olan tüm sepetler).
 
-final class AllCartsProvider extends $FunctionalProvider<AsyncValue<List<Cart>>,
-        List<Cart>, FutureOr<List<Cart>>>
+final class AllCartsProvider
+    extends
+        $FunctionalProvider<
+          AsyncValue<List<Cart>>,
+          List<Cart>,
+          FutureOr<List<Cart>>
+        >
     with $FutureModifier<List<Cart>>, $FutureProvider<List<Cart>> {
   /// Profil akışında gösterilecek sepet özetleri (dolu olan tüm sepetler).
   AllCartsProvider._()
-      : super(
-          from: null,
-          argument: null,
-          retry: null,
-          name: r'allCartsProvider',
-          isAutoDispose: true,
-          dependencies: null,
-          $allTransitiveDependencies: null,
-        );
+    : super(
+        from: null,
+        argument: null,
+        retry: null,
+        name: r'allCartsProvider',
+        isAutoDispose: true,
+        dependencies: null,
+        $allTransitiveDependencies: null,
+      );
 
   @override
   String debugGetCreateSourceHash() => _$allCartsHash();
@@ -103,15 +108,16 @@ final class CartDetailProvider
   /// Tek bir sepetin (örn. sadece market ya da sadece eczane) detay state'i.
   /// `family` olduğu için her `CartType` kendi bağımsız state'ine sahip —
   /// market sepetini güncellemek eczane sepetini yeniden yüklemez.
-  CartDetailProvider._(
-      {required CartDetailFamily super.from, required CartType super.argument})
-      : super(
-          retry: null,
-          name: r'cartDetailProvider',
-          isAutoDispose: true,
-          dependencies: null,
-          $allTransitiveDependencies: null,
-        );
+  CartDetailProvider._({
+    required CartDetailFamily super.from,
+    required CartType super.argument,
+  }) : super(
+         retry: null,
+         name: r'cartDetailProvider',
+         isAutoDispose: true,
+         dependencies: null,
+         $allTransitiveDependencies: null,
+       );
 
   @override
   String debugGetCreateSourceHash() => _$cartDetailHash();
@@ -146,24 +152,27 @@ String _$cartDetailHash() => r'dd28a45a14f7a57fb7852cdc46cf56b0f1c85002';
 
 final class CartDetailFamily extends $Family
     with
-        $ClassFamilyOverride<CartDetail, AsyncValue<Cart>, Cart, FutureOr<Cart>,
-            CartType> {
+        $ClassFamilyOverride<
+          CartDetail,
+          AsyncValue<Cart>,
+          Cart,
+          FutureOr<Cart>,
+          CartType
+        > {
   CartDetailFamily._()
-      : super(
-          retry: null,
-          name: r'cartDetailProvider',
-          dependencies: null,
-          $allTransitiveDependencies: null,
-          isAutoDispose: true,
-        );
+    : super(
+        retry: null,
+        name: r'cartDetailProvider',
+        dependencies: null,
+        $allTransitiveDependencies: null,
+        isAutoDispose: true,
+      );
 
   /// Tek bir sepetin (örn. sadece market ya da sadece eczane) detay state'i.
   /// `family` olduğu için her `CartType` kendi bağımsız state'ine sahip —
   /// market sepetini güncellemek eczane sepetini yeniden yüklemez.
 
-  CartDetailProvider call(
-    CartType type,
-  ) =>
+  CartDetailProvider call(CartType type) =>
       CartDetailProvider._(argument: type, from: this);
 
   @override
@@ -178,22 +187,19 @@ abstract class _$CartDetail extends $AsyncNotifier<Cart> {
   late final _$args = ref.$arg as CartType;
   CartType get type => _$args;
 
-  FutureOr<Cart> build(
-    CartType type,
-  );
+  FutureOr<Cart> build(CartType type);
   @$mustCallSuper
   @override
   WhenComplete runBuild() {
     final ref = this.ref as $Ref<AsyncValue<Cart>, Cart>;
-    final element = ref.element as $ClassProviderElement<
-        AnyNotifier<AsyncValue<Cart>, Cart>,
-        AsyncValue<Cart>,
-        Object?,
-        Object?>;
-    return element.handleCreate(
-        ref,
-        () => build(
-              _$args,
-            ));
+    final element =
+        ref.element
+            as $ClassProviderElement<
+              AnyNotifier<AsyncValue<Cart>, Cart>,
+              AsyncValue<Cart>,
+              Object?,
+              Object?
+            >;
+    return element.handleCreate(ref, () => build(_$args));
   }
 }
