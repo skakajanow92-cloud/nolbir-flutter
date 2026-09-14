@@ -10,6 +10,7 @@ import 'accommodation_profile_card_view.dart';
 import 'food_profile_card_view.dart';
 import 'engagement_profile_card_view.dart';
 import 'career_profile_card_view.dart';
+import 'dating_profile_card_view.dart';
 
 void registerProfileCardViews() {
   CardViewRegistry.register<ProfileHeaderCard>(
@@ -59,6 +60,12 @@ void registerProfileCardViews() {
         CareerProfileCardView(card: card as CareerProfileCard),
   );
   ProfileModuleOrder.register<CareerProfileCard>();
+
+  CardViewRegistry.register<DatingProfileCard>(
+    (context, card, isActive) =>
+        DatingProfileCardView(card: card as DatingProfileCard),
+  );
+  ProfileModuleOrder.register<DatingProfileCard>();
 
   CardViewRegistry.register<UserPostCard>(
     (context, card, isActive) => UserPostCardView(card: card as UserPostCard),

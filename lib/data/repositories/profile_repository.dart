@@ -6,6 +6,7 @@ import '../../models/accommodation.dart';
 import '../../models/food.dart';
 import '../../models/engagement.dart';
 import '../../models/career.dart';
+import '../../models/dating.dart';
 
 /// Sol tab (Profil) veri kaynağı sözleşmesi.
 abstract class ProfileRepository {
@@ -422,6 +423,50 @@ class MockProfileRepository implements ProfileRepository {
         ),
         Skill(id: "sk4", name: "Flutter", level: SkillLevel.intermediate),
         Skill(id: "sk5", name: "Prototipleme", level: SkillLevel.expert),
+      ],
+    ),
+    const DatingProfileCard(
+      id: "dating1",
+      tagline: "Hafta sonu dağ yürüyüşleri, hafta içi kitap kafeler.",
+      photoUrls: [],
+      sexualOrientation: SexualOrientation.heterosexual,
+      relationshipGoal: RelationshipGoal.longTerm,
+      interests: [
+        InterestTag(
+          id: "int1",
+          category: InterestCategory.hobby,
+          label: "Doğa Yürüyüşü",
+        ),
+        InterestTag(
+          id: "int2",
+          category: InterestCategory.sport,
+          label: "Yüzme",
+        ),
+        InterestTag(
+          id: "int3",
+          category: InterestCategory.artist,
+          label: "Sezen Aksu",
+        ),
+        InterestTag(
+          id: "int4",
+          category: InterestCategory.movie,
+          label: "Interstellar",
+        ),
+        InterestTag(
+          id: "int5",
+          category: InterestCategory.game,
+          label: "Zelda",
+        ),
+        InterestTag(
+          id: "int6",
+          category: InterestCategory.book,
+          label: "Kürk Mantolu Madonna",
+        ),
+        InterestTag(
+          id: "int7",
+          category: InterestCategory.music,
+          label: "Alternatif Rock",
+        ),
       ],
     ),
     const UserPostCard(id: "post1", mediaUrl: "", caption: "İlk paylaşım"),
