@@ -3,6 +3,7 @@ import 'wallet.dart';
 import 'insurance.dart';
 import 'travel.dart';
 import 'accommodation.dart';
+import 'food.dart';
 
 /// FeedCard tipleri için "koleksiyona kaydedilebilir" opsiyonel yeteneği.
 /// Bir kart türü koleksiyona eklenebilir olmak istiyorsa sadece bu arayüzü
@@ -247,6 +248,27 @@ class AccommodationProfileCard extends FeedCard implements Collectible {
 
   @override
   (String, String) toCollectionPreview() => ("Konaklama Profili", "");
+}
+
+/// Altıncı profil modülü: kullanıcının yemek/kafe alışkanlıkları —
+/// favori yemekler, favori mekanlar, düzenli siparişler, kafe sadakat/
+/// indirim kartları. Önceki modüllerden farklı olarak dört alt bölümü var.
+class FoodProfileCard extends FeedCard implements Collectible {
+  final List<FavoriteFood> favoriteFoods;
+  final List<FavoriteRestaurant> favoriteRestaurants;
+  final List<RecurringOrder> recurringOrders;
+  final List<CafeLoyaltyCard> loyaltyCards;
+
+  const FoodProfileCard({
+    required String id,
+    this.favoriteFoods = const [],
+    this.favoriteRestaurants = const [],
+    this.recurringOrders = const [],
+    this.loyaltyCards = const [],
+  }) : super(id);
+
+  @override
+  (String, String) toCollectionPreview() => ("Yemek Profili", "");
 }
 
 /// Kullanıcının dolu her sepeti için profil akışında gösterilen özet kart.

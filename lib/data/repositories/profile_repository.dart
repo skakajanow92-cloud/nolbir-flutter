@@ -3,6 +3,7 @@ import '../../models/wallet.dart';
 import '../../models/insurance.dart';
 import '../../models/travel.dart';
 import '../../models/accommodation.dart';
+import '../../models/food.dart';
 
 /// Sol tab (Profil) veri kaynağı sözleşmesi.
 abstract class ProfileRepository {
@@ -238,6 +239,71 @@ class MockProfileRepository implements ProfileRepository {
           checkOut: DateTime.now().add(const Duration(days: 53)),
           confirmationNumber: "CND-2026-33456",
           price: 65000,
+        ),
+      ],
+    ),
+    const FoodProfileCard(
+      id: "food1",
+      favoriteFoods: [
+        FavoriteFood(id: "ff1", name: "Mantı", cuisine: "Türk"),
+        FavoriteFood(id: "ff2", name: "Izgara Köfte", cuisine: "Türk"),
+        FavoriteFood(id: "ff3", name: "Sushi", cuisine: "Japon"),
+        FavoriteFood(id: "ff4", name: "Tiramisu", cuisine: "İtalyan"),
+      ],
+      favoriteRestaurants: [
+        FavoriteRestaurant(
+          id: "fr1",
+          name: "Nusr-Et",
+          cuisine: "Steakhouse",
+          location: "İstanbul",
+        ),
+        FavoriteRestaurant(
+          id: "fr2",
+          name: "Mikla",
+          cuisine: "Modern Türk",
+          location: "İstanbul",
+        ),
+        FavoriteRestaurant(
+          id: "fr3",
+          name: "Kronotrop",
+          cuisine: "Kahve",
+          location: "Ankara",
+        ),
+      ],
+      recurringOrders: [
+        RecurringOrder(
+          id: "ro1",
+          restaurantName: "Domino's Pizza",
+          orderDescription: "Büyük Boy Karışık Pizza",
+          frequency: "Her Cuma akşamı",
+        ),
+        RecurringOrder(
+          id: "ro2",
+          restaurantName: "Starbucks",
+          orderDescription: "Büyük Boy Latte",
+          frequency: "Her sabah işe giderken",
+        ),
+      ],
+      loyaltyCards: [
+        CafeLoyaltyCard(
+          id: "cl1",
+          cafeName: "Kronotrop",
+          stampsCollected: 7,
+          stampsRequired: 10,
+          rewardDescription: "1 Ücretsiz Filtre Kahve",
+        ),
+        CafeLoyaltyCard(
+          id: "cl2",
+          cafeName: "Starbucks Rewards",
+          stampsCollected: 145,
+          stampsRequired: 200,
+          rewardDescription: "Ücretsiz İçecek",
+        ),
+        CafeLoyaltyCard(
+          id: "cl3",
+          cafeName: "Simit Sarayı",
+          discountPercent: 15,
+          rewardDescription: "Kart sahiplerine sabit indirim",
         ),
       ],
     ),
