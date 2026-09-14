@@ -1,4 +1,5 @@
 import 'package:riverpod_annotation/riverpod_annotation.dart';
+import '../../../core/cart/profile_module_order.dart';
 import '../../../data/repositories/profile_repository.dart';
 import '../../../models/feed_card.dart';
 import '../../cart/application/cart_providers.dart';
@@ -31,22 +32,11 @@ class ProfileFeed extends _$ProfileFeed {
         )
         .toList();
 
-    // Sıralama: kimlik -> cüzdan -> sigorta -> diğer paylaşımlar -> sepet özetleri.
-    // NOT: 3 modülde bile bu "her modül için bir whereType" yaklaşımı
-    // uzamaya başladı — bir sonraki modülde (ör. seyahat) genel bir
-    // "profil modülü registry" sistemine geçmeyi düşün (sabit sıralı bir
-    // liste + her modülün kendi FeedCard tipini döndüren bir provider).
-    final header = posts.whereType<ProfileHeaderCard>();
-    final wallet = posts.whereType<WalletProfileCard>();
-    final insurance = posts.whereType<InsuranceProfileCard>();
-    final otherPosts = posts.where(
-      (c) =>
-          c is! ProfileHeaderCard &&
-          c is! WalletProfileCard &&
-          c is! InsuranceProfileCard,
-    );
-
-    return [...header, ...wallet, ...insurance, ...otherPosts, ...cartCards];
+    // Sıralama artık burada elle yazılmıyor — ProfileModuleOrder, hangi
+    // modülün hangi sırada register edildiğine bakarak diziyor (bkz.
+    // core/cards/profile_module_order.dart). Yeni bir modül eklediğinde
+    // bu fonksiyona DOKUNMAN gerekmiyor.
+    return ProfileModuleOrder.sort([...posts, ...cartCards]);
   }
 
   Future<void> refresh() async {
@@ -65,10 +55,7 @@ class ProfileFeed extends _$ProfileFeed {
   ///
   /// NOT (bilinçli, geçici tasarım kararı): Şu an sadece yerel state
   /// güncelleniyor — repository'ye persist etme (gerçek backend/API çağrısı)
-  /// bilerek bu adıma dahil edilmedi. Görsel arayüzü tam teşekküllü
-  /// tamamladıktan sonra buraya `repo.updateHeader(...)` gibi bir çağrı
-  /// eklenecek; o zamana kadar düzenlemeler sayfa yenilenince (provider
-  /// invalidate/refresh) kaybolur.
+  /// bilerek bu adıma dahil edilmedi.
   void updateHeader(ProfileHeaderCard updated) {
     final current = state.value ?? [];
     state = AsyncData([
