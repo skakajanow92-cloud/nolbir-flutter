@@ -5,11 +5,8 @@ import 'profile_header_card_view.dart';
 import 'user_post_card_view.dart';
 import 'wallet_profile_card_view.dart';
 import 'insurance_profile_card_view.dart';
+import 'travel_profile_card_view.dart';
 
-/// Bu fonksiyondaki her blok ARTIK iki işi birden yapıyor: hem görünümü
-/// kaydediyor (CardViewRegistry) hem de profil akışındaki sırasını
-/// belirliyor (ProfileModuleOrder). Yeni bir profil modülü eklerken bu iki
-/// satırı bir arada, istediğin sıraya yazman yeterli.
 void registerProfileCardViews() {
   CardViewRegistry.register<ProfileHeaderCard>(
     (context, card, isActive) =>
@@ -28,6 +25,12 @@ void registerProfileCardViews() {
         InsuranceProfileCardView(card: card as InsuranceProfileCard),
   );
   ProfileModuleOrder.register<InsuranceProfileCard>();
+
+  CardViewRegistry.register<TravelProfileCard>(
+    (context, card, isActive) =>
+        TravelProfileCardView(card: card as TravelProfileCard),
+  );
+  ProfileModuleOrder.register<TravelProfileCard>();
 
   CardViewRegistry.register<UserPostCard>(
     (context, card, isActive) => UserPostCardView(card: card as UserPostCard),
