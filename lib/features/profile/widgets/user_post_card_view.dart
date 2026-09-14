@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../../core/widgets/card_shell.dart';
-import '../../../models/feed_card.dart';
+import '../../../models/feed_card/feed_card.dart';
 
 class UserPostCardView extends StatelessWidget {
   final UserPostCard card;

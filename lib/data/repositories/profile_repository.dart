@@ -1,4 +1,4 @@
-import '../../models/feed_card.dart';
+import '../../models/feed_card/feed_card.dart';
 import '../../models/wallet.dart';
 import '../../models/insurance.dart';
 import '../../models/travel.dart';

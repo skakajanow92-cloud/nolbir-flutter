@@ -1,6 +1,6 @@
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import '../../../data/repositories/collection_repository.dart';
-import '../../../models/feed_card.dart';
+import '../../../models/feed_card/feed_card.dart';
 
 part 'collection_providers.g.dart';
 

@@ -1,4 +1,4 @@
-import '../../models/feed_card.dart';
+import '../../models/feed_card/feed_card.dart';
 import '../../models/cart.dart';
 
 /// Orta tab (Genel Akış) veri kaynağı sözleşmesi.

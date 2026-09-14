@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../../models/feed_card.dart';
+import '../../models/feed_card/feed_card.dart';
 
 /// TikTok tarzı dikey kaydırılan kart motoru.
 /// Üç tab da bu widget'ı kullanır; fark sadece verilen `cards` listesi

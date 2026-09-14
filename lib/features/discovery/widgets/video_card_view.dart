@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:media_kit/media_kit.dart';
 import 'package:media_kit_video/media_kit_video.dart';
 import '../../../core/widgets/card_shell.dart';
-import '../../../models/feed_card.dart';
+import '../../../models/feed_card/feed_card.dart';
 import '../../collection/widgets/save_to_collection_button.dart';
 
 /// Video kartı görünümü — media_kit ile gerçek video oynatma.

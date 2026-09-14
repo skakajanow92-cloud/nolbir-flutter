@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/widgets/card_shell.dart';
-import '../../../models/feed_card.dart';
+import '../../../models/feed_card/feed_card.dart';
 import '../../../models/cart.dart';
 import '../../cart/application/cart_providers.dart';
 import '../../collection/widgets/save_to_collection_button.dart';

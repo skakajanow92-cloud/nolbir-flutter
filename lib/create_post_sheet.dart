@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/media/media_pick_result.dart';
 import '../../../core/media/media_providers.dart';
-import '../../../models/feed_card.dart';
+import '../../../models/feed_card/feed_card.dart';
 import '../features/profile/application/profile_providers.dart';
 
 /// Profil tab'ındaki "+" butonuna basınca açılan seçim ekranı.

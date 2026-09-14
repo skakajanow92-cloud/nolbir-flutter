@@ -1,5 +1,5 @@
 import '../../../core/cart/card_view_registry.dart';
-import '../../../models/feed_card.dart';
+import '../../../models/feed_card/feed_card.dart';
 import 'video_card_view.dart';
 import 'product_card_view.dart';
 import 'subscription_card_view.dart';

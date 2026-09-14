@@ -1,7 +1,7 @@
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import '../../../core/cart/profile_module_order.dart';
 import '../../../data/repositories/profile_repository.dart';
-import '../../../models/feed_card.dart';
+import '../../../models/feed_card/feed_card.dart';
 import '../../cart/application/cart_providers.dart';
 
 part 'profile_providers.g.dart';

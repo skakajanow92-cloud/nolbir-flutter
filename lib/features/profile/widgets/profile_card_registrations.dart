@@ -1,6 +1,6 @@
 import '../../../core/cart/card_view_registry.dart';
 import '../../../core/cart/profile_module_order.dart';
-import '../../../models/feed_card.dart';
+import '../../../models/feed_card/feed_card.dart';
 import 'profile_header_card_view.dart';
 import 'user_post_card_view.dart';
 import 'wallet_profile_card_view.dart';

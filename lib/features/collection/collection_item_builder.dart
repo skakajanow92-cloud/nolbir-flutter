@@ -1,4 +1,4 @@
-import '../../models/feed_card.dart';
+import '../../models/feed_card/feed_card.dart';
 
 CollectionItemCard toCollectionItem(FeedCard card) {
   final (String title, String previewUrl) = switch (card) {

@@ -1,4 +1,4 @@
-import '../../models/feed_card.dart';
+import '../../models/feed_card/feed_card.dart';
 
 /// Profil akışındaki kart türlerinin görüntülenme SIRASINI belirleyen
 /// registry. `CardViewRegistry`'nin sıralama karşılığı.

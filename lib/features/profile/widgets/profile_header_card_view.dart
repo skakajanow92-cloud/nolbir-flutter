@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../../core/widgets/card_shell.dart';
-import '../../../models/feed_card.dart';
+import '../../../models/feed_card/feed_card.dart';
 import 'edit_profile_sheet.dart';
 
 /// Kullanıcının "Temel Bilgiler" kimlik kartı — profil akışının ilk modülü.

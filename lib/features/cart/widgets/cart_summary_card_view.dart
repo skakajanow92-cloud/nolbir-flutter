@@ -4,7 +4,7 @@ import '../../../core/widgets/card_shell.dart';
 import '../../../core/cart/cart_visuals.dart';
 import '../../../core/cart/cart_item_registry.dart';
 import '../../../models/cart.dart';
-import '../../../models/feed_card.dart';
+import '../../../models/feed_card/feed_card.dart';
 import '../application/cart_providers.dart';
 
 /// Profil akışındaki tam ekran sepet özeti.

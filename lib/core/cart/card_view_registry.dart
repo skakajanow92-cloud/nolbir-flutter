@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../../models/feed_card.dart';
+import '../../models/feed_card/feed_card.dart';
 
 typedef CardViewBuilder =
     Widget Function(BuildContext context, FeedCard card, bool isActive);

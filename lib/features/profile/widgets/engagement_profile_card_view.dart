@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../../../models/feed_card.dart';
+import '../../../models/feed_card/feed_card.dart';
 import '../../../models/engagement.dart';
 
 /// Etkileşim Analizi Profili — yedinci profil modülü.
