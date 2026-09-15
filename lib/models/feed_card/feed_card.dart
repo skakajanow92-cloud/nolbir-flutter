@@ -26,6 +26,7 @@ export 'insurance_profile_card.dart';
 export 'travel_profile_card.dart';
 export 'accommodation_profile_card.dart';
 export 'food_profile_card.dart';
+export 'donation_profile_card.dart';
 export 'engagement_profile_card.dart';
 export 'career_profile_card.dart';
 export 'dating_profile_card.dart';
