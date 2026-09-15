@@ -23,15 +23,20 @@ import 'vertical_card_feed.dart';
 /// `PageView`'a devredip bir sonraki/önceki karta yumuşak geçiş yaptırır.
 /// Sınır İÇİNDEKİ her sürükleme ise normal şekilde sadece içeriği
 /// kaydırır — dışarı hiç taşmaz.
+///
+/// DİKKAT (bkz. `_isOwnVerticalScroll`): `NotificationListener` ağaçtan
+/// yukarı kabarcıklanan TÜM scroll bildirimlerini yakalar — bu kartların
+/// içindeki yatay `ListView`'lar da kendi uçlarına geldiğinde
+/// `OverscrollNotification` yayınlar. Filtrelenmezse, kullanıcı yatay bir
+/// listeyi sağa/sola kaydırıp ucuna geldiğinde kart DEĞİŞİR; bu istenen
+/// davranış değildir. Bu yüzden sadece (1) dikey eksenli ve (2) doğrudan
+/// bu widget'ın kendi Scrollable'ından gelen (depth == 0) bildirimleri
+/// dikkate alıyoruz.
 class PageAwareScrollView extends StatefulWidget {
   final Widget child;
   final EdgeInsetsGeometry? padding;
 
-  const PageAwareScrollView({
-    super.key,
-    required this.child,
-    this.padding,
-  });
+  const PageAwareScrollView({super.key, required this.child, this.padding});
 
   @override
   State<PageAwareScrollView> createState() => _PageAwareScrollViewState();
@@ -65,7 +70,30 @@ class _PageAwareScrollViewState extends State<PageAwareScrollView> {
     );
   }
 
+  /// Bildirim gerçekten BU widget'ın kendi dikey scroll'undan mı geliyor?
+  ///
+  /// - `depth == 0`: doğrudan sarmaladığımız `SingleChildScrollView`'den
+  ///   geliyor. İçerideki yatay listeler depth >= 1 ile gelir.
+  /// - `axis == Axis.vertical`: yatay bir listenin ucuna gelmek kart
+  ///   geçişini ASLA tetiklememeli.
+  ///
+  /// İkisi de tek başına yeterli görünse de bilinçli olarak ikisini
+  /// birden kontrol ediyoruz: ileride bu widget'ın içine iç içe dikey bir
+  /// liste konursa (depth filtresi onu eler) ya da doğrudan çocuk olarak
+  /// yatay bir yapı gelirse (eksen filtresi onu eler) davranış bozulmasın.
+  bool _isOwnVerticalScroll(ScrollNotification notification) {
+    return notification.depth == 0 &&
+        notification.metrics.axis == Axis.vertical;
+  }
+
   bool _handleNotification(ScrollNotification notification) {
+    if (!_isOwnVerticalScroll(notification)) {
+      // İçerideki yatay listelerden (favori mekanlar, iş deneyimleri,
+      // referanslar...) gelen bildirimler — bunlara hiç karışma, normal
+      // kabarcıklanmalarına izin ver.
+      return false;
+    }
+
     if (notification is OverscrollNotification) {
       _maybeHandoff(notification.overscroll);
     } else if (notification is ScrollEndNotification) {
@@ -80,7 +108,9 @@ class _PageAwareScrollViewState extends State<PageAwareScrollView> {
   void _maybeHandoff(double overscroll) {
     if (_handoffTriggered || overscroll == 0) return;
     final feedController = _feedController;
-    if (feedController == null) return; // bu widget bir feed içinde değilse dokunma
+    if (feedController == null) {
+      return; // bu widget bir feed içinde değilse dokunma
+    }
 
     _handoffTriggered = true;
     if (overscroll > 0) {
