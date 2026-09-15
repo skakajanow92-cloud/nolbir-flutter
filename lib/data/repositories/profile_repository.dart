@@ -31,6 +31,7 @@ class MockProfileRepository implements ProfileRepository {
     buildCareerMock(),
     buildDatingMock(),
     buildChannelsMock(),
+    buildStreamingMock(),
     ...buildPostsMock(),
   ];
 

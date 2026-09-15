@@ -1,7 +1,7 @@
 import '../channel.dart';
 import 'base.dart';
 
-/// Onuncu profil modülü: kullanıcının oluşturup yönettiği kanallar —
+/// On birinci profil modülü: kullanıcının oluşturup yönettiği kanallar —
 /// YouTube benzeri, uzun video içerikleri paylaşılan kanallar. Her kanal
 /// kendi abone/izlenme/video/yorum verisine sahip (bkz. channel.dart'taki
 /// çoklu-varlık deseni — WalletProfileCard'daki "birden fazla hesap"
