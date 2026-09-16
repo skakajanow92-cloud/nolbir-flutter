@@ -1,3 +1,4 @@
+import 'package:nolbir/data/repositories/profile_mock/event_mock.dart';
 import 'package:nolbir/data/repositories/profile_mock/health_mock.dart';
 
 import '../../models/feed_card/feed_card.dart';
@@ -35,6 +36,7 @@ class MockProfileRepository implements ProfileRepository {
     buildChannelsMock(),
     buildStreamingMock(),
     buildHealthMock(),
+    buildEventMock(),
     ...buildPostsMock(),
   ];
 
