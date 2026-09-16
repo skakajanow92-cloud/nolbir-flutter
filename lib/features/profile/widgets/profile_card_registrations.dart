@@ -14,6 +14,7 @@ import 'career_profile_card_view.dart';
 import 'dating_profile_card_view.dart';
 import 'channels_profile_card_view.dart';
 import 'streaming_profile_card_view.dart';
+import 'health_profile_card_view.dart';
 
 void registerProfileCardViews() {
   CardViewRegistry.register<ProfileHeaderCard>(
@@ -87,6 +88,12 @@ void registerProfileCardViews() {
         StreamingProfileCardView(card: card as StreamingProfileCard),
   );
   ProfileModuleOrder.register<StreamingProfileCard>();
+
+  CardViewRegistry.register<HealthProfileCard>(
+    (context, card, isActive) =>
+        HealthProfileCardView(card: card as HealthProfileCard),
+  );
+  ProfileModuleOrder.register<HealthProfileCard>();
 
   CardViewRegistry.register<UserPostCard>(
     (context, card, isActive) => UserPostCardView(card: card as UserPostCard),
