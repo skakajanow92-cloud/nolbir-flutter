@@ -36,3 +36,4 @@ export 'channels_profile_card.dart';
 export 'streaming_profile_card.dart';
 export 'health_profile_card.dart';
 export 'event_profile_card.dart';
+export 'estate_profile_card.dart';
