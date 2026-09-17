@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:nolbir/core/widgets/page_aware_scroll_view.dart';
 import '../../../models/feed_card/feed_card.dart';
 import '../../../models/streaming.dart';
 
@@ -40,7 +41,7 @@ class StreamingProfileCardView extends StatelessWidget {
         ),
         child: SafeArea(
           // <<< PageAware sarmalayıcını buraya koy
-          child: SingleChildScrollView(
+          child: PageAwareScrollView(
             padding: const EdgeInsets.only(bottom: 24),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -61,8 +62,10 @@ class StreamingProfileCardView extends StatelessWidget {
                 if (card.providers.isEmpty)
                   const Padding(
                     padding: EdgeInsets.symmetric(horizontal: 20),
-                    child: Text("Henüz bir yayın aboneliğin yok",
-                        style: TextStyle(color: Colors.white38, fontSize: 13)),
+                    child: Text(
+                      "Henüz bir yayın aboneliğin yok",
+                      style: TextStyle(color: Colors.white38, fontSize: 13),
+                    ),
                   )
                 else
                   for (final provider in card.providers) ...[
@@ -89,21 +92,27 @@ class _Header extends StatelessWidget {
       children: [
         const Row(
           children: [
-            Icon(Icons.subscriptions_outlined,
-                color: StreamingProfileCardView.moduleAccent, size: 20),
+            Icon(
+              Icons.subscriptions_outlined,
+              color: StreamingProfileCardView.moduleAccent,
+              size: 20,
+            ),
             SizedBox(width: 8),
-            Text("Yayın Abonelikleri",
-                style: TextStyle(color: Colors.white54, fontSize: 14)),
+            Text(
+              "Yayın Abonelikleri",
+              style: TextStyle(color: Colors.white54, fontSize: 14),
+            ),
           ],
         ),
         const SizedBox(height: 6),
         Text(
           "${_formatMoney(card.totalMonthlyCost)} TRY",
           style: const TextStyle(
-              color: Colors.white,
-              fontSize: 30,
-              fontWeight: FontWeight.w700,
-              height: 1.1),
+            color: Colors.white,
+            fontSize: 30,
+            fontWeight: FontWeight.w700,
+            height: 1.1,
+          ),
         ),
         const SizedBox(height: 2),
         Text(
@@ -131,12 +140,16 @@ class _RenewalAlert extends StatelessWidget {
         color: StreamingProfileCardView.moduleAccent.withValues(alpha: 0.18),
         borderRadius: BorderRadius.circular(14),
         border: Border.all(
-            color: StreamingProfileCardView.moduleAccent.withValues(alpha: 0.5)),
+          color: StreamingProfileCardView.moduleAccent.withValues(alpha: 0.5),
+        ),
       ),
       child: Row(
         children: [
-          const Icon(Icons.event_repeat_outlined,
-              color: StreamingProfileCardView.moduleAccent, size: 20),
+          const Icon(
+            Icons.event_repeat_outlined,
+            color: StreamingProfileCardView.moduleAccent,
+            size: 20,
+          ),
           const SizedBox(width: 10),
           Expanded(
             child: Text(
@@ -145,7 +158,10 @@ class _RenewalAlert extends StatelessWidget {
               maxLines: 2,
               overflow: TextOverflow.ellipsis,
               style: const TextStyle(
-                  color: Colors.white, fontSize: 13, fontWeight: FontWeight.w600),
+                color: Colors.white,
+                fontSize: 13,
+                fontWeight: FontWeight.w600,
+              ),
             ),
           ),
         ],
@@ -183,9 +199,10 @@ class _ProviderSection extends StatelessWidget {
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                   style: const TextStyle(
-                      color: Colors.white,
-                      fontSize: 16,
-                      fontWeight: FontWeight.w700),
+                    color: Colors.white,
+                    fontSize: 16,
+                    fontWeight: FontWeight.w700,
+                  ),
                 ),
               ),
               Text(
@@ -246,9 +263,10 @@ class _PackageCard extends StatelessWidget {
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                   style: const TextStyle(
-                      color: Colors.white,
-                      fontWeight: FontWeight.w700,
-                      fontSize: 15),
+                    color: Colors.white,
+                    fontWeight: FontWeight.w700,
+                    fontSize: 15,
+                  ),
                 ),
               ),
               _Badge(label: package.quality.label, color: color),
@@ -297,8 +315,10 @@ class _ChannelChip extends StatelessWidget {
         borderRadius: BorderRadius.circular(14),
         border: Border.all(color: Colors.white12),
       ),
-      child: Text(channel.name,
-          style: const TextStyle(color: Colors.white70, fontSize: 11)),
+      child: Text(
+        channel.name,
+        style: const TextStyle(color: Colors.white70, fontSize: 11),
+      ),
     );
   }
 }
@@ -316,9 +336,14 @@ class _Badge extends StatelessWidget {
         color: color.withValues(alpha: 0.45),
         borderRadius: BorderRadius.circular(20),
       ),
-      child: Text(label,
-          style: const TextStyle(
-              color: Colors.white, fontSize: 10, fontWeight: FontWeight.w600)),
+      child: Text(
+        label,
+        style: const TextStyle(
+          color: Colors.white,
+          fontSize: 10,
+          fontWeight: FontWeight.w600,
+        ),
+      ),
     );
   }
 }
