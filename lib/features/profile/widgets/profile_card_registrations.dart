@@ -21,6 +21,7 @@ import 'estate_profile_card_view.dart';
 import 'taxi_profile_card_view.dart';
 import 'cargo_profile_card_view.dart';
 import 'sport_profile_card_view.dart';
+import 'bet_profile_card_view.dart';
 
 void registerProfileCardViews() {
   CardViewRegistry.register<ProfileHeaderCard>(
@@ -89,7 +90,7 @@ void registerProfileCardViews() {
   );
   ProfileModuleOrder.register<ChannelsProfileCard>();
 
-    CardViewRegistry.register<StreamingProfileCard>(
+  CardViewRegistry.register<StreamingProfileCard>(
     (context, card, isActive) =>
         StreamingProfileCardView(card: card as StreamingProfileCard),
   );
@@ -136,6 +137,12 @@ void registerProfileCardViews() {
         SportProfileCardView(card: card as SportProfileCard),
   );
   ProfileModuleOrder.register<SportProfileCard>();
+
+  CardViewRegistry.register<BetProfileCard>(
+    (context, card, isActive) =>
+        BetProfileCardView(card: card as BetProfileCard),
+  );
+  ProfileModuleOrder.register<BetProfileCard>();
 
   CardViewRegistry.register<UserPostCard>(
     (context, card, isActive) => UserPostCardView(card: card as UserPostCard),

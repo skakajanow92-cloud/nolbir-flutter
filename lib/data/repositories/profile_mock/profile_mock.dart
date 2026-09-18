@@ -29,4 +29,5 @@ export 'estate_mock.dart';
 export 'taxi_mock.dart';
 export 'cargo_mock.dart';
 export 'sport_mock.dart';
+export 'bet_mock.dart';
 export 'posts_mock.dart';
