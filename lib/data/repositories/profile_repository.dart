@@ -32,6 +32,7 @@ class MockProfileRepository implements ProfileRepository {
     buildDatingMock(),
     buildChannelsMock(),
     buildStreamingMock(),
+    buildEducationMock(),
     buildHealthMock(),
     buildEventMock(),
     buildEstateMock(),

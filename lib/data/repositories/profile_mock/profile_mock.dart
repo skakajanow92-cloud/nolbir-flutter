@@ -22,6 +22,7 @@ export 'career_mock.dart';
 export 'dating_mock.dart';
 export 'channels_mock.dart';
 export 'streaming_mock.dart';
+export 'education_mock.dart';
 export 'health_mock.dart';
 export 'event_mock.dart';
 export 'estate_mock.dart';

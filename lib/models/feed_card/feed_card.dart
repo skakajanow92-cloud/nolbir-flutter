@@ -34,6 +34,7 @@ export 'cart_summary_card.dart';
 export 'collection_item_card.dart';
 export 'channels_profile_card.dart';
 export 'streaming_profile_card.dart';
+export 'education_profile_card.dart';
 export 'health_profile_card.dart';
 export 'event_profile_card.dart';
 export 'estate_profile_card.dart';

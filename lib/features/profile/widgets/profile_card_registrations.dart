@@ -14,6 +14,7 @@ import 'career_profile_card_view.dart';
 import 'dating_profile_card_view.dart';
 import 'channels_profile_card_view.dart';
 import 'streaming_profile_card_view.dart';
+import 'education_profile_card_view.dart';
 import 'health_profile_card_view.dart';
 import 'event_profile_card_view.dart';
 import 'estate_profile_card_view.dart';
@@ -90,6 +91,12 @@ void registerProfileCardViews() {
         StreamingProfileCardView(card: card as StreamingProfileCard),
   );
   ProfileModuleOrder.register<StreamingProfileCard>();
+
+  CardViewRegistry.register<EducationProfileCard>(
+    (context, card, isActive) =>
+        EducationProfileCardView(card: card as EducationProfileCard),
+  );
+  ProfileModuleOrder.register<EducationProfileCard>();
 
   CardViewRegistry.register<HealthProfileCard>(
     (context, card, isActive) =>
