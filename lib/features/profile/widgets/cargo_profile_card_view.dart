@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:nolbir/core/widgets/page_aware_scroll_view.dart';
 import '../../../models/feed_card/feed_card.dart';
 import '../../../models/cargo.dart';
 
@@ -40,7 +41,7 @@ class CargoProfileCardView extends StatelessWidget {
           ),
         ),
         child: SafeArea(
-          child: SingleChildScrollView(
+          child: PageAwareScrollView(
             padding: const EdgeInsets.only(bottom: 24),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
