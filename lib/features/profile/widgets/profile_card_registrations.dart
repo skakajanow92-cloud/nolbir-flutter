@@ -23,7 +23,7 @@ import 'cargo_profile_card_view.dart';
 import 'portfolio_profile_card_view.dart';
 import 'sport_profile_card_view.dart';
 import 'bet_profile_card_view.dart';
-
+import 'smart_home_profile_card_view.dart';
 
 void registerProfileCardViews() {
   CardViewRegistry.register<ProfileHeaderCard>(
@@ -151,6 +151,12 @@ void registerProfileCardViews() {
         BetProfileCardView(card: card as BetProfileCard),
   );
   ProfileModuleOrder.register<BetProfileCard>();
+
+  CardViewRegistry.register<SmartHomeProfileCard>(
+    (context, card, isActive) =>
+        SmartHomeProfileCardView(card: card as SmartHomeProfileCard),
+  );
+  ProfileModuleOrder.register<SmartHomeProfileCard>();
 
   CardViewRegistry.register<UserPostCard>(
     (context, card, isActive) => UserPostCardView(card: card as UserPostCard),

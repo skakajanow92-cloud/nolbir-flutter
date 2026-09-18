@@ -41,6 +41,7 @@ class MockProfileRepository implements ProfileRepository {
     buildPortfolioMock(),
     buildSportMock(),
     buildBetMock(),
+    buildSmartHomeMock(),
     ...buildPostsMock(),
   ];
 

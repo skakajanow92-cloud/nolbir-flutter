@@ -40,6 +40,8 @@ export 'event_profile_card.dart';
 export 'estate_profile_card.dart';
 export 'taxi_profile_card.dart';
 export 'cargo_profile_card.dart';
+export 'portfolio_profile_card.dart';
 export 'sport_profile_card.dart';
 export 'bet_profile_card.dart';
-export 'portfolio_profile_card.dart';
+export 'smart_home_profile_card.dart';
+

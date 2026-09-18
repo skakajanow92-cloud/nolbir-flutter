@@ -31,4 +31,5 @@ export 'cargo_mock.dart';
 export 'portfolio_mock.dart';
 export 'sport_mock.dart';
 export 'bet_mock.dart';
+export 'smart_home_mock.dart';
 export 'posts_mock.dart';
