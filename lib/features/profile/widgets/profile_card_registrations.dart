@@ -20,8 +20,10 @@ import 'event_profile_card_view.dart';
 import 'estate_profile_card_view.dart';
 import 'taxi_profile_card_view.dart';
 import 'cargo_profile_card_view.dart';
+import 'portfolio_profile_card_view.dart';
 import 'sport_profile_card_view.dart';
 import 'bet_profile_card_view.dart';
+
 
 void registerProfileCardViews() {
   CardViewRegistry.register<ProfileHeaderCard>(
@@ -131,6 +133,12 @@ void registerProfileCardViews() {
         CargoProfileCardView(card: card as CargoProfileCard),
   );
   ProfileModuleOrder.register<CargoProfileCard>();
+
+  CardViewRegistry.register<PortfolioProfileCard>(
+    (context, card, isActive) =>
+        PortfolioProfileCardView(card: card as PortfolioProfileCard),
+  );
+  ProfileModuleOrder.register<PortfolioProfileCard>();
 
   CardViewRegistry.register<SportProfileCard>(
     (context, card, isActive) =>

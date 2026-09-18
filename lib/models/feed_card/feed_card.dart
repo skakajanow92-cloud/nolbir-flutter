@@ -42,5 +42,4 @@ export 'taxi_profile_card.dart';
 export 'cargo_profile_card.dart';
 export 'sport_profile_card.dart';
 export 'bet_profile_card.dart';
-
-
+export 'portfolio_profile_card.dart';
