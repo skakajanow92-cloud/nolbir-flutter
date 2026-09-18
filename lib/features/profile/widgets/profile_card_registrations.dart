@@ -19,6 +19,7 @@ import 'health_profile_card_view.dart';
 import 'event_profile_card_view.dart';
 import 'estate_profile_card_view.dart';
 import 'taxi_profile_card_view.dart';
+import 'cargo_profile_card_view.dart';
 
 void registerProfileCardViews() {
   CardViewRegistry.register<ProfileHeaderCard>(
@@ -122,6 +123,12 @@ void registerProfileCardViews() {
         TaxiProfileCardView(card: card as TaxiProfileCard),
   );
   ProfileModuleOrder.register<TaxiProfileCard>();
+
+  CardViewRegistry.register<CargoProfileCard>(
+    (context, card, isActive) =>
+        CargoProfileCardView(card: card as CargoProfileCard),
+  );
+  ProfileModuleOrder.register<CargoProfileCard>();
 
   CardViewRegistry.register<UserPostCard>(
     (context, card, isActive) => UserPostCardView(card: card as UserPostCard),

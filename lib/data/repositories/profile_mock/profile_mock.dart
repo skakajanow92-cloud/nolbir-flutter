@@ -27,4 +27,6 @@ export 'health_mock.dart';
 export 'event_mock.dart';
 export 'estate_mock.dart';
 export 'taxi_mock.dart';
+export 'cargo_mock.dart';
 export 'posts_mock.dart';
+

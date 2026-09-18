@@ -39,3 +39,4 @@ export 'health_profile_card.dart';
 export 'event_profile_card.dart';
 export 'estate_profile_card.dart';
 export 'taxi_profile_card.dart';
+export 'cargo_profile_card.dart';

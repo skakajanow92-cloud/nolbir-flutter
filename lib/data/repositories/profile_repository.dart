@@ -1,5 +1,3 @@
-import 'package:nolbir/data/repositories/profile_mock/taxi_mock.dart';
-
 import '../../models/feed_card/feed_card.dart';
 import 'profile_mock/profile_mock.dart';
 
@@ -39,6 +37,7 @@ class MockProfileRepository implements ProfileRepository {
     buildEventMock(),
     buildEstateMock(),
     buildTaxiMock(),
+    buildCargoMock(),
     ...buildPostsMock(),
   ];
 
