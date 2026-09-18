@@ -24,6 +24,7 @@ import 'portfolio_profile_card_view.dart';
 import 'sport_profile_card_view.dart';
 import 'bet_profile_card_view.dart';
 import 'smart_home_profile_card_view.dart';
+import 'vehicle_profile_card_view.dart';
 
 void registerProfileCardViews() {
   CardViewRegistry.register<ProfileHeaderCard>(
@@ -157,6 +158,12 @@ void registerProfileCardViews() {
         SmartHomeProfileCardView(card: card as SmartHomeProfileCard),
   );
   ProfileModuleOrder.register<SmartHomeProfileCard>();
+
+  CardViewRegistry.register<VehicleProfileCard>(
+    (context, card, isActive) =>
+        VehicleProfileCardView(card: card as VehicleProfileCard),
+  );
+  ProfileModuleOrder.register<VehicleProfileCard>();
 
   CardViewRegistry.register<UserPostCard>(
     (context, card, isActive) => UserPostCardView(card: card as UserPostCard),

@@ -44,4 +44,4 @@ export 'portfolio_profile_card.dart';
 export 'sport_profile_card.dart';
 export 'bet_profile_card.dart';
 export 'smart_home_profile_card.dart';
-
+export 'vehicle_profile_card.dart';
