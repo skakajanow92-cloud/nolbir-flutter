@@ -36,7 +36,8 @@ class ProfileFeed extends _$ProfileFeed {
     // modülün hangi sırada register edildiğine bakarak diziyor (bkz.
     // core/cards/profile_module_order.dart). Yeni bir modül eklediğinde
     // bu fonksiyona DOKUNMAN gerekmiyor.
-    return ProfileModuleOrder.sort([...posts, ...cartCards]);
+    const verificationCard = VerificationProfileCard(id: "verification_center");
+    return ProfileModuleOrder.sort([...posts, ...cartCards, verificationCard]);
   }
 
   Future<void> refresh() async {

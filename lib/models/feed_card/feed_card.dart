@@ -47,3 +47,4 @@ export 'smart_home_profile_card.dart';
 export 'vehicle_profile_card.dart';
 export 'hosting_profile_card.dart';
 export 'market_cart_card.dart';
+export 'verification_profile_card.dart';
