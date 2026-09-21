@@ -5,6 +5,7 @@ import '../../../models/feed_card/feed_card.dart';
 import 'cart_summary_card_view.dart';
 import 'market_cart_card_view.dart';
 import 'second_hand_cart_card_view.dart';
+import 'ticket_cart_card_view.dart';
 
 void registerCartCardViews() {
   CardViewRegistry.register<CartSummaryCard>(
@@ -27,4 +28,10 @@ void registerCartCardViews() {
         SecondHandCartCardView(card: card as SecondHandCartCard),
   );
   ProfileModuleOrder.register<SecondHandCartCard>();
+
+  CardViewRegistry.register<TicketCartCard>(
+    ((context, card, isActive) =>
+        TicketCartCardView(card: card as TicketCartCard)),
+  );
+  ProfileModuleOrder.register<TicketCartCard>();
 }
