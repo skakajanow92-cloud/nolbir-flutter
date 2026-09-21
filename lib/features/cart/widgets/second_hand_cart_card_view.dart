@@ -1,30 +1,29 @@
 import 'package:flutter/material.dart';
-import '../../../models/cart_card/market_cart_card.dart';
+import '../../../models/cart_card/cart_card.dart';
 import '../../../models/cart.dart';
-import '../../../models/market_cart.dart';
+import '../../../models/second_hand_cart.dart';
 
-/// Market Sepeti Kartı — Sepet Kartları ailesinin ilk üyesi.
+/// İkinci El Sepeti Kartı — Sepet Kartları ailesinin ikinci üyesi.
 ///
-/// TASARIM NOTU: Profil modülleriyle AYNI görsel dili paylaşıyor (koyu
-/// gradyan zemin, bölüm başlıkları, mini kartlar) ama farklı bir amaca
-/// hizmet ediyor: profil modülleri kullanıcının SAHİP OLDUĞU varlıkları
-/// gösterirken, sepet kartları SATIN ALMAYA HAZIRLANDIĞI şeyleri
-/// gösteriyor. "Sepetim" bölümü bilerek dikey liste — bir alışveriş
-/// sepeti doğal olarak yatay kaydırmalı mini kartlardan çok dikey bir
-/// döküm gibi okunur; diğer bölümler (karşılaştırma, öneriler) yatay
-/// kaydırmalı kalmaya devam ediyor.
+/// TASARIM NOTU: Market Sepeti Kartı ile AYNI görsel dili paylaşıyor
+/// (koyu gradyan, bölüm başlıkları, dikey "Sepetim" listesi + yatay
+/// mini kart bölümleri) ama satıcı kavramı kasıtlı olarak farklı
+/// vurgulanıyor: her satır bireysel satıcının adını, puanını ve
+/// ürünün durumunu (Sıfır/Az Kullanılmış/İkinci El) gösteriyor —
+/// kurumsal bir market rozeti değil.
 ///
-/// Modül vurgu rengi: canlı kobalt mavisi — önceki tüm profil
-/// modüllerinden daha doygun/parlak, "e-ticaret/market" hissi için
-/// bilerek seçildi.
-class MarketCartCardView extends StatelessWidget {
-  final MarketCartCard card;
+/// Modül vurgu rengi: toz lila — "vintage/ikinci el" hissi veren,
+/// Market Sepeti'nin kobalt mavisinden (0xFF3D6FD1) ve önceki mor
+/// tonlarından (menekşe-mor, mor-gri sunucu, fuşya, mauve) ayrışan
+/// daha nötr/toz bir ton.
+class SecondHandCartCardView extends StatelessWidget {
+  final SecondHandCartCard card;
 
-  const MarketCartCardView({super.key, required this.card});
+  const SecondHandCartCardView({super.key, required this.card});
 
-  static const moduleAccent = Color(0xFF3D6FD1);
-  static const _base = Color(0xFF0D1018);
-  static const _baseEnd = Color(0xFF141A26);
+  static const moduleAccent = Color(0xFF6E6280);
+  static const _base = Color(0xFF120F16);
+  static const _baseEnd = Color(0xFF1A1620);
 
   @override
   Widget build(BuildContext context) {
@@ -68,24 +67,23 @@ class MarketCartCardView extends StatelessWidget {
                         ),
                 ),
                 const SizedBox(height: 24),
-                _SectionLabel(
-                    text: "Fiyat Karşılaştırması (${card.priceComparisons.length})"),
+                _SectionLabel(text: "Benzer İlanlarla Karşılaştır (${card.similarListings.length})"),
                 const SizedBox(height: 10),
                 SizedBox(
-                  height: 148,
-                  child: card.priceComparisons.isEmpty
-                      ? const _EmptyHint(text: "Karşılaştırma için ürün yok")
+                  height: 160,
+                  child: card.similarListings.isEmpty
+                      ? const _EmptyHint(text: "Karşılaştırma için ilan yok")
                       : ListView.separated(
                           padding: const EdgeInsets.symmetric(horizontal: 20),
                           scrollDirection: Axis.horizontal,
-                          itemCount: card.priceComparisons.length,
+                          itemCount: card.similarListings.length,
                           separatorBuilder: (_, __) => const SizedBox(width: 12),
                           itemBuilder: (context, i) =>
-                              _ComparisonMiniCard(group: card.priceComparisons[i]),
+                              _ListingGroupMiniCard(group: card.similarListings[i]),
                         ),
                 ),
                 const SizedBox(height: 24),
-                _SectionLabel(text: "Sana Özel Öneriler (${card.recommendations.length})"),
+                _SectionLabel(text: "Sana Özel İlan Önerileri (${card.recommendations.length})"),
                 const SizedBox(height: 10),
                 SizedBox(
                   height: 158,
@@ -97,7 +95,7 @@ class MarketCartCardView extends StatelessWidget {
                           itemCount: card.recommendations.length,
                           separatorBuilder: (_, __) => const SizedBox(width: 12),
                           itemBuilder: (_, i) =>
-                              _RecommendationMiniCard(product: card.recommendations[i]),
+                              _RecommendationMiniCard(listing: card.recommendations[i]),
                         ),
                 ),
               ],
@@ -120,10 +118,10 @@ class _Header extends StatelessWidget {
       children: [
         const Row(
           children: [
-            Icon(Icons.shopping_cart_outlined,
-                color: MarketCartCardView.moduleAccent, size: 20),
+            Icon(Icons.recycling_outlined,
+                color: SecondHandCartCardView.moduleAccent, size: 20),
             SizedBox(width: 8),
-            Text("Market Sepeti", style: TextStyle(color: Colors.white54, fontSize: 14)),
+            Text("İkinci El Sepeti", style: TextStyle(color: Colors.white54, fontSize: 14)),
           ],
         ),
         const SizedBox(height: 6),
@@ -171,13 +169,39 @@ class _EmptyHint extends StatelessWidget {
   }
 }
 
+class _ConditionBadge extends StatelessWidget {
+  final ItemCondition condition;
+  const _ConditionBadge({required this.condition});
+
+  @override
+  Widget build(BuildContext context) {
+    final color = switch (condition) {
+      ItemCondition.brandNew => const Color(0xFF7FD98A),
+      ItemCondition.likeNew => const Color(0xFFB8D97F),
+      ItemCondition.used => Colors.white54,
+    };
+
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+      decoration: BoxDecoration(
+        color: color.withValues(alpha: 0.20),
+        borderRadius: BorderRadius.circular(20),
+      ),
+      child: Text(condition.label,
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
+          style: TextStyle(color: color, fontSize: 9, fontWeight: FontWeight.w600)),
+    );
+  }
+}
+
 class _CartItemRow extends StatelessWidget {
   final CartItem item;
   const _CartItemRow({required this.item});
 
   @override
   Widget build(BuildContext context) {
-    final color = _seedColor(item.marketName);
+    final color = _seedColor(item.sellerName);
 
     return Container(
       margin: const EdgeInsets.only(bottom: 10),
@@ -197,26 +221,48 @@ class _CartItemRow extends StatelessWidget {
               borderRadius: BorderRadius.circular(10),
             ),
             alignment: Alignment.center,
-            child: Icon(Icons.shopping_bag_outlined, color: color, size: 20),
+            child: Icon(Icons.storefront_outlined, color: color, size: 20),
           ),
           const SizedBox(width: 12),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(item.title,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    style: const TextStyle(
-                        color: Colors.white, fontSize: 14, fontWeight: FontWeight.w600)),
-                const SizedBox(height: 2),
-                Text(
-                  item.unitLabel != null
-                      ? "${item.marketName} · ${item.unitLabel}"
-                      : item.marketName,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: TextStyle(color: color, fontSize: 11, fontWeight: FontWeight.w600),
+                Row(
+                  children: [
+                    Expanded(
+                      child: Text(item.title,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: const TextStyle(
+                              color: Colors.white, fontSize: 14, fontWeight: FontWeight.w600)),
+                    ),
+                    const SizedBox(width: 6),
+                    _ConditionBadge(condition: item.condition),
+                  ],
+                ),
+                const SizedBox(height: 3),
+                Row(
+                  children: [
+                    Flexible(
+                      child: Text(item.sellerName,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: TextStyle(
+                              color: color, fontSize: 11, fontWeight: FontWeight.w600)),
+                    ),
+                    if (item.sellerRating != null) ...[
+                      const SizedBox(width: 6),
+                      const Icon(Icons.star, size: 11, color: Color(0xFFE0B23A)),
+                      Text(item.sellerRating!.toStringAsFixed(1),
+                          style: const TextStyle(color: Colors.white54, fontSize: 11)),
+                    ],
+                    if (item.sellerLocation != null) ...[
+                      const SizedBox(width: 6),
+                      Text("· ${item.sellerLocation}",
+                          style: const TextStyle(color: Colors.white38, fontSize: 11)),
+                    ],
+                  ],
                 ),
               ],
             ),
@@ -239,15 +285,14 @@ class _CartItemRow extends StatelessWidget {
   }
 }
 
-class _ComparisonMiniCard extends StatelessWidget {
-  final PriceComparisonGroup group;
-  const _ComparisonMiniCard({required this.group});
+class _ListingGroupMiniCard extends StatelessWidget {
+  final SimilarListingGroup group;
+  const _ListingGroupMiniCard({required this.group});
 
   @override
   Widget build(BuildContext context) {
-    final color = _seedColor(group.productName);
+    final color = _seedColor(group.listingTitle);
     final cheapest = group.cheapestOffer;
-    final savings = group.savingsPercentVsHighest;
 
     return GestureDetector(
       onTap: () => _openDetail(context),
@@ -262,31 +307,26 @@ class _ComparisonMiniCard extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(group.productName,
+            Text(group.listingTitle,
                 maxLines: 2,
                 overflow: TextOverflow.ellipsis,
                 style: const TextStyle(
                     color: Colors.white, fontSize: 14, fontWeight: FontWeight.w700)),
-            if (group.unitLabel != null)
-              Text(group.unitLabel!,
-                  style: const TextStyle(color: Colors.white38, fontSize: 11)),
             const Spacer(),
             if (cheapest != null) ...[
               Text("${_formatMoney(cheapest.price)} ${cheapest.currency}",
                   style: const TextStyle(
                       color: Colors.white, fontSize: 17, fontWeight: FontWeight.w700)),
-              Text("en ucuz: ${cheapest.marketName}",
+              Text("en ucuz: ${cheapest.sellerName}",
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                   style: TextStyle(color: color, fontSize: 11, fontWeight: FontWeight.w600)),
-              if (savings != null && savings > 0)
-                Text("%${savings.toStringAsFixed(0)} tasarruf",
-                    style: const TextStyle(color: Color(0xFF7FD98A), fontSize: 11)),
+              _ConditionBadge(condition: cheapest.condition),
             ] else
-              const Text("Stokta teklif yok",
+              const Text("Aktif ilan yok",
                   style: TextStyle(color: Colors.white38, fontSize: 12)),
             const SizedBox(height: 4),
-            Text("${group.offers.length} markette",
+            Text("${group.offers.length} ilan",
                 style: const TextStyle(color: Colors.white38, fontSize: 10)),
           ],
         ),
@@ -297,26 +337,28 @@ class _ComparisonMiniCard extends StatelessWidget {
   void _openDetail(BuildContext context) {
     showModalBottomSheet(
       context: context,
-      backgroundColor: const Color(0xFF141A26),
+      backgroundColor: const Color(0xFF1A1620),
       isScrollControlled: true,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
-      builder: (_) => PriceComparisonSheet(group: group),
+      builder: (_) => SimilarListingSheet(group: group),
     );
   }
 }
 
-/// Karşılaştırma mini kartına dokununca açılan tüm tekliflerin listesi
-/// (bkz. diğer modüllerdeki detay sheet presedanı).
-class PriceComparisonSheet extends StatelessWidget {
-  final PriceComparisonGroup group;
-  const PriceComparisonSheet({super.key, required this.group});
+/// İlan grubu mini kartına dokununca açılan tüm satıcı tekliflerinin
+/// listesi (bkz. market_cart_card_view.dart'taki PriceComparisonSheet
+/// presedanı).
+class SimilarListingSheet extends StatelessWidget {
+  final SimilarListingGroup group;
+  const SimilarListingSheet({super.key, required this.group});
 
   @override
   Widget build(BuildContext context) {
     final offers = group.sortedByPrice;
     final cheapestId = group.cheapestOffer?.id;
+    final highestRatedId = group.highestRatedOffer?.id;
 
     return SafeArea(
       child: SingleChildScrollView(
@@ -329,7 +371,7 @@ class PriceComparisonSheet extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Expanded(
-                  child: Text(group.productName,
+                  child: Text(group.listingTitle,
                       style: const TextStyle(
                           color: Colors.white, fontWeight: FontWeight.w700, fontSize: 18)),
                 ),
@@ -339,11 +381,12 @@ class PriceComparisonSheet extends StatelessWidget {
                 ),
               ],
             ),
-            if (group.unitLabel != null)
-              Text(group.unitLabel!,
-                  style: const TextStyle(color: Colors.white54, fontSize: 13)),
             const SizedBox(height: 16),
-            ...offers.map((o) => _OfferRow(offer: o, isCheapest: o.id == cheapestId)),
+            ...offers.map((o) => _OfferRow(
+                  offer: o,
+                  isCheapest: o.id == cheapestId,
+                  isHighestRated: o.id == highestRatedId,
+                )),
           ],
         ),
       ),
@@ -352,68 +395,88 @@ class PriceComparisonSheet extends StatelessWidget {
 }
 
 class _OfferRow extends StatelessWidget {
-  final MarketOffer offer;
+  final IndividualSellerOffer offer;
   final bool isCheapest;
-  const _OfferRow({required this.offer, required this.isCheapest});
+  final bool isHighestRated;
+  const _OfferRow({
+    required this.offer,
+    required this.isCheapest,
+    required this.isHighestRated,
+  });
 
   @override
   Widget build(BuildContext context) {
-    return Opacity(
-      opacity: offer.inStock ? 1.0 : 0.5,
-      child: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 8),
-        child: Row(
-          children: [
-            Expanded(
-              child: Row(
-                children: [
-                  Text(offer.marketName,
-                      style: const TextStyle(
-                          color: Colors.white, fontSize: 14, fontWeight: FontWeight.w600)),
-                  if (isCheapest && offer.inStock) ...[
-                    const SizedBox(width: 8),
-                    Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-                      decoration: BoxDecoration(
-                        color: const Color(0xFF7FD98A).withValues(alpha: 0.2),
-                        borderRadius: BorderRadius.circular(20),
-                      ),
-                      child: const Text("En Ucuz",
-                          style: TextStyle(
-                              color: Color(0xFF7FD98A),
-                              fontSize: 10,
-                              fontWeight: FontWeight.w600)),
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 8),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    Flexible(
+                      child: Text(offer.sellerName,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: const TextStyle(
+                              color: Colors.white, fontSize: 14, fontWeight: FontWeight.w600)),
                     ),
+                    if (offer.sellerRating != null) ...[
+                      const SizedBox(width: 6),
+                      const Icon(Icons.star, size: 12, color: Color(0xFFE0B23A)),
+                      Text(offer.sellerRating!.toStringAsFixed(1),
+                          style: const TextStyle(color: Colors.white54, fontSize: 12)),
+                    ],
                   ],
+                ),
+                const SizedBox(height: 4),
+                Row(
+                  children: [
+                    _ConditionBadge(condition: offer.condition),
+                    if (offer.location != null) ...[
+                      const SizedBox(width: 6),
+                      Text(offer.location!,
+                          style: const TextStyle(color: Colors.white38, fontSize: 11)),
+                    ],
+                  ],
+                ),
+                if (isCheapest || isHighestRated) ...[
+                  const SizedBox(height: 4),
+                  Text(
+                    isCheapest && isHighestRated
+                        ? "En ucuz · En yüksek puanlı"
+                        : (isCheapest ? "En ucuz" : "En yüksek puanlı"),
+                    style: const TextStyle(
+                        color: Color(0xFF7FD98A), fontSize: 11, fontWeight: FontWeight.w600),
+                  ),
                 ],
-              ),
+              ],
             ),
-            if (!offer.inStock)
-              const Text("Stokta yok",
-                  style: TextStyle(color: Colors.white38, fontSize: 12))
-            else
-              Text("${_formatMoney(offer.price)} ${offer.currency}",
-                  style: TextStyle(
-                      color: isCheapest ? const Color(0xFF7FD98A) : Colors.white,
-                      fontSize: 15,
-                      fontWeight: FontWeight.w700)),
-          ],
-        ),
+          ),
+          Text("${_formatMoney(offer.price)} ${offer.currency}",
+              style: TextStyle(
+                  color: isCheapest ? const Color(0xFF7FD98A) : Colors.white,
+                  fontSize: 15,
+                  fontWeight: FontWeight.w700)),
+        ],
       ),
     );
   }
 }
 
 class _RecommendationMiniCard extends StatelessWidget {
-  final RecommendedProduct product;
-  const _RecommendationMiniCard({required this.product});
+  final RecommendedListing listing;
+  const _RecommendationMiniCard({required this.listing});
 
   @override
   Widget build(BuildContext context) {
-    final color = _seedColor(product.marketName);
+    final color = _seedColor(listing.sellerName);
 
     return Container(
-      width: 168,
+      width: 172,
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
         color: color.withValues(alpha: 0.16),
@@ -429,36 +492,38 @@ class _RecommendationMiniCard extends StatelessWidget {
               color: color.withValues(alpha: 0.3),
               borderRadius: BorderRadius.circular(20),
             ),
-            child: Text(product.reason.label,
+            child: Text(listing.reason.label,
                 style: TextStyle(color: color, fontSize: 9, fontWeight: FontWeight.w600)),
           ),
           const SizedBox(height: 8),
-          Text(product.title,
+          Text(listing.title,
               maxLines: 2,
               overflow: TextOverflow.ellipsis,
               style: const TextStyle(
                   color: Colors.white, fontSize: 14, fontWeight: FontWeight.w700)),
           const Spacer(),
-          Text("${_formatMoney(product.price)} ${product.currency}",
+          Text("${_formatMoney(listing.price)} ${listing.currency}",
               style: const TextStyle(
                   color: Colors.white, fontSize: 15, fontWeight: FontWeight.w700)),
-          Text(product.marketName,
+          Text(listing.sellerName,
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
               style: const TextStyle(color: Colors.white38, fontSize: 11)),
+          const SizedBox(height: 2),
+          _ConditionBadge(condition: listing.condition),
         ],
       ),
     );
   }
 }
 
-// Market/ürün adı başına sabit, elle seçilmiş uyumlu bir palet (bkz.
+// Satıcı/ilan adı başına sabit, elle seçilmiş uyumlu bir palet (bkz.
 // diğer modüllerdeki aynı yaklaşım).
 const _seedPalette = <Color>[
-  Color(0xFF2E3E5A),
-  Color(0xFF5A3E2E),
-  Color(0xFF2E5A3E),
-  Color(0xFF4A2E5A),
+  Color(0xFF4A3E5A),
+  Color(0xFF3E4A5A),
+  Color(0xFF5A3E45),
+  Color(0xFF4A4A3E),
 ];
 
 Color _seedColor(String seed) {
