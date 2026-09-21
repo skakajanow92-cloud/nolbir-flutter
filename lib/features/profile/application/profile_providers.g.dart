@@ -87,7 +87,7 @@ final class ProfileFeedProvider
   ProfileFeed create() => ProfileFeed();
 }
 
-String _$profileFeedHash() => r'772cfe2270b6fd6796a2dd0853ec4e1ec0d81e48';
+String _$profileFeedHash() => r'4d39b0f931e34b5838af1880ab8ea345d08005fa';
 
 /// Şu an sabit "mevcut kullanıcı" — auth katmanı eklenince
 /// gerçek userId buradan (örn. authStateProvider) okunacak.

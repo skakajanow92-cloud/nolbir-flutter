@@ -12,10 +12,10 @@ import '../features/verification/widgets/verification_card_registrations.dart';
 /// dokunmana gerek kalmaz.
 void registerAllCardViews() {
   registerDiscoveryCardViews();
+  registerVerificationFormViews();
+  registerVerificationCardViews();
   registerProfileCardViews();
   registerCollectionCardViews();
   registerCartCardViews();
   registerFormViews();
-  registerVerificationFormViews();
-  registerVerificationCardViews();
 }
