@@ -1,5 +1,6 @@
 import '../../models/feed_card/feed_card.dart';
 import 'profile_mock/profile_mock.dart';
+import 'cart_mock/cart_mock.dart';
 
 /// Sol tab (Profil) veri kaynağı sözleşmesi.
 abstract class ProfileRepository {
@@ -44,6 +45,7 @@ class MockProfileRepository implements ProfileRepository {
     buildSmartHomeMock(),
     buildVehicleMock(),
     buildHostingMock(),
+    buildMarketCartMock(),
     ...buildPostsMock(),
   ];
 
