@@ -4,7 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:media_kit/media_kit.dart';
 import 'app/main_scaffold.dart';
 import 'app/card_registrations.dart';
-import 'windows_material_scroll.dart';
+import 'core/widgets/windows_material_scroll.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
