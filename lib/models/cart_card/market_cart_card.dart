@@ -1,4 +1,4 @@
-import 'base.dart';
+import '../feed_card/base.dart';
 import '../market_cart.dart';
 import '../cart.dart';
 

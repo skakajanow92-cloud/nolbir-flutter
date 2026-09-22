@@ -1,4 +1,4 @@
-import '../../../models/feed_card/feed_card.dart';
+import '../../../models/cart_card/market_cart_card.dart';
 import '../../../models/market_cart.dart';
 import '../../../models/cart.dart';
 
