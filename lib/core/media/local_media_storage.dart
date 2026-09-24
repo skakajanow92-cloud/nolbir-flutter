@@ -1,34 +1,19 @@
-import 'dart:io';
-import 'package:path_provider/path_provider.dart';
 import 'media_pick_result.dart';
+import 'local_media_storage_io.dart'
+    if (dart.library.html) 'platform/local_media_storage_web.dart' as platform;
 
-/// Seçilen bir medyayı cihazda KALICI hale getirir.
+/// Seçilen bir medyayı KALICI hale getirir — native'de gerçek bir dosyaya
+/// yazar, web'de zaten bellekteki `bytes`'ı olduğu gibi geri döner.
 ///
-/// NEDEN GEREKLİ: `image_picker`/`file_picker`'ın döndürdüğü path çoğu
-/// zaman geçici bir önbellek (cache) konumudur — işletim sistemi bunu
-/// istediği an temizleyebilir. Bir gönderi/kart bu path'i doğrudan
-/// saklarsa, uygulama yeniden açıldığında dosya kaybolmuş olabilir. Bu
-/// sınıf dosyayı uygulamanın kalıcı belge dizinine kopyalayıp yeni,
-/// güvenilir path'i döner.
+/// Gerçek implementasyon burada DEĞİL: `platform/local_media_storage_io.dart`
+/// (dart:io) ile `platform/local_media_storage_web.dart` (no-op) arasında
+/// conditional import ile seçiliyor — çağıran kod (`MediaService`, kartlar)
+/// hangi platformda çalıştığını hiç bilmiyor.
 class LocalMediaStorage {
   LocalMediaStorage._();
 
-  static Future<String> saveLocally(MediaPickResult media) async {
-    final docsDir = await getApplicationDocumentsDirectory();
-    final targetDir = Directory('${docsDir.path}/media');
-    if (!await targetDir.exists()) {
-      await targetDir.create(recursive: true);
-    }
+  static Future<MediaPickResult> saveLocally(MediaPickResult media) =>
+      platform.persist(media);
 
-    final uniqueName =
-        "${DateTime.now().millisecondsSinceEpoch}_${media.fileName}";
-    final targetFile = File('${targetDir.path}/$uniqueName');
-    await File(media.path).copy(targetFile.path);
-    return targetFile.path;
-  }
-
-  static Future<void> delete(String localPath) async {
-    final file = File(localPath);
-    if (await file.exists()) await file.delete();
-  }
+  static Future<void> delete(String path) => platform.deleteAt(path);
 }

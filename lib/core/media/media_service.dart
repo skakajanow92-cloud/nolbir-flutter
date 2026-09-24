@@ -40,7 +40,6 @@ class MediaService {
   Future<MediaPickResult?> _persist(Future<MediaPickResult?> pick) async {
     final picked = await pick;
     if (picked == null) return null;
-    final localPath = await LocalMediaStorage.saveLocally(picked);
-    return picked.copyWith(path: localPath);
+    return LocalMediaStorage.saveLocally(picked);
   }
 }

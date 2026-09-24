@@ -35,7 +35,7 @@ class _CreatePostSheetState extends ConsumerState<CreatePostSheet> {
     try {
       final media = await pick();
       if (media == null) return; // kullanıcı iptal etti — hata değil
-      await _addPost(media.path, caption: caption);
+      await _addPost(media, caption: caption);
     } catch (e) {
       setState(() =>
           _errorMessage = "İşlem tamamlanamadı: izin verildiğinden emin ol.");
@@ -44,10 +44,13 @@ class _CreatePostSheetState extends ConsumerState<CreatePostSheet> {
     }
   }
 
-  Future<void> _addPost(String localPath, {required String caption}) async {
+  Future<void> _addPost(MediaPickResult media, {required String caption}) async {
     final newPost = UserPostCard(
       id: "post_${DateTime.now().millisecondsSinceEpoch}",
-      mediaUrl: localPath,
+      // NOT: `path` sadece native'de var — web'de null döner. Şimdilik
+      // boş string'e düşüyoruz; web'de gerçek önizleme `media.bytes` ile
+      // `Image.memory`/video-blob üzerinden ayrıca ele alınmalı.
+      mediaUrl: media.path ?? "",
       caption: caption,
     );
     await ref.read(profileFeedProvider.notifier).addPost(newPost);
