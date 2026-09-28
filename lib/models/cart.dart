@@ -26,19 +26,29 @@ class CartType {
   static const food = CartType('food'); // yemek siparişi
   static const pharmacy = CartType('pharmacy'); // eczane/ilaç
   static const travelTicket = CartType('travel_ticket'); // gezi/seyahat bileti
-  static const eventTicket = CartType('event_ticket'); // etkinlik/organizasyon bileti
+  static const eventTicket = CartType(
+    'event_ticket',
+  ); // etkinlik/organizasyon bileti
   static const hosting = CartType('hosting'); // hosting hizmetleri
-  static const subscription = CartType('subscription'); // video/koleksiyon aboneliği
+  static const subscription = CartType(
+    'subscription',
+  ); // video/koleksiyon aboneliği
   static const investment = CartType('investment'); // yatırım portföyü
   static const insurance = CartType('insurance'); // sigorta poliçeleri
   static const banking = CartType('banking'); // banka ürün/hizmetleri
-  static const healthAppointment = CartType('health_appointment'); // sağlık randevusu
-  static const legalFinanceConsulting =
-      CartType('legal_finance_consulting'); // hukuk/mali danışmanlık
+  static const healthAppointment = CartType(
+    'health_appointment',
+  ); // sağlık randevusu
+  static const legalFinanceConsulting = CartType(
+    'legal_finance_consulting',
+  ); // hukuk/mali danışmanlık
   static const betting = CartType('betting'); // bahis kuponu
   static const sportsGear = CartType('sports_gear'); // spor malzemesi
   static const wholesale = CartType('wholesale'); // toptan ticari ürünler
   static const education = CartType('education'); // ders/kurs
+  static const accommodation = CartType(
+    'accommodation',
+  ); // otel/konaklama rezervasyonu
 
   @override
   bool operator ==(Object other) => other is CartType && other.id == id;

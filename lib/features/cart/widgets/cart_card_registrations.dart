@@ -6,6 +6,7 @@ import 'cart_summary_card_view.dart';
 import 'market_cart_card_view.dart';
 import 'second_hand_cart_card_view.dart';
 import 'ticket_cart_card_view.dart';
+import 'hotel_cart_card_view.dart';
 
 void registerCartCardViews() {
   CardViewRegistry.register<CartSummaryCard>(
@@ -34,4 +35,10 @@ void registerCartCardViews() {
         TicketCartCardView(card: card as TicketCartCard)),
   );
   ProfileModuleOrder.register<TicketCartCard>();
+
+  CardViewRegistry.register<HotelCartCard>(
+    ((context, card, isActive) =>
+        HotelCartCardView(card: card as HotelCartCard)),
+  );
+  ProfileModuleOrder.register<HotelCartCard>();
 }
