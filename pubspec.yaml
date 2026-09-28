@@ -37,6 +37,8 @@ dependencies:
   flutter_riverpod: ^3.4.3
   riverpod_annotation: ^4.0.7
   dio: ^5.11.1
+  hive_flutter: ^1.1.0
+  hive_ce_flutter: ^2.4.0
 
   # Video oynatma
   media_kit: ^1.2.6

@@ -2,15 +2,16 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:media_kit/media_kit.dart';
+import 'package:nolbir/core/storage/local_store.dart';
 import 'app/main_scaffold.dart';
 import 'app/card_registrations.dart';
 import 'core/widgets/windows_material_scroll.dart';
 
-void main() {
+void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   MediaKit.ensureInitialized();
   registerAllCardViews(); // tüm kart görünümlerini burada, tek seferde kaydet
-
+  await LocalStore.init();
   _enableImmersiveFullScreen();
 
   runApp(const ProviderScope(child: MyApp()));
