@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../../../models/cart_card/market_cart_card.dart';
+import '../../../models/cart_card/cart_card.dart';
 import '../../../models/cart.dart';
 import '../../../models/market_cart.dart';
 

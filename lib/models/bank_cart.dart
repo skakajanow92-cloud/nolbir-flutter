@@ -1,95 +1,99 @@
 import 'cart.dart';
 
-/// Banka/finans ürünü türü.
-enum BankProductType { loan, deposit, safeDepositBox, preciousMetal, crypto }
+/// Banka ürününün türü.
+enum BankProductType { deposit, preciousMetal, loan, safeBox, crypto }
 
 extension BankProductTypeLabel on BankProductType {
   String get label => switch (this) {
-        BankProductType.loan => "Kredi",
-        BankProductType.deposit => "Mevduat",
-        BankProductType.safeDepositBox => "Kasa Kiralama",
+        BankProductType.deposit => "Vadeli Mevduat",
         BankProductType.preciousMetal => "Kıymetli Maden",
-        BankProductType.crypto => "Kripto",
+        BankProductType.loan => "Kredi",
+        BankProductType.safeBox => "Kiralık Kasa",
+        BankProductType.crypto => "Kripto Varlık",
       };
 }
 
-/// Bir başvuru adımının durumu.
-enum StepStatus { pending, inProgress, completed, rejected }
+/// Bir işlem adımının durumu.
+enum ProcessStepStatus { pending, inProgress, completed, rejected }
 
-extension StepStatusLabel on StepStatus {
+extension ProcessStepStatusLabel on ProcessStepStatus {
   String get label => switch (this) {
-        StepStatus.pending => "Bekliyor",
-        StepStatus.inProgress => "Devam Ediyor",
-        StepStatus.completed => "Tamamlandı",
-        StepStatus.rejected => "Reddedildi",
+        ProcessStepStatus.pending => "Bekliyor",
+        ProcessStepStatus.inProgress => "İşlemde",
+        ProcessStepStatus.completed => "Tamamlandı",
+        ProcessStepStatus.rejected => "Reddedildi",
       };
 }
 
-/// Bir banka ürünü başvurusunun tek bir adımı.
+/// Bir banka ürünü başvurusunun tek bir işlem adımı.
 ///
-/// BİLİNÇLİ TASARIM KARARI: "Para aktarınca hesap açılır" (mevduat/
-/// kıymetli maden) ile "forma yönlendirilip evrak onaylanır" (kredi/
-/// kasa/kripto) akışları AYRI modellenmedi — ikisi de aynı `ProcessStep`
-/// listesiyle temsil ediliyor, sadece adımların içeriği (title) farklı.
-/// Bu, sepetin "satın al ve bitir" değil "checkout sonrası süreç devam
-/// eder" doğasını tek bir yapıyla karşılıyor.
+/// BİLİNÇLİ TASARIM KARARI: Banka ürünleri sepetindeki "sepete ekle/öde"
+/// diğer sepetlerin aksine bir SONUÇ değil bir BAŞLANGIÇ — para transferiyle
+/// açılan ürünler (vadeli mevduat, kıymetli maden) ile forma yönlendirip
+/// belge onayı bekleyen ürünler (kredi, kiralık kasa, kripto) TAMAMEN
+/// FARKLI gerçek dünya akışları, ama ikisi de aynı `ProcessStep` dizisiyle
+/// temsil edilebiliyor — ayrı bir "akış türü" enum'u YOK, fark sadece
+/// hangi adımların hangi sırayla eklendiğinde.
 class ProcessStep {
   final String id;
-  final String title; // örn. "Evrak Onayı", "Para Transferi", "Hesap Açılışı"
-  final StepStatus status;
+  final String label; // örn. "Kimlik Doğrulama", "Para Transferi", "Belge Onayı"
+  final ProcessStepStatus status;
   final DateTime? completedAt;
   final String? note;
 
   const ProcessStep({
     required this.id,
-    required this.title,
-    this.status = StepStatus.pending,
+    required this.label,
+    required this.status,
     this.completedAt,
     this.note,
   });
 }
 
-/// `CartItem.metadata` üzerinden banka sepetine özel alanları okuyan
-/// yardımcı extension (bkz. diğer sepet dosyalarındaki aynı yaklaşım).
+/// `CartItem.metadata` üzerinden banka ürünleri sepetine özel alanları
+/// okuyan yardımcı extension.
 extension BankCartItemExtras on CartItem {
   BankProductType get productType =>
       (metadata['productType'] as BankProductType?) ?? BankProductType.deposit;
-  String get bankName => (metadata['bankName'] as String?) ?? "Bilinmeyen Kurum";
+  String get bankName => (metadata['bankName'] as String?) ?? "Bilinmeyen Banka";
   double? get interestRate => metadata['interestRate'] as double?;
   int? get termMonths => metadata['termMonths'] as int?;
+  List<ProcessStep> get processSteps =>
+      (metadata['processSteps'] as List<ProcessStep>?) ?? const [];
 
-  /// Hesabın/işlemin tamamlanması için aktarılması gereken tutar —
-  /// mevduat/kıymetli maden ürünlerinde anlamlı; kredi/kasa/kripto gibi
-  /// "forma yönlendir" akışlarında `null` kalabilir.
-  double? get requiredTransferAmount => metadata['requiredTransferAmount'] as double?;
-
-  List<ProcessStep> get steps => (metadata['steps'] as List<ProcessStep>?) ?? const [];
-
-  int get completedStepCount =>
-      steps.where((s) => s.status == StepStatus.completed).length;
-
+  /// Tüm adımlar tamamlandıysa ürün tamamen işlenmiş sayılır (bkz.
+  /// cargo.dart'taki `ShipmentStatus.isFinal` ile aynı "durum bazlı"
+  /// yaklaşım — tarih değil, adım durumları belirleyici).
   bool get isFullyProcessed =>
-      steps.isNotEmpty && steps.every((s) => s.status == StepStatus.completed);
+      processSteps.isNotEmpty &&
+      processSteps.every((s) => s.status == ProcessStepStatus.completed);
 
-  bool get hasRejectedStep => steps.any((s) => s.status == StepStatus.rejected);
+  bool get hasRejectedStep =>
+      processSteps.any((s) => s.status == ProcessStepStatus.rejected);
 
-  /// Sıradaki (bekleyen ya da devam eden) ilk adım — tamamlanmışsa `null`.
+  /// Şu an bekleyen/işlemde olan ilk adım — kartta öne çıkarılacak adım.
   ProcessStep? get currentStep {
-    for (final s in steps) {
-      if (s.status == StepStatus.pending || s.status == StepStatus.inProgress) return s;
+    for (final step in processSteps) {
+      if (step.status == ProcessStepStatus.pending ||
+          step.status == ProcessStepStatus.inProgress) {
+        return step;
+      }
     }
     return null;
   }
+
+  int get completedStepCount =>
+      processSteps.where((s) => s.status == ProcessStepStatus.completed).length;
 }
 
-/// Aynı ürün türü/vade için tek bir bankanın oranı.
-class BankRateOffer {
+/// Bir bankanın tek bir faiz teklifi.
+class BankOffer {
   final String id;
   final String bankName;
-  final double interestRate; // yıllık, yüzde olarak
+  final double interestRate;
   final bool isAvailable;
 
-  const BankRateOffer({
+  const BankOffer({
     required this.id,
     required this.bankName,
     required this.interestRate,
@@ -97,73 +101,69 @@ class BankRateOffer {
   });
 }
 
-/// Aynı ürün (örn. "12 Ay Vadeli Mevduat" ya da "İhtiyaç Kredisi") için
-/// farklı bankaların oranlarının toplandığı grup.
+/// Aynı ürün için farklı bankaların faiz tekliflerinin toplandığı grup.
 ///
-/// ÖNEMLİ TASARIM NOKTASI: "En iyi teklif" ürün türüne göre YÖN
-/// DEĞİŞTİRİR — mevduatta en YÜKSEK faiz iyidir, krediде en DÜŞÜK faiz
-/// iyidir. `bestOffer` bunu `productType`e bakarak hesaplıyor; aksi
-/// halde kredi karşılaştırmasında yanlışlıkla en pahalı teklif "en iyi"
-/// gösterilirdi.
-class RateComparisonGroup {
+/// BİLİNÇLİ TASARIM KARARI: "En iyi teklif" yönü ürün türüne göre TERS
+/// DÖNÜYOR — kredide en DÜŞÜK faiz en iyisi, mevduatta en YÜKSEK faiz en
+/// iyisi. Bu yön `lowerIsBetter` ile tek bir yerden belirleniyor, kartın
+/// geri kalanı bunu sorgusuz kullanıyor.
+class InterestRateComparisonGroup {
   final String id;
-  final String productLabel;
+  final String productName; // örn. "12 Ay Vadeli TL Mevduat", "İhtiyaç Kredisi"
   final BankProductType productType;
-  final int? termMonths;
-  final List<BankRateOffer> offers;
+  final List<BankOffer> offers;
 
-  const RateComparisonGroup({
+  const InterestRateComparisonGroup({
     required this.id,
-    required this.productLabel,
+    required this.productName,
     required this.productType,
-    this.termMonths,
     this.offers = const [],
   });
 
-  bool get _lowerIsBetter => productType == BankProductType.loan;
+  bool get lowerIsBetter => productType == BankProductType.loan;
 
-  List<BankRateOffer> get sortedByRate {
+  List<BankOffer> get sortedByBest {
     final available = offers.where((o) => o.isAvailable).toList()
-      ..sort((a, b) => _lowerIsBetter
+      ..sort((a, b) => lowerIsBetter
           ? a.interestRate.compareTo(b.interestRate)
           : b.interestRate.compareTo(a.interestRate));
     final unavailable = offers.where((o) => !o.isAvailable).toList();
     return [...available, ...unavailable];
   }
 
-  BankRateOffer? get bestOffer {
+  BankOffer? get bestOffer {
     final available = offers.where((o) => o.isAvailable);
     if (available.isEmpty) return null;
-    return _lowerIsBetter
+    return lowerIsBetter
         ? available.reduce((a, b) => a.interestRate <= b.interestRate ? a : b)
         : available.reduce((a, b) => a.interestRate >= b.interestRate ? a : b);
   }
 }
 
 /// Bir önerinin gösterilme gerekçesi.
-enum BankRecommendationReason { betterRate, complementaryProduct }
+enum BankRecommendationReason { alternativeProduct, betterRate }
 
 extension BankRecommendationReasonLabel on BankRecommendationReason {
   String get label => switch (this) {
-        BankRecommendationReason.betterRate => "Daha İyi Koşul",
-        BankRecommendationReason.complementaryProduct => "Tamamlayıcı Ürün",
+        BankRecommendationReason.alternativeProduct => "Alternatif Ürün",
+        BankRecommendationReason.betterRate => "Daha İyi Oran",
       };
 }
 
 /// Kullanıcıya önerilen tek bir banka ürünü.
 class RecommendedBankProduct {
   final String id;
-  final String bankName;
   final String productName;
   final BankProductType productType;
+  final String bankName;
   final double? interestRate;
   final BankRecommendationReason reason;
 
   const RecommendedBankProduct({
     required this.id,
-    required this.bankName,
     required this.productName,
     required this.productType,
+    required this.bankName,
     this.interestRate,
     required this.reason,
   });
