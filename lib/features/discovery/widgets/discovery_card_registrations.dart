@@ -5,6 +5,7 @@ import 'video_card_view.dart';
 import 'product_card_view.dart';
 import 'subscription_card_view.dart';
 import 'bank_product_card_view.dart';
+import 'insurance_product_card_view.dart';
 
 void registerDiscoveryCardViews() {
   CardViewRegistry.register<VideoCard>(
@@ -21,5 +22,9 @@ void registerDiscoveryCardViews() {
   CardViewRegistry.register<BankProductCard>(
     (context, card, isActive) =>
         BankProductCardView(card: card as BankProductCard),
+  );
+  CardViewRegistry.register<InsuranceProductCard>(
+    (context, card, isActive) =>
+        InsuranceProductCardView(card: card as InsuranceProductCard),
   );
 }
