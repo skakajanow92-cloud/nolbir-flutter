@@ -1,6 +1,9 @@
 import '../../../core/cart/card_view_registry.dart';
 import '../../../models/feed_card/feed_card.dart';
 import '../../../models/product_card/product_card.dart';
+import 'business_menu_card_view.dart';
+import 'food_item_card_view.dart';
+import 'food_place_search_card_view.dart';
 import 'hotel_search_card_view.dart';
 import 'popular_hotels_card_view.dart';
 import 'video_card_view.dart';
@@ -50,9 +53,22 @@ void registerDiscoveryCardViews() {
         PopularRoutesCardView(card: card as PopularRoutesCard),
   );
   CardViewRegistry.register<HotelSearchCard>(
-  (context, card, isActive) => HotelSearchCardView(card: card as HotelSearchCard),
-);
-CardViewRegistry.register<PopularHotelsCard>(
-  (context, card, isActive) => PopularHotelsCardView(card: card as PopularHotelsCard),
-);
+    (context, card, isActive) =>
+        HotelSearchCardView(card: card as HotelSearchCard),
+  );
+  CardViewRegistry.register<PopularHotelsCard>(
+    (context, card, isActive) =>
+        PopularHotelsCardView(card: card as PopularHotelsCard),
+  );
+  CardViewRegistry.register<FoodItemCard>(
+    (context, card, isActive) => FoodItemCardView(card: card as FoodItemCard),
+  );
+  CardViewRegistry.register<BusinessMenuCard>(
+    (context, card, isActive) =>
+        BusinessMenuCardView(card: card as BusinessMenuCard),
+  );
+  CardViewRegistry.register<FoodPlaceSearchCard>(
+    (context, card, isActive) =>
+        FoodPlaceSearchCardView(card: card as FoodPlaceSearchCard),
+  );
 }

@@ -435,6 +435,77 @@ class MockDiscoveryRepository implements DiscoveryRepository {
     ),
   ];
 
+  static final List<FoodItemCard Function(String id)> _foodItemBuilders = [
+    (id) => FoodItemCard(
+      id: id,
+      businessName: "Napoli Pizzeria",
+      businessLogoUrl: "",
+      businessType: "Lokanta",
+      itemName: "Margherita Pizza",
+      description: "Taş fırında, taze fesleğen ve mozzarella ile.",
+      price: 240,
+      discountedPrice: 190,
+      rating: 4.6,
+      reviewCount: 980,
+      category: FoodCategory.mainCourse,
+      dietaryTags: const [DietaryTag.vegetarian],
+      prepTimeMinutes: 25,
+    ),
+  ];
+
+  static final List<BusinessMenuCard Function(String id)>
+  _businessMenuBuilders = [
+    (id) => BusinessMenuCard(
+      id: id,
+      businessName: "Köy Sofrası",
+      businessLogoUrl: "",
+      businessType: "Ev Yemekleri",
+      rating: 4.4,
+      reviewCount: 540,
+      deliveryTimeMinutes: 35,
+      deliveryFee: 0,
+      minOrderAmount: 150,
+      distanceKm: 2.3,
+      items: const [
+        MenuItem(
+          id: "m1",
+          name: "Mercimek Çorbası",
+          description: "Ev yapımı, tereyağlı",
+          price: 60,
+          category: FoodCategory.starter,
+        ),
+        MenuItem(
+          id: "m2",
+          name: "Kuru Fasulye",
+          description: "Pilav eşliğinde",
+          price: 120,
+          category: FoodCategory.mainCourse,
+        ),
+        MenuItem(
+          id: "m3",
+          name: "Künefe",
+          description: "Sıcak servis",
+          price: 95,
+          discountedPrice: 80,
+          category: FoodCategory.dessert,
+          dietaryTags: [DietaryTag.vegetarian],
+        ),
+      ],
+    ),
+  ];
+
+  static final List<FoodPlaceSearchCard Function(String id)>
+  _foodPlaceSearchBuilders = [
+    (id) => FoodPlaceSearchCard(
+      id: id,
+      platformName: "YemekYolda",
+      platformLogoUrl: "",
+      description: "Çevrendeki kafe ve lokantalardan sipariş ver.",
+      cuisineTypes: const ["Türk Mutfağı", "İtalyan", "Fast Food", "Tatlı"],
+      popularLocations: const ["Kadıköy", "Beşiktaş", "Çankaya"],
+    ),
+  ];
+
   @override
   Future<List<FeedCard>> fetchFeed({
     required int page,
@@ -442,11 +513,11 @@ class MockDiscoveryRepository implements DiscoveryRepository {
   }) async {
     await Future.delayed(const Duration(milliseconds: 400));
 
-    if (page >= 12) return [];
+    if (page >= 15) return [];
 
     return List.generate(pageSize, (i) {
       final n = page * pageSize + i;
-      final type = n % 11; // 0: video, 1: ürün, 2: abonelik, 3: banka ürünü
+      final type = n % 14; // 0: video, 1: ürün, 2: abonelik, 3: banka ürünü
       switch (type) {
         case 0:
           return VideoCard(
@@ -500,9 +571,19 @@ class MockDiscoveryRepository implements DiscoveryRepository {
           return _hotelSearchBuilders[n % _hotelSearchBuilders.length](
             "hotels$n",
           );
-        default:
+        case 10:
           return _popularHotelsBuilders[n % _popularHotelsBuilders.length](
             "populer_otels$n",
+          );
+        case 11:
+          return _foodItemBuilders[n % _foodItemBuilders.length]("food$n");
+        case 12:
+          return _businessMenuBuilders[n % _businessMenuBuilders.length](
+            "menu$n",
+          );
+        default:
+          return _foodPlaceSearchBuilders[n % _foodPlaceSearchBuilders.length](
+            "foodsearch$n",
           );
       }
     });
