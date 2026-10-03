@@ -319,6 +319,21 @@ class MockDiscoveryRepository implements DiscoveryRepository {
     ),
   ];
 
+  static const _gridThemes = [
+    "Bu haftanın fırsatları",
+    "Ofis ve kırtasiye ihtiyaçları",
+    "Ev yenileme seçenekleri",
+  ];
+
+  List<EcommerceProductCard> _buildGridItems(int seed, int count) {
+    return List.generate(count, (i) {
+      final n = seed * 100 + i;
+      final builder =
+          _ecommerceProductBuilders[n % _ecommerceProductBuilders.length];
+      return builder("grid_${seed}_$n");
+    });
+  }
+
   @override
   Future<List<FeedCard>> fetchFeed({
     required int page,
@@ -326,11 +341,11 @@ class MockDiscoveryRepository implements DiscoveryRepository {
   }) async {
     await Future.delayed(const Duration(milliseconds: 400));
 
-    if (page >= 7) return [];
+    if (page >= 8) return [];
 
     return List.generate(pageSize, (i) {
       final n = page * pageSize + i;
-      final type = n % 6; // 0: video, 1: ürün, 2: abonelik, 3: banka ürünü
+      final type = n % 7; // 0: video, 1: ürün, 2: abonelik, 3: banka ürünü
       switch (type) {
         case 0:
           return VideoCard(
@@ -362,9 +377,16 @@ class MockDiscoveryRepository implements DiscoveryRepository {
         case 4:
           return _ecommerceProductBuilders[n %
               _ecommerceProductBuilders.length]("ecmc$n");
-        default:
+        case 5:
           return _insuranceProductBuilders[n %
               _insuranceProductBuilders.length]("ins$n");
+        default:
+          return ProductGridCard(
+            id: "grid$n",
+            title: _gridThemes[n % _gridThemes.length],
+            subtitle: "Farklı mağazalardan seçilmiş 12 ürün",
+            products: _buildGridItems(n, 12),
+          );
       }
     });
   }

@@ -7,6 +7,7 @@ import 'subscription_card_view.dart';
 import 'bank_product_card_view.dart';
 import 'insurance_product_card_view.dart';
 import 'ecommerce_product_card_view.dart';
+import 'product_grid_card_view.dart';
 
 void registerDiscoveryCardViews() {
   CardViewRegistry.register<VideoCard>(
@@ -31,5 +32,9 @@ void registerDiscoveryCardViews() {
   CardViewRegistry.register<EcommerceProductCard>(
     (context, card, isActive) =>
         EcommerceProductCardView(card: card as EcommerceProductCard),
+  );
+  CardViewRegistry.register<ProductGridCard>(
+    (context, card, isActive) =>
+        ProductGridCardView(card: card as ProductGridCard),
   );
 }
