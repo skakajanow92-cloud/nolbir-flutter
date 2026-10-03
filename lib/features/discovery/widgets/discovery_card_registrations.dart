@@ -6,6 +6,7 @@ import 'product_card_view.dart';
 import 'subscription_card_view.dart';
 import 'bank_product_card_view.dart';
 import 'insurance_product_card_view.dart';
+import 'ecommerce_product_card_view.dart';
 
 void registerDiscoveryCardViews() {
   CardViewRegistry.register<VideoCard>(
@@ -26,5 +27,9 @@ void registerDiscoveryCardViews() {
   CardViewRegistry.register<InsuranceProductCard>(
     (context, card, isActive) =>
         InsuranceProductCardView(card: card as InsuranceProductCard),
+  );
+  CardViewRegistry.register<EcommerceProductCard>(
+    (context, card, isActive) =>
+        EcommerceProductCardView(card: card as EcommerceProductCard),
   );
 }

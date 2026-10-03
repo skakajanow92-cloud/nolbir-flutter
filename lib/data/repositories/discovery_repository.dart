@@ -217,6 +217,108 @@ class MockDiscoveryRepository implements DiscoveryRepository {
     ),
   ];
 
+  static final List<EcommerceProductCard Function(String id)>
+  _ecommerceProductBuilders = [
+    (id) => EcommerceProductCard(
+      id: id,
+      storeName: "Moda Dükkanı",
+      storeLogoUrl: "",
+      brandName: "Nordline",
+      category: ProductCategory.clothing,
+      title: "Yünlü Kaban",
+      description: "Kışlık, su itici kumaşlı, astarlı kaban.",
+      price: 1299.0,
+      discountedPrice: 899.0,
+      rating: 4.4,
+      reviewCount: 612,
+      stockStatus: StockStatus.lowStock,
+      imageUrls: const ["", ""],
+      variantGroups: const [
+        ProductVariantGroup(name: "Beden", options: ["S", "M", "L", "XL"]),
+        ProductVariantGroup(
+          name: "Renk",
+          options: ["Siyah", "Kamel", "Lacivert"],
+        ),
+      ],
+      specs: const [
+        ProductSpec(label: "Kumaş", value: "%70 Yün, %30 Polyester"),
+        ProductSpec(label: "Astar", value: "Var"),
+      ],
+    ),
+    (id) => EcommerceProductCard(
+      id: id,
+      storeName: "Teknoloji Merkezi",
+      storeLogoUrl: "",
+      brandName: "Orion",
+      category: ProductCategory.mobileDevices,
+      title: "Orion X12 Akıllı Telefon",
+      description: "6.5 inç ekran, üçlü kamera, hızlı şarj desteği.",
+      price: 24999.0,
+      rating: 4.6,
+      reviewCount: 3480,
+      imageUrls: const [""],
+      variantGroups: const [
+        ProductVariantGroup(
+          name: "Depolama",
+          options: ["128GB", "256GB", "512GB"],
+        ),
+        ProductVariantGroup(name: "Renk", options: ["Grafit", "Gümüş"]),
+      ],
+      specs: const [
+        ProductSpec(label: "Ekran", value: "6.5\" AMOLED"),
+        ProductSpec(label: "İşlemci", value: "Octa-core 2.8GHz"),
+        ProductSpec(label: "Batarya", value: "5000 mAh"),
+        ProductSpec(label: "Kamera", value: "50MP + 12MP + 8MP"),
+      ],
+      cartType: CartType.secondHand,
+    ),
+    (id) => EcommerceProductCard(
+      id: id,
+      storeName: "Usta Hırdavat",
+      storeLogoUrl: "",
+      brandName: "PowerMax",
+      category: ProductCategory.powerTools,
+      title: "PowerMax 900W Matkap",
+      description: "Darbeli, değişken hız kontrollü profesyonel matkap.",
+      price: 1850.0,
+      rating: 4.2,
+      reviewCount: 198,
+      stockStatus: StockStatus.inStock,
+      imageUrls: const [""],
+      specs: const [
+        ProductSpec(label: "Güç", value: "900W"),
+        ProductSpec(label: "Mandren", value: "13mm"),
+        ProductSpec(label: "Ağırlık", value: "2.1 kg"),
+        ProductSpec(label: "Kutu İçeriği", value: "Çanta + 5 uç"),
+      ],
+      cartType: CartType.wholesale,
+    ),
+    (id) => EcommerceProductCard(
+      id: id,
+      storeName: "Yapı Market",
+      storeLogoUrl: "",
+      category: ProductCategory.construction,
+      title: "Alçıpan Levha",
+      description: "Standart iç mekan alçıpan levha, nem direnci yüksek.",
+      price: 189.0,
+      rating: 3.9,
+      reviewCount: 74,
+      stockStatus: StockStatus.preOrder,
+      imageUrls: const [""],
+      variantGroups: const [
+        ProductVariantGroup(
+          name: "Ölçü",
+          options: ["120x200cm", "120x250cm", "120x300cm"],
+        ),
+      ],
+      specs: const [
+        ProductSpec(label: "Kalınlık", value: "12.5mm"),
+        ProductSpec(label: "Kenar Tipi", value: "Düz kenar"),
+      ],
+      cartType: CartType.wholesale,
+    ),
+  ];
+
   @override
   Future<List<FeedCard>> fetchFeed({
     required int page,
@@ -224,11 +326,11 @@ class MockDiscoveryRepository implements DiscoveryRepository {
   }) async {
     await Future.delayed(const Duration(milliseconds: 400));
 
-    if (page >= 6) return [];
+    if (page >= 7) return [];
 
     return List.generate(pageSize, (i) {
       final n = page * pageSize + i;
-      final type = n % 5; // 0: video, 1: ürün, 2: abonelik, 3: banka ürünü
+      final type = n % 6; // 0: video, 1: ürün, 2: abonelik, 3: banka ürünü
       switch (type) {
         case 0:
           return VideoCard(
@@ -257,6 +359,9 @@ class MockDiscoveryRepository implements DiscoveryRepository {
           return _bankProductBuilders[n % _bankProductBuilders.length](
             "bank$n",
           );
+        case 4:
+          return _ecommerceProductBuilders[n %
+              _ecommerceProductBuilders.length]("ecmc$n");
         default:
           return _insuranceProductBuilders[n %
               _insuranceProductBuilders.length]("ins$n");
