@@ -1,6 +1,8 @@
 import '../../../core/cart/card_view_registry.dart';
 import '../../../models/feed_card/feed_card.dart';
 import '../../../models/product_card/product_card.dart';
+import 'hotel_search_card_view.dart';
+import 'popular_hotels_card_view.dart';
 import 'video_card_view.dart';
 import 'product_card_view.dart';
 import 'subscription_card_view.dart';
@@ -47,4 +49,10 @@ void registerDiscoveryCardViews() {
     (context, card, isActive) =>
         PopularRoutesCardView(card: card as PopularRoutesCard),
   );
+  CardViewRegistry.register<HotelSearchCard>(
+  (context, card, isActive) => HotelSearchCardView(card: card as HotelSearchCard),
+);
+CardViewRegistry.register<PopularHotelsCard>(
+  (context, card, isActive) => PopularHotelsCardView(card: card as PopularHotelsCard),
+);
 }

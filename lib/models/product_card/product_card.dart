@@ -6,3 +6,5 @@ export 'ecommerce_product_card.dart';
 export 'product_grid_card.dart';
 export 'ticket_search_card.dart';
 export 'popular_routes_card.dart';
+export 'hotel_search_card.dart';
+export 'popular_hotels_card.dart';

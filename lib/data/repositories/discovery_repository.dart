@@ -389,6 +389,52 @@ class MockDiscoveryRepository implements DiscoveryRepository {
     ),
   ];
 
+  static final List<HotelSearchCard Function(String id)> _hotelSearchBuilders =
+      [
+        (id) => HotelSearchCard(
+          id: id,
+          platformName: "KalacakYer",
+          platformLogoUrl: "",
+          description: "Otel, pansiyon ve butik konaklamaları karşılaştır.",
+          popularDestinations: const [
+            "Antalya",
+            "Kapadokya",
+            "İstanbul",
+            "Bodrum",
+          ],
+        ),
+      ];
+
+  static final List<PopularHotelsCard Function(String id)>
+  _popularHotelsBuilders = [
+    (id) => PopularHotelsCard(
+      id: id,
+      title: "Size Özel Seçildi",
+      subtitle: "Akıllı öneriler",
+      hotels: const [
+        PopularHotelItem(
+          name: "Mavi Koy Otel",
+          imageUrl: "",
+          location: "Bodrum, Muğla",
+          rating: 4.5,
+          reviewCount: 842,
+          pricePerNight: 1450,
+          tags: ["Wi-Fi", "Evcil Hayvan Dostu"],
+          smartBadge: "Rotanıza yakın",
+        ),
+        PopularHotelItem(
+          name: "Yeşil Vadi Resort",
+          imageUrl: "",
+          location: "Kapadokya, Nevşehir",
+          rating: 4.2,
+          reviewCount: 311,
+          pricePerNight: 980,
+          tags: ["Kahvaltı Dahil"],
+        ),
+      ],
+    ),
+  ];
+
   @override
   Future<List<FeedCard>> fetchFeed({
     required int page,
@@ -396,11 +442,11 @@ class MockDiscoveryRepository implements DiscoveryRepository {
   }) async {
     await Future.delayed(const Duration(milliseconds: 400));
 
-    if (page >= 10) return [];
+    if (page >= 12) return [];
 
     return List.generate(pageSize, (i) {
       final n = page * pageSize + i;
-      final type = n % 9; // 0: video, 1: ürün, 2: abonelik, 3: banka ürünü
+      final type = n % 11; // 0: video, 1: ürün, 2: abonelik, 3: banka ürünü
       switch (type) {
         case 0:
           return VideoCard(
@@ -446,9 +492,17 @@ class MockDiscoveryRepository implements DiscoveryRepository {
           return _ticketSearchBuilders[n % _ticketSearchBuilders.length](
             "ticket$n",
           );
-        default:
+        case 8:
           return _popularRoutesBuilders[n % _popularRoutesBuilders.length](
             "routes$n",
+          );
+        case 9:
+          return _hotelSearchBuilders[n % _hotelSearchBuilders.length](
+            "hotels$n",
+          );
+        default:
+          return _popularHotelsBuilders[n % _popularHotelsBuilders.length](
+            "populer_otels$n",
           );
       }
     });
