@@ -334,6 +334,61 @@ class MockDiscoveryRepository implements DiscoveryRepository {
     });
   }
 
+  static final List<TicketSearchCard Function(String id)>
+  _ticketSearchBuilders = [
+    (id) => TicketSearchCard(
+      id: id,
+      platformName: "FlyNow",
+      platformLogoUrl: "",
+      transportMode: TransportMode.flight,
+      description:
+          "Yurt içi ve yurt dışı uçuşlarda en uygun fiyatları karşılaştır.",
+      popularCities: const ["İstanbul", "Ankara", "İzmir", "Antalya"],
+    ),
+    (id) => TicketSearchCard(
+      id: id,
+      platformName: "Otobüsüm",
+      platformLogoUrl: "",
+      transportMode: TransportMode.bus,
+      description: "Yüzlerce firma arasından en uygun otobüs biletini bul.",
+      popularCities: const ["İstanbul", "Bursa", "Eskişehir", "Konya"],
+    ),
+  ];
+
+  static final List<PopularRoutesCard Function(String id)>
+  _popularRoutesBuilders = [
+    (id) => PopularRoutesCard(
+      id: id,
+      title: "Bu Hafta Trend",
+      subtitle: "Popüler rotalar",
+      routes: const [
+        PopularRouteItem(
+          destinationName: "Kapadokya",
+          imageUrl: "",
+          fromCity: "İstanbul",
+          toCity: "Nevşehir",
+          startingPrice: 650,
+          tag: "Trend",
+        ),
+        PopularRouteItem(
+          destinationName: "Bodrum",
+          imageUrl: "",
+          fromCity: "İzmir",
+          toCity: "Bodrum",
+          startingPrice: 420,
+          tag: "Kampanyalı",
+        ),
+        PopularRouteItem(
+          destinationName: "Trabzon",
+          imageUrl: "",
+          fromCity: "Ankara",
+          toCity: "Trabzon",
+          startingPrice: 580,
+        ),
+      ],
+    ),
+  ];
+
   @override
   Future<List<FeedCard>> fetchFeed({
     required int page,
@@ -341,11 +396,11 @@ class MockDiscoveryRepository implements DiscoveryRepository {
   }) async {
     await Future.delayed(const Duration(milliseconds: 400));
 
-    if (page >= 8) return [];
+    if (page >= 10) return [];
 
     return List.generate(pageSize, (i) {
       final n = page * pageSize + i;
-      final type = n % 7; // 0: video, 1: ürün, 2: abonelik, 3: banka ürünü
+      final type = n % 9; // 0: video, 1: ürün, 2: abonelik, 3: banka ürünü
       switch (type) {
         case 0:
           return VideoCard(
@@ -380,12 +435,20 @@ class MockDiscoveryRepository implements DiscoveryRepository {
         case 5:
           return _insuranceProductBuilders[n %
               _insuranceProductBuilders.length]("ins$n");
-        default:
+        case 6:
           return ProductGridCard(
             id: "grid$n",
             title: _gridThemes[n % _gridThemes.length],
             subtitle: "Farklı mağazalardan seçilmiş 12 ürün",
             products: _buildGridItems(n, 12),
+          );
+        case 7:
+          return _ticketSearchBuilders[n % _ticketSearchBuilders.length](
+            "ticket$n",
+          );
+        default:
+          return _popularRoutesBuilders[n % _popularRoutesBuilders.length](
+            "routes$n",
           );
       }
     });

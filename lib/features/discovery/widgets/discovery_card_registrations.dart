@@ -8,6 +8,8 @@ import 'bank_product_card_view.dart';
 import 'insurance_product_card_view.dart';
 import 'ecommerce_product_card_view.dart';
 import 'product_grid_card_view.dart';
+import 'ticket_search_card_view.dart';
+import 'popular_routes_card_view.dart';
 
 void registerDiscoveryCardViews() {
   CardViewRegistry.register<VideoCard>(
@@ -36,5 +38,13 @@ void registerDiscoveryCardViews() {
   CardViewRegistry.register<ProductGridCard>(
     (context, card, isActive) =>
         ProductGridCardView(card: card as ProductGridCard),
+  );
+  CardViewRegistry.register<TicketSearchCard>(
+    (context, card, isActive) =>
+        TicketSearchCardView(card: card as TicketSearchCard),
+  );
+  CardViewRegistry.register<PopularRoutesCard>(
+    (context, card, isActive) =>
+        PopularRoutesCardView(card: card as PopularRoutesCard),
   );
 }
