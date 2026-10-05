@@ -25,15 +25,22 @@ class StoreLogo extends StatelessWidget {
       ),
       alignment: Alignment.center,
       child: logoUrl.isEmpty
-          ? Text(name.isNotEmpty ? name[0].toUpperCase() : "?",
+          ? Text(
+              name.isNotEmpty ? name[0].toUpperCase() : "?",
               style: const TextStyle(
-                  color: Colors.white, fontSize: 18, fontWeight: FontWeight.w700))
+                color: Colors.white,
+                fontSize: 18,
+                fontWeight: FontWeight.w700,
+              ),
+            )
           : ClipRRect(
               borderRadius: BorderRadius.circular(12),
-              child: Image.network(logoUrl,
-                  fit: BoxFit.cover,
-                  errorBuilder: (_, __, ___) =>
-                      const Icon(Icons.storefront, color: Colors.white54)),
+              child: Image.network(
+                logoUrl,
+                fit: BoxFit.cover,
+                errorBuilder: (_, _, _) =>
+                    const Icon(Icons.storefront, color: Colors.white54),
+              ),
             ),
     );
   }
@@ -42,22 +49,36 @@ class StoreLogo extends StatelessWidget {
 class RatingBadge extends StatelessWidget {
   final double rating;
   final int reviewCount;
-  const RatingBadge({super.key, required this.rating, required this.reviewCount});
+  const RatingBadge({
+    super.key,
+    required this.rating,
+    required this.reviewCount,
+  });
 
   @override
   Widget build(BuildContext context) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.end,
       children: [
-        Row(mainAxisSize: MainAxisSize.min, children: [
-          const Icon(Icons.star_rounded, color: Colors.amber, size: 16),
-          const SizedBox(width: 2),
-          Text(rating.toStringAsFixed(1),
+        Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const Icon(Icons.star_rounded, color: Colors.amber, size: 16),
+            const SizedBox(width: 2),
+            Text(
+              rating.toStringAsFixed(1),
               style: const TextStyle(
-                  color: Colors.white, fontSize: 13, fontWeight: FontWeight.w600)),
-        ]),
-        Text("$reviewCount değerlendirme",
-            style: const TextStyle(color: Colors.white38, fontSize: 10)),
+                color: Colors.white,
+                fontSize: 13,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ],
+        ),
+        Text(
+          "$reviewCount değerlendirme",
+          style: const TextStyle(color: Colors.white38, fontSize: 10),
+        ),
       ],
     );
   }
@@ -66,7 +87,11 @@ class RatingBadge extends StatelessWidget {
 class ProductImageGallery extends StatelessWidget {
   final List<String> imageUrls;
   final double height;
-  const ProductImageGallery({super.key, required this.imageUrls, this.height = 220});
+  const ProductImageGallery({
+    super.key,
+    required this.imageUrls,
+    this.height = 220,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -77,10 +102,15 @@ class ProductImageGallery extends StatelessWidget {
         itemCount: imageUrls.length,
         itemBuilder: (_, i) => Container(
           color: Colors.white.withValues(alpha: 0.05),
-          child: Image.network(imageUrls[i],
-              fit: BoxFit.contain,
-              errorBuilder: (_, __, ___) =>
-                  const Icon(Icons.image_outlined, color: Colors.white24, size: 48)),
+          child: Image.network(
+            imageUrls[i],
+            fit: BoxFit.contain,
+            errorBuilder: (_, _, _) => const Icon(
+              Icons.image_outlined,
+              color: Colors.white24,
+              size: 48,
+            ),
+          ),
         ),
       ),
     );
@@ -106,8 +136,14 @@ class StockBadge extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Text(status.label,
-        style: TextStyle(color: _color, fontSize: 12, fontWeight: FontWeight.w600));
+    return Text(
+      status.label,
+      style: TextStyle(
+        color: _color,
+        fontSize: 12,
+        fontWeight: FontWeight.w600,
+      ),
+    );
   }
 }
 
@@ -121,39 +157,54 @@ class ProductTitleAndPrice extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(product.title,
-            style: const TextStyle(
-                color: Colors.white, fontSize: 18, fontWeight: FontWeight.w700)),
-        const SizedBox(height: 6),
-        Row(children: [
-          Text(
-            "${product.effectivePrice.toStringAsFixed(2)} ${product.currency}",
-            style: const TextStyle(
-                color: productAccent, fontSize: 20, fontWeight: FontWeight.w700),
+        Text(
+          product.title,
+          style: const TextStyle(
+            color: Colors.white,
+            fontSize: 18,
+            fontWeight: FontWeight.w700,
           ),
-          if (discountPercent != null) ...[
-            const SizedBox(width: 8),
+        ),
+        const SizedBox(height: 6),
+        Row(
+          children: [
             Text(
-              "${product.price.toStringAsFixed(2)} ${product.currency}",
+              "${product.effectivePrice.toStringAsFixed(2)} ${product.currency}",
               style: const TextStyle(
+                color: productAccent,
+                fontSize: 20,
+                fontWeight: FontWeight.w700,
+              ),
+            ),
+            if (discountPercent != null) ...[
+              const SizedBox(width: 8),
+              Text(
+                "${product.price.toStringAsFixed(2)} ${product.currency}",
+                style: const TextStyle(
                   color: Colors.white38,
                   fontSize: 14,
-                  decoration: TextDecoration.lineThrough),
-            ),
-            const SizedBox(width: 8),
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 2),
-              decoration: BoxDecoration(
+                  decoration: TextDecoration.lineThrough,
+                ),
+              ),
+              const SizedBox(width: 8),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 2),
+                decoration: BoxDecoration(
                   color: Colors.redAccent.withValues(alpha: 0.25),
-                  borderRadius: BorderRadius.circular(6)),
-              child: Text("-%$discountPercent",
+                  borderRadius: BorderRadius.circular(6),
+                ),
+                child: Text(
+                  "-%$discountPercent",
                   style: const TextStyle(
-                      color: Colors.redAccent,
-                      fontSize: 11,
-                      fontWeight: FontWeight.w700)),
-            ),
+                    color: Colors.redAccent,
+                    fontSize: 11,
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+              ),
+            ],
           ],
-        ]),
+        ),
         const SizedBox(height: 6),
         StockBadge(status: product.stockStatus),
       ],
@@ -178,9 +229,14 @@ class VariantGroupPicker extends ConsumerWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(group.name,
-            style: const TextStyle(
-                color: Colors.white70, fontSize: 13, fontWeight: FontWeight.w600)),
+        Text(
+          group.name,
+          style: const TextStyle(
+            color: Colors.white70,
+            fontSize: 13,
+            fontWeight: FontWeight.w600,
+          ),
+        ),
         const SizedBox(height: 8),
         Wrap(
           spacing: 8,
@@ -189,22 +245,32 @@ class VariantGroupPicker extends ConsumerWidget {
             final isSelected = option == selected;
             return GestureDetector(
               onTap: () {
-                final notifier =
-                    ref.read(productVariantSelectionProvider(productId).notifier);
+                final notifier = ref.read(
+                  productVariantSelectionProvider(productId).notifier,
+                );
                 notifier.update((state) => {...state, group.name: option});
               },
               child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 14,
+                  vertical: 8,
+                ),
                 decoration: BoxDecoration(
                   color: isSelected
                       ? productAccent.withValues(alpha: 0.25)
                       : Colors.white.withValues(alpha: 0.05),
                   borderRadius: BorderRadius.circular(20),
-                  border: Border.all(color: isSelected ? productAccent : Colors.white24),
+                  border: Border.all(
+                    color: isSelected ? productAccent : Colors.white24,
+                  ),
                 ),
-                child: Text(option,
-                    style: TextStyle(
-                        color: isSelected ? Colors.white : Colors.white70, fontSize: 13)),
+                child: Text(
+                  option,
+                  style: TextStyle(
+                    color: isSelected ? Colors.white : Colors.white70,
+                    fontSize: 13,
+                  ),
+                ),
               ),
             );
           }).toList(),
@@ -225,16 +291,28 @@ class ProductSpecsTable extends StatelessWidget {
         for (final spec in specs)
           Padding(
             padding: const EdgeInsets.symmetric(vertical: 5),
-            child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
-              SizedBox(
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                SizedBox(
                   width: 120,
-                  child: Text(spec.label,
-                      style: const TextStyle(color: Colors.white54, fontSize: 13))),
-              Expanded(
-                  child: Text(spec.value,
-                      style: const TextStyle(
-                          color: Colors.white, fontSize: 13, fontWeight: FontWeight.w600))),
-            ]),
+                  child: Text(
+                    spec.label,
+                    style: const TextStyle(color: Colors.white54, fontSize: 13),
+                  ),
+                ),
+                Expanded(
+                  child: Text(
+                    spec.value,
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 13,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ),
+              ],
+            ),
           ),
       ],
     );
@@ -243,7 +321,9 @@ class ProductSpecsTable extends StatelessWidget {
 
 /// Eksik varyant seçimlerini döner; hepsi seçiliyse boş liste.
 List<String> missingVariantGroups(
-    EcommerceProductCard product, Map<String, String> selections) {
+  EcommerceProductCard product,
+  Map<String, String> selections,
+) {
   return [
     for (final group in product.variantGroups)
       if (!selections.containsKey(group.name)) group.name,
@@ -263,7 +343,9 @@ Future<void> addProductToCart(
     );
     return;
   }
-  await ref.read(cartDetailProvider(product.cartType).notifier).addItem(
+  await ref
+      .read(cartDetailProvider(product.cartType).notifier)
+      .addItem(
         CartItem(
           id: product.id,
           cartType: product.cartType,
@@ -277,8 +359,119 @@ Future<void> addProductToCart(
   if (context.mounted) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-          content: Text("${product.title} sepete eklendi"),
-          duration: const Duration(seconds: 1)),
+        content: Text("${product.title} sepete eklendi"),
+        duration: const Duration(seconds: 1),
+      ),
+    );
+  }
+}
+
+/// Karat, gram, taş türü gibi kısa öznitelikleri göstermek için genel
+/// rozet. Yemek kartlarındaki diyet etiketi, kuyumcu kartlarındaki ayar/
+/// gram rozeti gibi farklı sektörlerdeki küçük etiketler için ortak.
+class AttributeBadge extends StatelessWidget {
+  final String text;
+  final Color accentColor;
+  final IconData? icon;
+
+  const AttributeBadge({
+    super.key,
+    required this.text,
+    required this.accentColor,
+    this.icon,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+      decoration: BoxDecoration(
+        color: accentColor.withValues(alpha: 0.16),
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: accentColor.withValues(alpha: 0.4)),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          if (icon != null) ...[
+            Icon(icon, color: Colors.white70, size: 13),
+            const SizedBox(width: 5),
+          ],
+          Text(text, style: const TextStyle(color: Colors.white, fontSize: 12)),
+        ],
+      ),
+    );
+  }
+}
+
+/// İndirimli/indirimsiz fiyat satırı. `ProductTitleAndPrice` bunu
+/// `EcommerceProductCard`'a özel kurmuştu; burada genel haliyle (sadece
+/// sayı + para birimi alıyor) çıkarıldı — refactor turunda
+/// `ProductTitleAndPrice` da bunun üstüne kurulabilir.
+class PriceRow extends StatelessWidget {
+  final double price;
+  final double? discountedPrice;
+  final String currency;
+  final Color accentColor;
+
+  const PriceRow({
+    super.key,
+    required this.price,
+    required this.currency,
+    required this.accentColor,
+    this.discountedPrice,
+  });
+
+  double get _effective => discountedPrice ?? price;
+
+  int? get _discountPercent {
+    if (discountedPrice == null || discountedPrice! >= price || price == 0)
+      return null;
+    return (((price - discountedPrice!) / price) * 100).round();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final discountPercent = _discountPercent;
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Text(
+          "${_effective.toStringAsFixed(2)} $currency",
+          style: TextStyle(
+            color: accentColor,
+            fontSize: 20,
+            fontWeight: FontWeight.w700,
+          ),
+        ),
+        if (discountPercent != null) ...[
+          const SizedBox(width: 8),
+          Text(
+            "${price.toStringAsFixed(2)} $currency",
+            style: const TextStyle(
+              color: Colors.white38,
+              fontSize: 14,
+              decoration: TextDecoration.lineThrough,
+            ),
+          ),
+          const SizedBox(width: 8),
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 2),
+            decoration: BoxDecoration(
+              color: Colors.redAccent.withValues(alpha: 0.25),
+              borderRadius: BorderRadius.circular(6),
+            ),
+            child: Text(
+              "-%$discountPercent",
+              style: const TextStyle(
+                color: Colors.redAccent,
+                fontSize: 11,
+                fontWeight: FontWeight.w700,
+              ),
+            ),
+          ),
+        ],
+      ],
     );
   }
 }

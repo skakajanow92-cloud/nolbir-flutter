@@ -2,9 +2,12 @@ import '../../../core/cart/card_view_registry.dart';
 import '../../../models/feed_card/feed_card.dart';
 import '../../../models/product_card/product_card.dart';
 import 'business_menu_card_view.dart';
+import 'custom_jewelry_order_card_view.dart';
 import 'food_item_card_view.dart';
 import 'food_place_search_card_view.dart';
 import 'hotel_search_card_view.dart';
+import 'jewelry_catalog_card_view.dart';
+import 'jewelry_item_card_view.dart';
 import 'popular_hotels_card_view.dart';
 import 'video_card_view.dart';
 import 'product_card_view.dart';
@@ -70,5 +73,17 @@ void registerDiscoveryCardViews() {
   CardViewRegistry.register<FoodPlaceSearchCard>(
     (context, card, isActive) =>
         FoodPlaceSearchCardView(card: card as FoodPlaceSearchCard),
+  );
+  CardViewRegistry.register<JewelryItemCard>(
+    (context, card, isActive) =>
+        JewelryItemCardView(card: card as JewelryItemCard),
+  );
+  CardViewRegistry.register<JewelryCatalogCard>(
+    (context, card, isActive) =>
+        JewelryCatalogCardView(card: card as JewelryCatalogCard),
+  );
+  CardViewRegistry.register<CustomJewelryOrderCard>(
+    (context, card, isActive) =>
+        CustomJewelryOrderCardView(card: card as CustomJewelryOrderCard),
   );
 }

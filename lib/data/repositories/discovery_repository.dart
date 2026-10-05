@@ -506,6 +506,100 @@ class MockDiscoveryRepository implements DiscoveryRepository {
     ),
   ];
 
+  static final List<JewelryItemCard Function(String id)> _jewelryItemBuilders =
+      [
+        (id) => JewelryItemCard(
+          id: id,
+          brandName: "Altın Kesif",
+          brandLogoUrl: "",
+          itemName: "Tektaş Yüzük",
+          description: "El işçiliği detaylı, zarif tektaş pırlanta yüzük.",
+          category: JewelryCategory.ring,
+          metalType: MetalType.whiteGold,
+          karat: 18,
+          weightGrams: 3.2,
+          gemstones: const ["Pırlanta"],
+          price: 18500,
+          discountedPrice: 16900,
+          rating: 4.8,
+          reviewCount: 212,
+        ),
+      ];
+
+  static final List<JewelryCatalogCard Function(String id)>
+  _jewelryCatalogBuilders = [
+    (id) => JewelryCatalogCard(
+      id: id,
+      brandName: "Vera Kuyumculuk",
+      brandLogoUrl: "",
+      rating: 4.5,
+      reviewCount: 640,
+      items: const [
+        JewelryCatalogItem(
+          id: "j1",
+          name: "İnce Zincir Kolye",
+          category: JewelryCategory.necklace,
+          metalType: MetalType.gold,
+          karat: 14,
+          weightGrams: 2.1,
+          price: 4200,
+        ),
+        JewelryCatalogItem(
+          id: "j2",
+          name: "Halka Küpe",
+          category: JewelryCategory.earring,
+          metalType: MetalType.gold,
+          karat: 14,
+          weightGrams: 1.4,
+          price: 2600,
+          discountedPrice: 2150,
+        ),
+        JewelryCatalogItem(
+          id: "j3",
+          name: "Zincir Bileklik",
+          category: JewelryCategory.bracelet,
+          metalType: MetalType.roseGold,
+          karat: 18,
+          weightGrams: 4.0,
+          price: 7800,
+        ),
+        JewelryCatalogItem(
+          id: "j4",
+          name: "Klasik Alyans",
+          category: JewelryCategory.ring,
+          metalType: MetalType.whiteGold,
+          karat: 22,
+          weightGrams: 5.5,
+          price: 11200,
+        ),
+      ],
+    ),
+  ];
+
+  static final List<CustomJewelryOrderCard Function(String id)>
+  _customJewelryOrderBuilders = [
+    (id) => CustomJewelryOrderCard(
+      id: id,
+      brandName: "Atölye Form",
+      brandLogoUrl: "",
+      description:
+          "İsme özel tasarım mücevher — ölçü, ayar ve taşı sen belirle.",
+      availableCategories: const [
+        JewelryCategory.ring,
+        JewelryCategory.necklace,
+        JewelryCategory.bracelet,
+      ],
+      availableMetals: const [
+        MetalType.gold,
+        MetalType.whiteGold,
+        MetalType.roseGold,
+      ],
+      availableKarats: const [14, 18, 22],
+      minBudget: 3000,
+      maxBudget: 50000,
+    ),
+  ];
+
   @override
   Future<List<FeedCard>> fetchFeed({
     required int page,
@@ -513,11 +607,11 @@ class MockDiscoveryRepository implements DiscoveryRepository {
   }) async {
     await Future.delayed(const Duration(milliseconds: 400));
 
-    if (page >= 15) return [];
+    if (page >= 18) return [];
 
     return List.generate(pageSize, (i) {
       final n = page * pageSize + i;
-      final type = n % 14; // 0: video, 1: ürün, 2: abonelik, 3: banka ürünü
+      final type = n % 17; // 0: video, 1: ürün, 2: abonelik, 3: banka ürünü
       switch (type) {
         case 0:
           return VideoCard(
@@ -581,10 +675,21 @@ class MockDiscoveryRepository implements DiscoveryRepository {
           return _businessMenuBuilders[n % _businessMenuBuilders.length](
             "menu$n",
           );
-        default:
+        case 13:
           return _foodPlaceSearchBuilders[n % _foodPlaceSearchBuilders.length](
             "foodsearch$n",
           );
+        case 14:
+          return _jewelryItemBuilders[n % _jewelryItemBuilders.length](
+            "jewel$n",
+          );
+        case 15:
+          return _jewelryCatalogBuilders[n % _jewelryCatalogBuilders.length](
+            "jewelcat$n",
+          );
+        default:
+          return _customJewelryOrderBuilders[n %
+              _customJewelryOrderBuilders.length]("jewelcustom$n");
       }
     });
   }
