@@ -600,6 +600,88 @@ class MockDiscoveryRepository implements DiscoveryRepository {
     ),
   ];
 
+  static final List<GiftItemCard Function(String id)> _giftItemBuilders = [
+    (id) => GiftItemCard(
+      id: id,
+      businessName: "Çiçek Bahçesi",
+      businessLogoUrl: "",
+      itemName: "Kır Çiçeği Buketi",
+      description: "Mevsim çiçeklerinden özenle hazırlanmış, taze buket.",
+      category: GiftCategory.flowerBouquet,
+      occasions: const [Occasion.birthday, Occasion.getWell],
+      price: 450,
+      discountedPrice: 380,
+      rating: 4.7,
+      reviewCount: 356,
+      sameDayDelivery: true,
+      includesMessageCard: true,
+    ),
+  ];
+
+  static final List<GiftCatalogCard Function(String id)> _giftCatalogBuilders =
+      [
+        (id) => GiftCatalogCard(
+          id: id,
+          businessName: "Hediye Dünyası",
+          businessLogoUrl: "",
+          rating: 4.3,
+          reviewCount: 410,
+          items: const [
+            GiftCatalogItem(
+              id: "g1",
+              name: "Orkide Saksısı",
+              category: GiftCategory.plant,
+              price: 320,
+              sameDayDelivery: true,
+            ),
+            GiftCatalogItem(
+              id: "g2",
+              name: "Çikolata Kutusu",
+              category: GiftCategory.chocolate,
+              price: 280,
+              discountedPrice: 240,
+            ),
+            GiftCatalogItem(
+              id: "g3",
+              name: "Sürpriz Hediye Sepeti",
+              category: GiftCategory.giftBasket,
+              price: 650,
+            ),
+            GiftCatalogItem(
+              id: "g4",
+              name: "Peluş Ayı",
+              category: GiftCategory.toy,
+              price: 190,
+            ),
+          ],
+        ),
+      ];
+
+  static final List<CustomGiftOrderCard Function(String id)>
+  _customGiftOrderBuilders = [
+    (id) => CustomGiftOrderCard(
+      id: id,
+      businessName: "Atölye Hediye",
+      businessLogoUrl: "",
+      description:
+          "Vesileye özel, kişiselleştirilmiş hediye seti hazırlayalım.",
+      availableCategories: const [
+        GiftCategory.flowerArrangement,
+        GiftCategory.giftBasket,
+        GiftCategory.personalizedGift,
+      ],
+      availableOccasions: const [
+        Occasion.birthday,
+        Occasion.anniversary,
+        Occasion.wedding,
+        Occasion.newBorn,
+        Occasion.congratulations,
+      ],
+      minBudget: 200,
+      maxBudget: 5000,
+    ),
+  ];
+
   @override
   Future<List<FeedCard>> fetchFeed({
     required int page,
@@ -607,11 +689,11 @@ class MockDiscoveryRepository implements DiscoveryRepository {
   }) async {
     await Future.delayed(const Duration(milliseconds: 400));
 
-    if (page >= 18) return [];
+    if (page >= 21) return [];
 
     return List.generate(pageSize, (i) {
       final n = page * pageSize + i;
-      final type = n % 17; // 0: video, 1: ürün, 2: abonelik, 3: banka ürünü
+      final type = n % 20; // 0: video, 1: ürün, 2: abonelik, 3: banka ürünü
       switch (type) {
         case 0:
           return VideoCard(
@@ -687,9 +769,19 @@ class MockDiscoveryRepository implements DiscoveryRepository {
           return _jewelryCatalogBuilders[n % _jewelryCatalogBuilders.length](
             "jewelcat$n",
           );
-        default:
+        case 16:
           return _customJewelryOrderBuilders[n %
               _customJewelryOrderBuilders.length]("jewelcustom$n");
+        case 17:
+          return _giftItemBuilders[n % _giftItemBuilders.length]("gift$n");
+        case 18:
+          return _giftCatalogBuilders[n % _giftCatalogBuilders.length](
+            "giftcat$n",
+          );
+        default:
+          return _customGiftOrderBuilders[n % _customGiftOrderBuilders.length](
+            "giftcustom$n",
+          );
       }
     });
   }
