@@ -13,6 +13,7 @@ import 'hotel_search_card_view.dart';
 import 'jewelry_catalog_card_view.dart';
 import 'jewelry_item_card_view.dart';
 import 'messages_list_card_view.dart';
+import 'netflix_feed_card_view.dart';
 import 'popular_hotels_card_view.dart';
 import 'social_feed_card_view.dart';
 import 'video_card_view.dart';
@@ -124,5 +125,9 @@ void registerDiscoveryCardViews() {
   CardViewRegistry.register<YoutubeFeedCard>(
     (context, card, isActive) =>
         YoutubeFeedCardView(card: card as YoutubeFeedCard),
+  );
+  CardViewRegistry.register<NetflixFeedCard>(
+    (context, card, isActive) =>
+        NetflixFeedCardView(card: card as NetflixFeedCard),
   );
 }

@@ -824,6 +824,108 @@ class MockDiscoveryRepository implements DiscoveryRepository {
     ],
   );
 
+  static final NetflixFeedCard _netflixFeedCard = NetflixFeedCard(
+    id: "netflix_feed_main",
+    platformName: "Nolbir+",
+    plans: const [
+      SubscriptionPlan(
+        tier: SubscriptionTier.basic,
+        name: "Temel",
+        monthlyPrice: 59.9,
+        perks: ["720p kalite", "1 cihaz"],
+      ),
+      SubscriptionPlan(
+        tier: SubscriptionTier.standard,
+        name: "Standart",
+        monthlyPrice: 99.9,
+        perks: ["1080p kalite", "2 cihaz", "İndirme"],
+      ),
+      SubscriptionPlan(
+        tier: SubscriptionTier.premium,
+        name: "Premium",
+        monthlyPrice: 149.9,
+        perks: ["4K kalite", "4 cihaz", "İndirme", "Tüm canlı kanallar"],
+      ),
+      SubscriptionPlan(
+        tier: SubscriptionTier.premium,
+        name: "Yetişkin İçerik Paketi",
+        monthlyPrice: 39.9,
+        perks: ["18+ film ve dizilere erişim"],
+        isAdultAddon: true,
+      ),
+    ],
+    collections: const [
+      StreamingCollection(
+        id: "col1",
+        name: "Yeni Çıkanlar",
+        titles: [
+          StreamingTitle(
+            id: "t1",
+            name: "Gece Yarısı Treni",
+            type: StreamingContentType.movie,
+            synopsis:
+                "Gizemli bir yolculukta geçmişiyle yüzleşen bir kadının hikayesi.",
+            languageOptions: ["Türkçe Dublaj", "İngilizce Altyazılı"],
+            requiredTier: SubscriptionTier.basic,
+            rating: 7.8,
+            releaseYear: 2025,
+          ),
+          StreamingTitle(
+            id: "t2",
+            name: "Kuzey Rüzgarı",
+            type: StreamingContentType.series,
+            synopsis: "Küçük bir kasabada açığa çıkan sırların dizisi.",
+            languageOptions: ["Türkçe Altyazılı"],
+            requiredTier: SubscriptionTier.standard,
+            rating: 8.2,
+            releaseYear: 2024,
+          ),
+        ],
+      ),
+      StreamingCollection(
+        id: "col2",
+        name: "Canlı Yayın Kanalları",
+        titles: [
+          StreamingTitle(
+            id: "t3",
+            name: "Spor Kanalı HD",
+            type: StreamingContentType.liveChannel,
+            synopsis: "Canlı spor yayınları.",
+            requiredTier: SubscriptionTier.premium,
+            releaseYear: 2025,
+          ),
+          StreamingTitle(
+            id: "t4",
+            name: "Haber 7/24",
+            type: StreamingContentType.liveChannel,
+            synopsis: "Kesintisiz canlı haber yayını.",
+            requiredTier: SubscriptionTier.basic,
+            releaseYear: 2025,
+          ),
+        ],
+      ),
+      StreamingCollection(
+        id: "col3",
+        name: "Yetişkin İçerik Paketi",
+        isAdultCollection: true,
+        titles: [
+          StreamingTitle(
+            id: "t5",
+            name: "Kırmızı Oda",
+            type: StreamingContentType.movie,
+            synopsis:
+                "18 yaş ve üzeri izleyici kitlesine yönelik gerilim filmi.",
+            languageOptions: ["İngilizce Altyazılı"],
+            requiredTier: SubscriptionTier.premium,
+            isAdult: true,
+            rating: 6.9,
+            releaseYear: 2023,
+          ),
+        ],
+      ),
+    ],
+  );
+
   @override
   Future<List<FeedCard>> fetchFeed({
     required int page,
@@ -831,11 +933,11 @@ class MockDiscoveryRepository implements DiscoveryRepository {
   }) async {
     await Future.delayed(const Duration(milliseconds: 400));
 
-    if (page >= 26) return [];
+    if (page >= 27) return [];
 
     return List.generate(pageSize, (i) {
       final n = page * pageSize + i;
-      final type = n % 25; // 0: video, 1: ürün, 2: abonelik, 3: banka ürünü
+      final type = n % 26; // 0: video, 1: ürün, 2: abonelik, 3: banka ürünü
       switch (type) {
         case 0:
           return VideoCard(
@@ -932,6 +1034,8 @@ class MockDiscoveryRepository implements DiscoveryRepository {
           return _videoFeedCard;
         case 23:
           return _youtubeFeedCard;
+        case 24:
+          return _netflixFeedCard;
         default:
           return _messagesListCard;
       }
