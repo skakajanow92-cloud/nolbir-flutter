@@ -18,6 +18,12 @@ abstract interface class Collectible {
 /// (burada: kendi hikaye şeridi ve sonsuz kaydırmasıyla) render eder.
 abstract interface class LiveCollectible {}
 
+/// Kullanıcıya pasif içerik olarak değil, bir "ihtiyacın var mı?" aracı
+/// olarak sunulması gereken kart türleri için işaretleyici. Şu an
+/// davranış eklemiyor — akış karıştırma mantığı ileride bunu görünce
+/// farklı bir sunum (rozet, farklı sıklık) uygulayabilir.
+abstract interface class ToolCard {}
+
 /// Tüm feed kartlarının ortak temeli.
 ///
 /// BİLİNÇLİ TASARIM KARARI: Artık `sealed` DEĞİL — bilerek açık bırakıldı.

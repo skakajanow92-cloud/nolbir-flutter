@@ -26,6 +26,7 @@ import 'product_grid_card_view.dart';
 import 'ticket_search_card_view.dart';
 import 'popular_routes_card_view.dart';
 import 'video_feed_card_view.dart';
+import 'writing_tool_card_view.dart';
 import 'youtube_feed_card_view.dart';
 
 void registerDiscoveryCardViews() {
@@ -129,5 +130,9 @@ void registerDiscoveryCardViews() {
   CardViewRegistry.register<NetflixFeedCard>(
     (context, card, isActive) =>
         NetflixFeedCardView(card: card as NetflixFeedCard),
+  );
+  CardViewRegistry.register<WritingToolCard>(
+    (context, card, isActive) =>
+        WritingToolCardView(card: card as WritingToolCard),
   );
 }

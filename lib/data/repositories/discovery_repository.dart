@@ -926,6 +926,10 @@ class MockDiscoveryRepository implements DiscoveryRepository {
     ],
   );
 
+  static const WritingToolCard _writingToolCard = WritingToolCard(
+    id: "writing_tool_main",
+  );
+
   @override
   Future<List<FeedCard>> fetchFeed({
     required int page,
@@ -933,11 +937,11 @@ class MockDiscoveryRepository implements DiscoveryRepository {
   }) async {
     await Future.delayed(const Duration(milliseconds: 400));
 
-    if (page >= 27) return [];
+    if (page >= 28) return [];
 
     return List.generate(pageSize, (i) {
       final n = page * pageSize + i;
-      final type = n % 26; // 0: video, 1: ürün, 2: abonelik, 3: banka ürünü
+      final type = n % 27; // 0: video, 1: ürün, 2: abonelik, 3: banka ürünü
       switch (type) {
         case 0:
           return VideoCard(
@@ -1036,6 +1040,8 @@ class MockDiscoveryRepository implements DiscoveryRepository {
           return _youtubeFeedCard;
         case 24:
           return _netflixFeedCard;
+        case 25:
+          return _writingToolCard;
         default:
           return _messagesListCard;
       }
