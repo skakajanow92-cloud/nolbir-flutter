@@ -13,6 +13,7 @@ import 'jewelry_catalog_card_view.dart';
 import 'jewelry_item_card_view.dart';
 import 'messages_list_card_view.dart';
 import 'popular_hotels_card_view.dart';
+import 'social_feed_card_view.dart';
 import 'video_card_view.dart';
 import 'product_card_view.dart';
 import 'subscription_card_view.dart';
@@ -104,5 +105,9 @@ void registerDiscoveryCardViews() {
   CardViewRegistry.register<MessagesListCard>(
     (context, card, isActive) =>
         MessagesListCardView(card: card as MessagesListCard),
+  );
+  CardViewRegistry.register<SocialFeedCard>(
+    (context, card, isActive) =>
+        SocialFeedCardView(card: card as SocialFeedCard),
   );
 }

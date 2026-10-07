@@ -711,6 +711,37 @@ class MockDiscoveryRepository implements DiscoveryRepository {
     ],
   );
 
+  static final SocialFeedCard _socialFeedCard = SocialFeedCard(
+    id: "social_main",
+    stories: const [
+      StoryItem(id: "s1", username: "elif.y"),
+      StoryItem(id: "s2", username: "mert_k", isViewed: true),
+      StoryItem(id: "s3", username: "asli.d"),
+      StoryItem(id: "s4", username: "can_o", isViewed: true),
+      StoryItem(id: "s5", username: "zeynep"),
+    ],
+    seedPosts: [
+      SocialPost(
+        id: "post_seed_1",
+        username: "elif.y",
+        imageUrl: "",
+        caption: "Bugün harika bir gündü ☀️",
+        likeCount: 342,
+        commentCount: 18,
+        postedAt: DateTime.now().subtract(const Duration(hours: 1)),
+      ),
+      SocialPost(
+        id: "post_seed_2",
+        username: "mert_k",
+        imageUrl: "",
+        caption: "Yeni projeme başlıyorum 🚀",
+        likeCount: 128,
+        commentCount: 5,
+        postedAt: DateTime.now().subtract(const Duration(hours: 3)),
+      ),
+    ],
+  );
+
   @override
   Future<List<FeedCard>> fetchFeed({
     required int page,
@@ -718,11 +749,11 @@ class MockDiscoveryRepository implements DiscoveryRepository {
   }) async {
     await Future.delayed(const Duration(milliseconds: 400));
 
-    if (page >= 22) return [];
+    if (page >= 23) return [];
 
     return List.generate(pageSize, (i) {
       final n = page * pageSize + i;
-      final type = n % 21; // 0: video, 1: ürün, 2: abonelik, 3: banka ürünü
+      final type = n % 22; // 0: video, 1: ürün, 2: abonelik, 3: banka ürünü
       switch (type) {
         case 0:
           return VideoCard(
@@ -811,6 +842,8 @@ class MockDiscoveryRepository implements DiscoveryRepository {
           return _customGiftOrderBuilders[n % _customGiftOrderBuilders.length](
             "giftcustom$n",
           );
+        case 20:
+          return _socialFeedCard;
         default:
           return _messagesListCard;
       }

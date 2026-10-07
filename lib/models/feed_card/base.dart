@@ -8,6 +8,16 @@ abstract interface class Collectible {
   (String title, String previewUrl) toCollectionPreview();
 }
 
+/// Koleksiyona eklendiğinde statik bir önizleme yerine kartın KENDİSİNİN
+/// (canlı, kendi içinde yenilenmeye devam eden haliyle) saklanmasını
+/// isteyen kart türleri için işaretleyici arayüz. Bunu uygulayan bir kart
+/// koleksiyona eklendiğinde, `collection_item_builder.dart` statik bir
+/// `CollectionItemCard` önizlemesi ÜRETMEMELİ — orijinal `FeedCard`
+/// örneğini doğrudan koleksiyon listesine eklemeli. Böylece Koleksiyon
+/// tab'ı aynı `CardViewRegistry` üzerinden kartı birebir canlı haliyle
+/// (burada: kendi hikaye şeridi ve sonsuz kaydırmasıyla) render eder.
+abstract interface class LiveCollectible {}
+
 /// Tüm feed kartlarının ortak temeli.
 ///
 /// BİLİNÇLİ TASARIM KARARI: Artık `sealed` DEĞİL — bilerek açık bırakıldı.
