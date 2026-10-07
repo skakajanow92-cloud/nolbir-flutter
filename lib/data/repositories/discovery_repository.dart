@@ -768,6 +768,28 @@ class MockDiscoveryRepository implements DiscoveryRepository {
     ],
   );
 
+  static final VideoFeedCard _videoFeedCard = VideoFeedCard(
+    id: "video_feed_main",
+    seedVideos: const [
+      FeedVideoItem(
+        id: "vfeed1",
+        videoUrl: "",
+        username: "kaan.y",
+        description: "Bugün bunu deniyorum 👀",
+        likeCount: 1240,
+        commentCount: 87,
+      ),
+      FeedVideoItem(
+        id: "vfeed2",
+        videoUrl: "",
+        username: "selin_",
+        description: "Kahkaha garantili 😂",
+        likeCount: 3820,
+        commentCount: 214,
+      ),
+    ],
+  );
+
   @override
   Future<List<FeedCard>> fetchFeed({
     required int page,
@@ -775,11 +797,11 @@ class MockDiscoveryRepository implements DiscoveryRepository {
   }) async {
     await Future.delayed(const Duration(milliseconds: 400));
 
-    if (page >= 24) return [];
+    if (page >= 25) return [];
 
     return List.generate(pageSize, (i) {
       final n = page * pageSize + i;
-      final type = n % 23; // 0: video, 1: ürün, 2: abonelik, 3: banka ürünü
+      final type = n % 24; // 0: video, 1: ürün, 2: abonelik, 3: banka ürünü
       switch (type) {
         case 0:
           return VideoCard(
@@ -872,6 +894,8 @@ class MockDiscoveryRepository implements DiscoveryRepository {
           return _socialFeedCard;
         case 21:
           return _datingSwipeCard;
+        case 22:
+          return _videoFeedCard;
         default:
           return _messagesListCard;
       }

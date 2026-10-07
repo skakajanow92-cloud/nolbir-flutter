@@ -2,6 +2,7 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import '../../../models/product_card/product_card.dart';
 import '../../../core/widgets/vertical_card_feed.dart';
+import 'nav_arrow_buttons.dart';
 
 class SocialFeedCardView extends StatefulWidget {
   final SocialFeedCard card;
@@ -79,28 +80,7 @@ class _SocialFeedCardViewState extends State<SocialFeedCardView> {
                   ),
                 ],
               ),
-              if (feedController != null)
-                Positioned(
-                  right: 10,
-                  top: 0,
-                  bottom: 0,
-                  child: Center(
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        _NavArrowButton(
-                          icon: Icons.keyboard_arrow_up,
-                          onTap: feedController.previousPage,
-                        ),
-                        const SizedBox(height: 10),
-                        _NavArrowButton(
-                          icon: Icons.keyboard_arrow_down,
-                          onTap: feedController.nextPage,
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
+              if (feedController != null) const NavArrowOverlay(),
             ],
           ),
         ),
@@ -358,28 +338,6 @@ class _PostTile extends StatelessWidget {
               ),
             ),
         ],
-      ),
-    );
-  }
-}
-
-class _NavArrowButton extends StatelessWidget {
-  final IconData icon;
-  final VoidCallback onTap;
-  const _NavArrowButton({required this.icon, required this.onTap});
-
-  @override
-  Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        width: 34,
-        height: 34,
-        decoration: BoxDecoration(
-          color: Colors.black.withValues(alpha: 0.4),
-          shape: BoxShape.circle,
-        ),
-        child: Icon(icon, color: Colors.white70, size: 20),
       ),
     );
   }
