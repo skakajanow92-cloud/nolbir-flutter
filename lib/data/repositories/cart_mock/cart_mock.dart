@@ -6,3 +6,4 @@ export 'ticket_cart_mock.dart';
 export 'hotel_cart_mock.dart';
 export 'food_cart_mock.dart';
 export 'bank_cart_mock.dart';
+export 'pharmacy_cart_mock.dart';

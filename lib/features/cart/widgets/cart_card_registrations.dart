@@ -9,6 +9,7 @@ import 'market_cart_card_view.dart';
 import 'second_hand_cart_card_view.dart';
 import 'ticket_cart_card_view.dart';
 import 'hotel_cart_card_view.dart';
+import 'pharmacy_cart_card_view.dart';
 
 void registerCartCardViews() {
   CardViewRegistry.register<CartSummaryCard>(
@@ -53,4 +54,10 @@ void registerCartCardViews() {
     (context, card, isActive) => BankCartCardView(card: card as BankCartCard),
   );
   ProfileModuleOrder.register<BankCartCard>();
+
+  CardViewRegistry.register<PharmacyCartCard>(
+    (context, card, isActive) =>
+        PharmacyCartCardView(card: card as PharmacyCartCard),
+  );
+  ProfileModuleOrder.register<PharmacyCartCard>();
 }

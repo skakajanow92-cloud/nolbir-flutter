@@ -6,3 +6,4 @@ export 'ticket_cart_card.dart';
 export 'hotel_cart_card.dart';
 export 'food_cart_card.dart';
 export 'bank_cart_card.dart';
+export 'pharmacy_cart_card.dart';
