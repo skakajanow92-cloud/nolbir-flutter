@@ -4,6 +4,7 @@ import '../../../models/product_card/product_card.dart';
 import 'business_menu_card_view.dart';
 import 'custom_gift_order_card_view.dart';
 import 'custom_jewelry_order_card_view.dart';
+import 'dating_swipe_card_view.dart';
 import 'food_item_card_view.dart';
 import 'food_place_search_card_view.dart';
 import 'gift_catalog_card_view.dart';
@@ -109,5 +110,9 @@ void registerDiscoveryCardViews() {
   CardViewRegistry.register<SocialFeedCard>(
     (context, card, isActive) =>
         SocialFeedCardView(card: card as SocialFeedCard),
+  );
+  CardViewRegistry.register<DatingSwipeCard>(
+    (context, card, isActive) =>
+        DatingSwipeCardView(card: card as DatingSwipeCard),
   );
 }

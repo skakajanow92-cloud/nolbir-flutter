@@ -742,6 +742,32 @@ class MockDiscoveryRepository implements DiscoveryRepository {
     ],
   );
 
+  static final DatingSwipeCard _datingSwipeCard = DatingSwipeCard(
+    id: "dating_main",
+    seedProfiles: const [
+      DatingProfile(
+        id: "d1",
+        firstName: "Ece",
+        lastName: "Kaya",
+        age: 27,
+        hometown: "İstanbul",
+        bio: "Doğa yürüyüşleri ve iyi kahve tutkunu.",
+        hobbies: ["Yürüyüş", "Fotoğrafçılık", "Kahve"],
+        distanceKm: 4.2,
+      ),
+      DatingProfile(
+        id: "d2",
+        firstName: "Kerem",
+        lastName: "Demir",
+        age: 31,
+        hometown: "Ankara",
+        bio: "Hafta sonları dağcılık, hafta içi yazılım.",
+        hobbies: ["Dağcılık", "Kitap"],
+        distanceKm: 11.8,
+      ),
+    ],
+  );
+
   @override
   Future<List<FeedCard>> fetchFeed({
     required int page,
@@ -749,11 +775,11 @@ class MockDiscoveryRepository implements DiscoveryRepository {
   }) async {
     await Future.delayed(const Duration(milliseconds: 400));
 
-    if (page >= 23) return [];
+    if (page >= 24) return [];
 
     return List.generate(pageSize, (i) {
       final n = page * pageSize + i;
-      final type = n % 22; // 0: video, 1: ürün, 2: abonelik, 3: banka ürünü
+      final type = n % 23; // 0: video, 1: ürün, 2: abonelik, 3: banka ürünü
       switch (type) {
         case 0:
           return VideoCard(
@@ -844,6 +870,8 @@ class MockDiscoveryRepository implements DiscoveryRepository {
           );
         case 20:
           return _socialFeedCard;
+        case 21:
+          return _datingSwipeCard;
         default:
           return _messagesListCard;
       }

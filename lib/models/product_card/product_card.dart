@@ -21,3 +21,4 @@ export 'gift_catalog_card.dart';
 export 'custom_gift_order_card.dart';
 export 'messages_list_card.dart';
 export 'social_feed_card.dart';
+export 'dating_swipe_card.dart';
