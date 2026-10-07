@@ -11,6 +11,7 @@ import 'gift_item_card_view.dart';
 import 'hotel_search_card_view.dart';
 import 'jewelry_catalog_card_view.dart';
 import 'jewelry_item_card_view.dart';
+import 'messages_list_card_view.dart';
 import 'popular_hotels_card_view.dart';
 import 'video_card_view.dart';
 import 'product_card_view.dart';
@@ -99,5 +100,9 @@ void registerDiscoveryCardViews() {
   CardViewRegistry.register<CustomGiftOrderCard>(
     (context, card, isActive) =>
         CustomGiftOrderCardView(card: card as CustomGiftOrderCard),
+  );
+  CardViewRegistry.register<MessagesListCard>(
+    (context, card, isActive) =>
+        MessagesListCardView(card: card as MessagesListCard),
   );
 }

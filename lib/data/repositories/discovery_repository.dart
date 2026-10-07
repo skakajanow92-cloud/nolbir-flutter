@@ -682,6 +682,35 @@ class MockDiscoveryRepository implements DiscoveryRepository {
     ),
   ];
 
+  static final MessagesListCard _messagesListCard = MessagesListCard(
+    id: "messages_main",
+    contacts: [
+      ChatContact(
+        id: "c1",
+        name: "Elif Yıldız",
+        isOnline: true,
+        lastMessage: "Yarın saat kaçta buluşuyoruz?",
+        lastMessageTime: DateTime.now().subtract(const Duration(minutes: 5)),
+        unreadCount: 2,
+      ),
+      ChatContact(
+        id: "c2",
+        name: "Mert Kaya",
+        lastMessage: "Tamamdır, teşekkürler!",
+        lastMessageTime: DateTime.now().subtract(const Duration(hours: 2)),
+      ),
+      ChatContact(
+        id: "c3",
+        name: "Aslı Demir",
+        isOnline: true,
+        lastMessage: "Fotoğrafları gönderdim.",
+        lastMessageTime: DateTime.now().subtract(const Duration(hours: 5)),
+        unreadCount: 1,
+      ),
+      const ChatContact(id: "c4", name: "Can Öztürk"),
+    ],
+  );
+
   @override
   Future<List<FeedCard>> fetchFeed({
     required int page,
@@ -689,11 +718,11 @@ class MockDiscoveryRepository implements DiscoveryRepository {
   }) async {
     await Future.delayed(const Duration(milliseconds: 400));
 
-    if (page >= 21) return [];
+    if (page >= 22) return [];
 
     return List.generate(pageSize, (i) {
       final n = page * pageSize + i;
-      final type = n % 20; // 0: video, 1: ürün, 2: abonelik, 3: banka ürünü
+      final type = n % 21; // 0: video, 1: ürün, 2: abonelik, 3: banka ürünü
       switch (type) {
         case 0:
           return VideoCard(
@@ -778,10 +807,12 @@ class MockDiscoveryRepository implements DiscoveryRepository {
           return _giftCatalogBuilders[n % _giftCatalogBuilders.length](
             "giftcat$n",
           );
-        default:
+        case 19:
           return _customGiftOrderBuilders[n % _customGiftOrderBuilders.length](
             "giftcustom$n",
           );
+        default:
+          return _messagesListCard;
       }
     });
   }
