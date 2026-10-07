@@ -25,6 +25,7 @@ import 'product_grid_card_view.dart';
 import 'ticket_search_card_view.dart';
 import 'popular_routes_card_view.dart';
 import 'video_feed_card_view.dart';
+import 'youtube_feed_card_view.dart';
 
 void registerDiscoveryCardViews() {
   CardViewRegistry.register<VideoCard>(
@@ -119,5 +120,9 @@ void registerDiscoveryCardViews() {
   CardViewRegistry.register<VideoFeedCard>(
     (context, card, isActive) =>
         VideoFeedCardView(card: card as VideoFeedCard, isActive: isActive),
+  );
+  CardViewRegistry.register<YoutubeFeedCard>(
+    (context, card, isActive) =>
+        YoutubeFeedCardView(card: card as YoutubeFeedCard),
   );
 }

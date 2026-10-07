@@ -790,6 +790,40 @@ class MockDiscoveryRepository implements DiscoveryRepository {
     ],
   );
 
+  static const List<YoutubeChannel> _youtubeChannels = [
+    YoutubeChannel(id: "ch1", name: "Kod Atölyesi", subscriberCount: 184000),
+    YoutubeChannel(id: "ch2", name: "Mutfak Sırları", subscriberCount: 92000),
+    YoutubeChannel(
+      id: "ch3",
+      name: "Teknoloji Günlüğü",
+      subscriberCount: 410000,
+    ),
+    YoutubeChannel(id: "ch4", name: "Doğa Yolu", subscriberCount: 57000),
+  ];
+
+  static final YoutubeFeedCard _youtubeFeedCard = YoutubeFeedCard(
+    id: "youtube_feed_main",
+    subscribedChannels: _youtubeChannels,
+    seedVideos: [
+      LongVideoItem(
+        id: "yt_seed1",
+        title: "Flutter ile sıfırdan uygulama",
+        channel: _youtubeChannels[0],
+        duration: const Duration(minutes: 24, seconds: 12),
+        viewCount: 48200,
+        uploadedAt: DateTime.now().subtract(const Duration(days: 2)),
+      ),
+      LongVideoItem(
+        id: "yt_seed2",
+        title: "15 dakikada akşam yemeği",
+        channel: _youtubeChannels[1],
+        duration: const Duration(minutes: 14, seconds: 40),
+        viewCount: 9100,
+        uploadedAt: DateTime.now().subtract(const Duration(hours: 6)),
+      ),
+    ],
+  );
+
   @override
   Future<List<FeedCard>> fetchFeed({
     required int page,
@@ -797,11 +831,11 @@ class MockDiscoveryRepository implements DiscoveryRepository {
   }) async {
     await Future.delayed(const Duration(milliseconds: 400));
 
-    if (page >= 25) return [];
+    if (page >= 26) return [];
 
     return List.generate(pageSize, (i) {
       final n = page * pageSize + i;
-      final type = n % 24; // 0: video, 1: ürün, 2: abonelik, 3: banka ürünü
+      final type = n % 25; // 0: video, 1: ürün, 2: abonelik, 3: banka ürünü
       switch (type) {
         case 0:
           return VideoCard(
@@ -896,6 +930,8 @@ class MockDiscoveryRepository implements DiscoveryRepository {
           return _datingSwipeCard;
         case 22:
           return _videoFeedCard;
+        case 23:
+          return _youtubeFeedCard;
         default:
           return _messagesListCard;
       }

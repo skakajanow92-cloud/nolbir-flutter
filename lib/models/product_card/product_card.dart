@@ -23,3 +23,4 @@ export 'messages_list_card.dart';
 export 'social_feed_card.dart';
 export 'dating_swipe_card.dart';
 export 'video_feed_card.dart';
+export 'youtube_feed_card.dart';
