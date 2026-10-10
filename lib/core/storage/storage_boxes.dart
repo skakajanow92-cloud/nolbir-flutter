@@ -13,4 +13,5 @@ class StorageBoxes {
   static const settings = 'app_settings'; // tema, dil, tercihler
   static const auth = 'auth_cache'; // oturum/kullanıcı önbelleği
   static const cache = 'general_cache'; // genel amaçlı geçici önbellek
+  static const collection = 'collection_items'; // kullanıcının kaydettiği kartlar
 }
