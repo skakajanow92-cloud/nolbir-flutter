@@ -3,6 +3,8 @@ import '../features/discovery/widgets/discovery_card_registrations.dart';
 import '../features/profile/widgets/profile_card_registrations.dart';
 import '../features/collection/widgets/collection_card_registrations.dart';
 import '../features/cart/widgets/cart_card_registrations.dart';
+import '../features/shareholder/widgets/shareholder_card_registrations.dart';
+import '../features/shareholder/widgets/shareholder_form_registrations.dart';
 import '../features/verification/widgets/verification_form_registrations.dart';
 import '../features/verification/widgets/verification_card_registrations.dart';
 
@@ -14,6 +16,8 @@ void registerAllCardViews() {
   registerDiscoveryCardViews();
   registerVerificationFormViews();
   registerVerificationCardViews();
+  registerShareholderFormViews();
+  registerShareholderCardViews();
   registerProfileCardViews();
   registerCollectionCardViews();
   registerCartCardViews();

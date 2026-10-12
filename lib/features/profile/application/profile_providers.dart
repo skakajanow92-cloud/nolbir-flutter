@@ -32,6 +32,9 @@ class ProfileFeed extends _$ProfileFeed {
         )
         .toList();
 
+    const shareholderCard = ShareholderApplicationCard(
+      id: "shareholder_application_status",
+    );
     // Sıralama artık burada elle yazılmıyor — ProfileModuleOrder, hangi
     // modülün hangi sırada register edildiğine bakarak diziyor (bkz.
     // core/cards/profile_module_order.dart). Yeni bir modül eklediğinde
@@ -41,6 +44,7 @@ class ProfileFeed extends _$ProfileFeed {
       ...posts,
       ...cartCards,
       verificationCard,
+      shareholderCard,
     ]);
     return result;
   }
