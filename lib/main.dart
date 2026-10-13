@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'firebase_options.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:media_kit/media_kit.dart';
@@ -13,6 +15,8 @@ void main() async {
   registerAllCardViews(); // tüm kart görünümlerini burada, tek seferde kaydet
   await LocalStore.init();
   _enableImmersiveFullScreen();
+  // Firebase'i başlatın
+  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
 
   runApp(const ProviderScope(child: MyApp()));
 }
