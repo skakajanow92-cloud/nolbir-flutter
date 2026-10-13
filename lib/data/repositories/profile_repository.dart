@@ -52,6 +52,7 @@ class MockProfileRepository implements ProfileRepository {
     buildFoodCartMock(),
     buildBankCartMock(),
     buildPharmacyCartMock(),
+    buildEventTicketCartMock(),
     ...buildPostsMock(),
   ];
 
