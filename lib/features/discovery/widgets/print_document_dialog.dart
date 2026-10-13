@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import '../../../models/product_card/product_card.dart';
 
 class _MockPrinter {
   final String name;
@@ -14,9 +13,13 @@ const _mockPrinters = [
 ];
 
 class PrintDocumentDialog extends StatefulWidget {
-  final WritingDocument document;
-
-  const PrintDocumentDialog({super.key, required this.document});
+  //final WritingDocument document;
+  final String documentTitle;
+  const PrintDocumentDialog({
+    super.key,
+    //required this.document,
+    required this.documentTitle,
+  });
 
   @override
   State<PrintDocumentDialog> createState() => _PrintDocumentDialogState();
@@ -54,7 +57,7 @@ class _PrintDocumentDialogState extends State<PrintDocumentDialog> {
               ),
               const SizedBox(height: 4),
               Text(
-                "\"${widget.document.title}\" belgesini gönder",
+                "\"${widget.documentTitle}\" belgesini gönder",
                 style: const TextStyle(color: Colors.white54, fontSize: 13),
               ),
               const SizedBox(height: 16),

@@ -26,3 +26,4 @@ export 'video_feed_card.dart';
 export 'youtube_feed_card.dart';
 export 'netflix_feed_card.dart';
 export 'writing_tool_card.dart';
+export 'spreadsheet_tool_card.dart';

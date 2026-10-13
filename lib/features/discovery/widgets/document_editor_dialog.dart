@@ -167,7 +167,7 @@ class _DocumentEditorDialogState extends State<DocumentEditorDialog> {
                               isScrollControlled: true,
                               backgroundColor: Colors.transparent,
                               builder: (_) => PrintDocumentDialog(
-                                document: widget.document,
+                                documentTitle: widget.document.title,
                               ),
                             );
                           },

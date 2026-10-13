@@ -16,6 +16,7 @@ import 'messages_list_card_view.dart';
 import 'netflix_feed_card_view.dart';
 import 'popular_hotels_card_view.dart';
 import 'social_feed_card_view.dart';
+import 'spreadsheet_tool_card_view.dart';
 import 'video_card_view.dart';
 import 'product_card_view.dart';
 import 'subscription_card_view.dart';
@@ -134,5 +135,9 @@ void registerDiscoveryCardViews() {
   CardViewRegistry.register<WritingToolCard>(
     (context, card, isActive) =>
         WritingToolCardView(card: card as WritingToolCard),
+  );
+  CardViewRegistry.register<SpreadsheetToolCard>(
+    (context, card, isActive) =>
+        SpreadsheetToolCardView(card: card as SpreadsheetToolCard),
   );
 }
