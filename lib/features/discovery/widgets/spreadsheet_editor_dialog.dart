@@ -20,7 +20,7 @@ class SpreadsheetEditorDialog extends StatefulWidget {
 }
 
 class _SpreadsheetEditorDialogState extends State<SpreadsheetEditorDialog> {
-  static const accent = Color(0xFF2FB380);
+  //static const accent = Color(0xFF2FB380);
 
   late final TextEditingController _titleController;
   String _searchQuery = "";
