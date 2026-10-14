@@ -67,7 +67,7 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Çok Görevli Akış Uygulaması',
+      title: '01',
       debugShowCheckedModeBanner: false,
       theme: ThemeData.dark(useMaterial3: true),
       scrollBehavior: WindowsMaterialScrollBehavior(),

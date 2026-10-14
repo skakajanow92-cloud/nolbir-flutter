@@ -133,7 +133,7 @@ class _StoriesRow extends StatelessWidget {
         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
         scrollDirection: Axis.horizontal,
         itemCount: stories.length,
-        separatorBuilder: (_, __) => const SizedBox(width: 12),
+        separatorBuilder: (_, _) => const SizedBox(width: 12),
         itemBuilder: (_, i) => _StoryBubble(story: stories[i]),
       ),
     );

@@ -11,6 +11,7 @@ import 'ticket_cart_card_view.dart';
 import 'hotel_cart_card_view.dart';
 import 'pharmacy_cart_card_view.dart';
 import 'event_ticket_cart_card_view.dart';
+import 'hosting_cart_card_view.dart';
 
 void registerCartCardViews() {
   CardViewRegistry.register<CartSummaryCard>(
@@ -67,4 +68,10 @@ void registerCartCardViews() {
         EventTicketCartCardView(card: card as EventTicketCartCard),
   );
   ProfileModuleOrder.register<EventTicketCartCard>();
+
+  CardViewRegistry.register<HostingCartCard>(
+    (context, card, isActive) =>
+        HostingCartCardView(card: card as HostingCartCard),
+  );
+  ProfileModuleOrder.register<HostingCartCard>();
 }

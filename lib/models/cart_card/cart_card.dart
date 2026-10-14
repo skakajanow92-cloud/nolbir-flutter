@@ -8,3 +8,4 @@ export 'food_cart_card.dart';
 export 'bank_cart_card.dart';
 export 'pharmacy_cart_card.dart';
 export 'event_ticket_cart_card.dart';
+export 'hosting_cart_card.dart';
