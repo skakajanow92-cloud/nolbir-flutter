@@ -8,42 +8,18 @@ part of 'auth_providers.dart';
 
 // GENERATED CODE - DO NOT MODIFY BY HAND
 // ignore_for_file: type=lint, type=warning
-/// Kullanıcının oturum durumu.
-///
-/// NOT (bilinçli, geçici tasarım kararı): Şu an gerçek kimlik doğrulama
-/// YOK — `login`/`register` çağrıları boş/geçersiz olmadığı sürece
-/// başarılı sayılır ve state'i `true` yapar. Gerçek backend'e bağlanınca
-/// (JWT/token, secure storage, sunucu tarafı e-posta unique kontrolü vb.)
-/// burası değişecek — ama ProfileTab'ın gate mantığı (isUserProvider'ı
-/// izleyip true/false'a göre dallanma) AYNI kalacak.
 
 @ProviderFor(IsUser)
 final isUserProvider = IsUserProvider._();
 
-/// Kullanıcının oturum durumu.
-///
-/// NOT (bilinçli, geçici tasarım kararı): Şu an gerçek kimlik doğrulama
-/// YOK — `login`/`register` çağrıları boş/geçersiz olmadığı sürece
-/// başarılı sayılır ve state'i `true` yapar. Gerçek backend'e bağlanınca
-/// (JWT/token, secure storage, sunucu tarafı e-posta unique kontrolü vb.)
-/// burası değişecek — ama ProfileTab'ın gate mantığı (isUserProvider'ı
-/// izleyip true/false'a göre dallanma) AYNI kalacak.
 final class IsUserProvider extends $NotifierProvider<IsUser, bool> {
-  /// Kullanıcının oturum durumu.
-  ///
-  /// NOT (bilinçli, geçici tasarım kararı): Şu an gerçek kimlik doğrulama
-  /// YOK — `login`/`register` çağrıları boş/geçersiz olmadığı sürece
-  /// başarılı sayılır ve state'i `true` yapar. Gerçek backend'e bağlanınca
-  /// (JWT/token, secure storage, sunucu tarafı e-posta unique kontrolü vb.)
-  /// burası değişecek — ama ProfileTab'ın gate mantığı (isUserProvider'ı
-  /// izleyip true/false'a göre dallanma) AYNI kalacak.
   IsUserProvider._()
     : super(
         from: null,
         argument: null,
         retry: null,
         name: r'isUserProvider',
-        isAutoDispose: true,
+        isAutoDispose: false,
         dependencies: null,
         $allTransitiveDependencies: null,
       );
@@ -64,16 +40,7 @@ final class IsUserProvider extends $NotifierProvider<IsUser, bool> {
   }
 }
 
-String _$isUserHash() => r'8d175cc669c48921d3c09357078c95498fa641c0';
-
-/// Kullanıcının oturum durumu.
-///
-/// NOT (bilinçli, geçici tasarım kararı): Şu an gerçek kimlik doğrulama
-/// YOK — `login`/`register` çağrıları boş/geçersiz olmadığı sürece
-/// başarılı sayılır ve state'i `true` yapar. Gerçek backend'e bağlanınca
-/// (JWT/token, secure storage, sunucu tarafı e-posta unique kontrolü vb.)
-/// burası değişecek — ama ProfileTab'ın gate mantığı (isUserProvider'ı
-/// izleyip true/false'a göre dallanma) AYNI kalacak.
+String _$isUserHash() => r'9ae1a7ff35e3ed6369a102e18fcbf236eb7e3c2e';
 
 abstract class _$IsUser extends $Notifier<bool> {
   bool build();

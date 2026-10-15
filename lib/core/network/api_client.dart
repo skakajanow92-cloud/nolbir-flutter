@@ -1,11 +1,11 @@
-import 'dart:typed_data';
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 import 'api_auth_context.dart';
 import 'api_exception.dart';
 import 'app_config.dart';
 import 'platform/http_client_config_io.dart'
-    if (dart.library.html) 'platform/http_client_config_web.dart' as platform;
+    if (dart.library.html) 'platform/http_client_config_web.dart'
+    as platform;
 
 /// Uygulama genelinde TÜM API çıkışlarının aktığı TEK merkezi nokta.
 ///
@@ -66,8 +66,12 @@ class ApiClient {
       platform.configureDebugHttpClient(dio);
     }
 
-    final instance =
-        ApiClient._internal(baseUrl, key, dio, isSandboxed: sandboxed);
+    final instance = ApiClient._internal(
+      baseUrl,
+      key,
+      dio,
+      isSandboxed: sandboxed,
+    );
     instance._setupInterceptors();
     _instances[key] = instance;
     return instance;
@@ -76,9 +80,9 @@ class ApiClient {
   void _setupInterceptors() {
     dio.interceptors.add(
       InterceptorsWrapper(
-        onRequest: (options, handler) {
+        onRequest: (options, handler) async {
           if (!isSandboxed) {
-            final token = ApiAuthContext.token;
+            final token = await ApiAuthContext.resolveToken();
             if (token != null && token.isNotEmpty) {
               options.headers['Authorization'] = 'Bearer $token';
             }
@@ -112,43 +116,59 @@ class ApiClient {
     String endpoint, {
     Map<String, dynamic>? query,
     Options? options,
-  }) =>
-      _run(() => dio.get<T>(endpoint, queryParameters: query, options: options));
+  }) => _run(
+    () => dio.get<T>(endpoint, queryParameters: query, options: options),
+  );
 
   Future<Response<T>> post<T>(
     String endpoint, {
     dynamic data,
     Map<String, dynamic>? query,
     Options? options,
-  }) =>
-      _run(() => dio.post<T>(endpoint,
-          data: data, queryParameters: query, options: options));
+  }) => _run(
+    () => dio.post<T>(
+      endpoint,
+      data: data,
+      queryParameters: query,
+      options: options,
+    ),
+  );
 
   Future<Response<T>> put<T>(
     String endpoint, {
     dynamic data,
     Map<String, dynamic>? query,
     Options? options,
-  }) =>
-      _run(() => dio.put<T>(endpoint,
-          data: data, queryParameters: query, options: options));
+  }) => _run(
+    () => dio.put<T>(
+      endpoint,
+      data: data,
+      queryParameters: query,
+      options: options,
+    ),
+  );
 
   Future<Response<T>> patch<T>(
     String endpoint, {
     dynamic data,
     Map<String, dynamic>? query,
     Options? options,
-  }) =>
-      _run(() => dio.patch<T>(endpoint,
-          data: data, queryParameters: query, options: options));
+  }) => _run(
+    () => dio.patch<T>(
+      endpoint,
+      data: data,
+      queryParameters: query,
+      options: options,
+    ),
+  );
 
   Future<Response<T>> delete<T>(
     String endpoint, {
     Map<String, dynamic>? query,
     Options? options,
-  }) =>
-      _run(() =>
-          dio.delete<T>(endpoint, queryParameters: query, options: options));
+  }) => _run(
+    () => dio.delete<T>(endpoint, queryParameters: query, options: options),
+  );
 
   // --- DOSYA İŞLEMLERİ ---
   // BİLİNÇLİ TASARIM KARARI: `File` (dart:io) değil `Uint8List bytes`

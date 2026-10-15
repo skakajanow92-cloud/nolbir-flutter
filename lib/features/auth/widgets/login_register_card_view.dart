@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../application/auth_providers.dart';
+import '../../../core/auth/auth_service.dart';
 
 /// Temel Giriş/Kayıt formu.
 ///
@@ -53,23 +54,34 @@ class _LoginRegisterCardViewState extends ConsumerState<LoginRegisterCardView> {
   }
 
   void _toggleMode() => setState(() => _isRegisterMode = !_isRegisterMode);
+  bool _loading = false;
 
-  void _submit() {
-    if (!_formKey.currentState!.validate()) return;
-    final notifier = ref.read(isUserProvider.notifier);
+  Future<void> _submit() async {
+  if (!_formKey.currentState!.validate()) return;
+  setState(() => _loading = true);
+  final notifier = ref.read(isUserProvider.notifier);
+  try {
     if (_isRegisterMode) {
-      notifier.register(
+      await notifier.register(
         email: _emailController.text.trim(),
         password: _passwordController.text,
         pin: _pinController.text,
       );
     } else {
-      notifier.login(
+      await notifier.login(
         identifier: _identifierController.text.trim(),
         password: _loginPasswordController.text,
       );
     }
+  } on AuthException catch (e) {
+    if (mounted) {
+      ScaffoldMessenger.of(context)
+          .showSnackBar(SnackBar(content: Text(e.message)));
+    }
+  } finally {
+    if (mounted) setState(() => _loading = false);
   }
+}
 
   @override
   Widget build(BuildContext context) {
@@ -114,7 +126,7 @@ class _LoginRegisterCardViewState extends ConsumerState<LoginRegisterCardView> {
                         shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(12)),
                       ),
-                      onPressed: _submit,
+                      onPressed: _loading ? null : _submit,
                       child: Text(_isRegisterMode ? "Kayıt Ol" : "Giriş Yap"),
                     ),
                     const SizedBox(height: 14),
