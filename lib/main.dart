@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'app/card_detail_registrations.dart';
 import 'firebase_options.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -12,7 +13,8 @@ import 'core/widgets/windows_material_scroll.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   MediaKit.ensureInitialized();
-  registerAllCardViews(); // tüm kart görünümlerini burada, tek seferde kaydet
+  registerAllCardViews();
+  registerAllCardDetails();
   await LocalStore.init();
   _enableImmersiveFullScreen();
   // Firebase'i başlatın

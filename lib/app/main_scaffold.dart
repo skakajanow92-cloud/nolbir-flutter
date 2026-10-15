@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../core/layout/adaptive_shell.dart';
 import '../features/profile/profile_tab.dart';
 import '../features/discovery/discovery_tab.dart';
 import '../features/collection/collection_tab.dart';
@@ -23,7 +24,17 @@ class _MainScaffoldState extends State<MainScaffold> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return AdaptiveShell(
+      tabs: _tabs,
+      destinations: const [
+        ShellDestination(icon: Icons.person, label: "Profil"),
+        ShellDestination(icon: Icons.explore, label: "Akış"),
+        ShellDestination(icon: Icons.bookmark, label: "Koleksiyon"),
+      ],
+      currentIndex: _tabIndex,
+      onSelected: (i) => setState(() => _tabIndex = i),
+    );
+    /*Scaffold(
       backgroundColor: Colors.black,
       extendBody: true,
       body: IndexedStack(index: _tabIndex, children: _tabs),
@@ -40,6 +51,6 @@ class _MainScaffoldState extends State<MainScaffold> {
           BottomNavigationBarItem(icon: Icon(Icons.bookmark), label: "Koleksiyon"),
         ],
       ),
-    );
+    );*/
   }
 }

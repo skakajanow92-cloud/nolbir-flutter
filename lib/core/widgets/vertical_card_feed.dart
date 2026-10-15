@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../models/feed_card/feed_card.dart';
+import '../layout/feed_activity.dart';
 
 /// `VerticalCardFeed`'in dışarıdaki `PageController`'ını, kart içeriğinin
 /// derinliklerindeki widget'lara (ör. `PageAwareScrollView`) açan
@@ -67,7 +68,8 @@ class VerticalFeedController extends InheritedWidget {
 /// ```
 class VerticalCardFeed extends StatefulWidget {
   final List<FeedCard> cards;
-  final Widget Function(BuildContext context, FeedCard card, bool isActive) cardBuilder;
+  final Widget Function(BuildContext context, FeedCard card, bool isActive)
+  cardBuilder;
   final void Function(int index)? onPageChanged;
   final VoidCallback? onReachEnd; // sonsuz kaydırma / pagination tetikleyici
   final int loadMoreThreshold;
@@ -89,6 +91,9 @@ class _VerticalCardFeedState extends State<VerticalCardFeed>
     with AutomaticKeepAliveClientMixin {
   late final PageController _controller;
   int _activeIndex = 0;
+
+  FeedTabScope? _tabScope;
+  FeedCard? _lastReported;
 
   @override
   bool get wantKeepAlive => true;
@@ -117,8 +122,36 @@ class _VerticalCardFeedState extends State<VerticalCardFeed>
   }
 
   @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    _tabScope = FeedTabScope.maybeOf(context);
+  }
+
+  FeedCard? get _activeCard {
+    final cards = widget.cards;
+    if (cards.isEmpty) return null;
+    final index = _activeIndex < cards.length ? _activeIndex : cards.length - 1;
+    return cards[index];
+  }
+
+  void _reportActiveCard() {
+    final scope = _tabScope;
+    if (scope == null) return;
+    final card = _activeCard;
+    if (identical(card, _lastReported)) return;
+    _lastReported = card;
+    scope.tracker.report(scope.tabIndex, card);
+  }
+
+  @override
   Widget build(BuildContext context) {
     super.build(context);
+
+    if (_tabScope != null && !identical(_activeCard, _lastReported)) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) _reportActiveCard();
+      });
+    }
 
     if (widget.cards.isEmpty) {
       return const Center(child: CircularProgressIndicator());
