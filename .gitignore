@@ -52,4 +52,4 @@ firmware/.vscode/launch.json
 firmware/.vscode/ipch/
 
 # Nodejs build & local files
-nodejs/node_modules
+node_modules/
