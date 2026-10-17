@@ -284,6 +284,7 @@ class _DocumentTile extends StatelessWidget {
 /// `full_access_request_card_view.dart` ARASINDA paylaşılan "admin
 /// inceliyor" ekranı — kopya kod olmasın diye burada, gerekirse `core/
 /// widgets/`e taşınabilir.
+// ignore: unused_element
 class _PendingNotice extends StatelessWidget {
   final String title;
   final String message;
