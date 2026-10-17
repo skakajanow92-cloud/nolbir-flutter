@@ -1,9 +1,15 @@
 import '../../../core/layout/card_detail_registry.dart';
 import '../../../models/feed_card/feed_card.dart';
 import 'details/accommodation_detail.dart';
+import 'details/bet_detail.dart';
+import 'details/cargo_detail.dart';
 import 'details/career_detail.dart';
+import 'details/channels_detail.dart';
 import 'details/dating_detail.dart';
+import 'details/donation_detail.dart';
+import 'details/education_detail.dart';
 import 'details/engagement_detail.dart';
+import 'details/estate_detail.dart';
 import 'details/food_detail.dart';
 import 'details/header_detail.dart';
 import 'details/insurance_detail.dart';
@@ -23,10 +29,18 @@ void registerProfileCardDetails() {
   CardDetailRegistry.register<WalletProfileCard>(buildWalletDetail);
   CardDetailRegistry.register<InsuranceProfileCard>(buildInsuranceDetail);
   CardDetailRegistry.register<TravelProfileCard>(buildTravelDetail);
-  CardDetailRegistry.register<AccommodationProfileCard>(buildAccommodationDetail);
+  CardDetailRegistry.register<AccommodationProfileCard>(
+    buildAccommodationDetail,
+  );
   CardDetailRegistry.register<FoodProfileCard>(buildFoodDetail);
   CardDetailRegistry.register<EngagementProfileCard>(buildEngagementDetail);
   CardDetailRegistry.register<CareerProfileCard>(buildCareerDetail);
   CardDetailRegistry.register<DatingProfileCard>(buildDatingDetail);
   CardDetailRegistry.register<UserPostCard>(buildUserPostDetail);
+  CardDetailRegistry.register<BetProfileCard>(buildBetDetail);
+  CardDetailRegistry.register<CargoProfileCard>(buildCargoDetail);
+  CardDetailRegistry.register<ChannelsProfileCard>(buildChannelsDetail);
+  CardDetailRegistry.register<DonationProfileCard>(buildDonationDetail);
+  CardDetailRegistry.register<EducationProfileCard>(buildEducationDetail);
+  CardDetailRegistry.register<EstateProfileCard>(buildEstateDetail);
 }

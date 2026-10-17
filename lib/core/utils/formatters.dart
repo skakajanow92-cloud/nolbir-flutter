@@ -12,8 +12,18 @@ String formatDateTime(DateTime d) =>
 
 String formatMonth(DateTime d) {
   const months = [
-    'Oca', 'Şub', 'Mar', 'Nis', 'May', 'Haz',
-    'Tem', 'Ağu', 'Eyl', 'Eki', 'Kas', 'Ara',
+    'Oca',
+    'Şub',
+    'Mar',
+    'Nis',
+    'May',
+    'Haz',
+    'Tem',
+    'Ağu',
+    'Eyl',
+    'Eki',
+    'Kas',
+    'Ara',
   ];
   return '${months[d.month - 1]} ${d.year}';
 }
@@ -41,4 +51,13 @@ String formatDuration(int months) {
   if (years == 0) return '$rest ay';
   if (rest == 0) return '$years yıl';
   return '$years yıl $rest ay';
+}
+
+/// Süreyi video/parça uzunluğu gibi "4:05" ya da "1:02:09" biçiminde yazar.
+String formatClock(Duration d) {
+  final seconds = d.inSeconds % 60;
+  if (d.inHours > 0) {
+    return '${d.inHours}:${_two(d.inMinutes % 60)}:${_two(seconds)}';
+  }
+  return '${d.inMinutes}:${_two(seconds)}';
 }
