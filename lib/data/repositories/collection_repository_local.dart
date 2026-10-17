@@ -55,12 +55,12 @@ class LocalCollectionRepository implements CollectionRepository {
   }
 
   Map<String, dynamic> _toMap(CollectionItemCard item) => {
-        'id': item.id,
-        'title': item.title,
-        'previewUrl': item.previewUrl,
-        'originalCardType': item.originalCard.runtimeType.toString(),
-        'originalCardId': item.originalCard.id,
-      };
+    'id': item.id,
+    'title': item.title,
+    'previewUrl': item.previewUrl,
+    'originalCardType': item.originalCard.runtimeType.toString(),
+    'originalCardId': item.originalCard.id,
+  };
 
   CollectionItemCard _fromMap(Map<String, dynamic> map) {
     return CollectionItemCard(
@@ -82,5 +82,5 @@ class LocalCollectionRepository implements CollectionRepository {
 class _RestoredOriginalCard extends FeedCard {
   final String typeName;
   const _RestoredOriginalCard({required String id, required this.typeName})
-      : super(id);
+    : super(id);
 }

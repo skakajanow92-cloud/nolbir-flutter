@@ -63,8 +63,18 @@ class MediaPicker {
   /// platform ayrımına gerek yok. `PlatformFile.size` de kaldırıldığı
   /// için boyutu zaten okuduğumuz `bytes.length`'ten alıyoruz — ekstra
   /// bir disk/IO çağrısına gerek kalmıyor.
-  static Future<MediaPickResult?> pickAnyFile({FileType type = FileType.any}) async {
-    final file = await FilePicker.pickFile(type: type);
+  ///
+  /// [allowedExtensions] verilirse otomatik olarak `FileType.custom` ile
+  /// birlikte kullanılır (ör. sadece `['pdf','jpg','jpeg','png']`) — belge
+  /// yükleme akışlarının (ör. shareholder başvuru sihirbazı) ihtiyacı.
+  static Future<MediaPickResult?> pickAnyFile({
+    FileType type = FileType.any,
+    List<String>? allowedExtensions,
+  }) async {
+    final file = await FilePicker.pickFile(
+      type: allowedExtensions != null ? FileType.custom : type,
+      allowedExtensions: allowedExtensions,
+    );
     if (file == null) return null; // kullanıcı iptal etti
 
     final bytes = await file.readAsBytes();

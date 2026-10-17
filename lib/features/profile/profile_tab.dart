@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:nolbir/features/auth/application/auth_providers.dart';
-import 'package:nolbir/features/auth/widgets/login_register_card_view.dart';
 import '../../core/widgets/vertical_card_feed.dart';
 import '../../app/card_factory.dart';
 import 'application/profile_providers.dart';
@@ -17,13 +15,7 @@ class ProfileTab extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final feedAsync = ref.watch(profileFeedProvider);
-    final isUser = ref.watch(isUserProvider);
-    if (!isUser) {
-      return const Scaffold(
-        backgroundColor: Colors.transparent,
-        body: LoginRegisterCardView(),
-      );
-    }
+
     return feedAsync.when(
       loading: () => const Center(child: CircularProgressIndicator()),
       error: (err, _) => Center(

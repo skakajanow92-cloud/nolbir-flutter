@@ -113,3 +113,12 @@ class Cart {
   int get itemCount => items.fold(0, (sum, i) => sum + i.quantity);
   bool get isEmpty => items.isEmpty;
 }
+
+/*
+siradaki sepet turumuz portfoy sepet turu yani yatirim araclari ile
+ doldurulmus bir sepet olsun farkli fonlardan hisse senetleri tahviller
+ bonolor viop dovuz kiymetli maden turlerinden kripto varliklardan 
+ olusan bir sepet farkli araci kurumlardan veya bankalardan olusturulmus 
+ portfoyler toplumu henuz odemeye gecilmemis portfoyler toplumi farkli 
+ borsalarda yapilacak islem turleri
+*/

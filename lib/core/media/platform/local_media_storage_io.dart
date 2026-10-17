@@ -1,6 +1,6 @@
 import 'dart:io';
 import 'package:path_provider/path_provider.dart';
-import 'media_pick_result.dart';
+import '../media_pick_result.dart';
 
 /// SADECE bu dosya `dart:io`/`path_provider` içe aktarır — web derlemesi
 /// bunu hiç görmez (bkz. local_media_storage.dart'taki conditional import).

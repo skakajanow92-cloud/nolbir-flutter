@@ -1,4 +1,4 @@
-import 'package:hive_ce_flutter/hive_flutter.dart';
+import 'package:hive_ce_flutter/hive_ce_flutter.dart';
 
 /// Uygulama genelinde TÜM yerel key-value depolamanın (Hive) TEK giriş noktası.
 ///
@@ -65,14 +65,10 @@ class LocalStore {
     if (cached != null) return Future.value(cached);
 
     // Aynı box'ın eşzamanlı iki açılışı tek Future'a bağlanır.
-    return _opening[key] ??= _openInternal(
-      realName,
-      key,
-      encryptionKey,
-      sandboxed,
-    ).whenComplete(() {
-      _opening.remove(key);
-    });
+    return _opening[key] ??=
+        _openInternal(realName, key, encryptionKey, sandboxed).whenComplete(() {
+          _opening.remove(key);
+        });
   }
 
   static Future<LocalStore> _openInternal(
@@ -83,8 +79,9 @@ class LocalStore {
   ) async {
     final box = await Hive.openBox(
       realName,
-      encryptionCipher:
-          encryptionKey != null ? HiveAesCipher(encryptionKey) : null,
+      encryptionCipher: encryptionKey != null
+          ? HiveAesCipher(encryptionKey)
+          : null,
     );
     final store = LocalStore._(box, realName, key, sandboxed);
     _instances[key] = store;
@@ -92,7 +89,10 @@ class LocalStore {
   }
 
   static String _sandboxName(String isolationKey, String boxName) {
-    final safe = isolationKey.toLowerCase().replaceAll(RegExp(r'[^a-z0-9_]'), '_');
+    final safe = isolationKey.toLowerCase().replaceAll(
+      RegExp(r'[^a-z0-9_]'),
+      '_',
+    );
     return 'san_${safe}__$boxName';
   }
 

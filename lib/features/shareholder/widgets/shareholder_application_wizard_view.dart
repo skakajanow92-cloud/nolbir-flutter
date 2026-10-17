@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:file_picker/file_picker.dart';
 import '../../../models/shareholder_application.dart';
+import '../../verification/widgets/full_access_gate.dart';
 import '../application/shareholder_providers.dart';
 
 /// Holding'e Ortaklık Başvurusu — 5 adımlı sihirbaz.
@@ -11,6 +12,12 @@ import '../application/shareholder_providers.dart';
 /// içerik tek bir belge yükleme ekranından çok daha fazla veri ve dosya
 /// topluyor, tek bir uzun form yerine adımlara bölünmesi hem kullanıcıyı
 /// yormuyor hem de "Gözden Geçir" adımında eksikleri net gösterebiliyor.
+///
+/// GÜNCELLEME: `body` artık `FullAccessGate` ile sarmalı — normalde bu
+/// ekrana sadece `ShareholderApplicationCardView`'ın kilitli-değil CTA'sı
+/// üzerinden ulaşılıyor (o da C1'i zaten kontrol ediyor), ama bu ikinci
+/// bir katman: `FormViewRegistry` üzerinden başka bir yoldan (ör. ileride
+/// bir deep link) buraya ulaşılırsa yine kilit devrede olsun diye.
 class ShareholderApplicationWizardView extends ConsumerStatefulWidget {
   const ShareholderApplicationWizardView({super.key});
 
@@ -79,17 +86,17 @@ class _ShareholderApplicationWizardViewState
         );
   }
 
-  /// NOT: `withData: true` — Flutter Web'de gerçek dosya yolu yok, bu
-  /// bayrak olmadan `bytes` null gelir ve önizleme/kayıt çalışmaz.
+  /// NOT: `file_picker` v13 API — `withData`/`pickFiles()` listesi yerine
+  /// tekil `pickFile()` kullanılıyor (bkz. `media_picker.dart`'taki AYNI
+  /// v12->v13 düzeltmesi). `bytes` her platformda `readAsBytes()` ile
+  /// okunuyor, Web'de ayrıca bir bayrağa gerek yok.
   Future<void> _pickDocument(DocumentType type) async {
-    final result = await FilePicker.pickFiles(
+    final file = await FilePicker.pickFile(
       type: FileType.custom,
-      allowedExtensions: ['pdf', 'jpg', 'jpeg', 'png'],
-      withData: true,
+      allowedExtensions: const ['pdf', 'jpg', 'jpeg', 'png'],
     );
-    if (result.isEmpty) return;
-    final file = result.single;
-    Uint8List bytes = await file.readAsBytes();
+    if (file == null) return;
+    final Uint8List bytes = await file.readAsBytes();
 
     ref
         .read(shareholderApplicationDraftProvider.notifier)
@@ -98,7 +105,10 @@ class _ShareholderApplicationWizardViewState
             type: type,
             fileName: file.name,
             bytes: bytes,
-            fileSizeBytes: bytes.elementSizeInBytes,
+            // DÜZELTME: `Uint8List.elementSizeInBytes` HER ZAMAN 1 döner
+            // (listenin eleman başına bayt boyutu, toplam uzunluk DEĞİL) —
+            // gerçek dosya boyutu `bytes.length`.
+            fileSizeBytes: bytes.length,
             uploadedAt: DateTime.now(),
           ),
         );
@@ -162,49 +172,58 @@ class _ShareholderApplicationWizardViewState
         backgroundColor: const Color(0xFF0F0D14),
         title: const Text("Ortaklık Başvurusu"),
       ),
-      body: Theme(
-        data: Theme.of(context).copyWith(
-          colorScheme: Theme.of(context).colorScheme.copyWith(primary: accent),
-        ),
-        child: Stepper(
-          type: StepperType.vertical,
-          currentStep: _currentStep,
-          onStepContinue: () {
-            if (_currentStep == 0) _savePersonalInfo();
-            if (_currentStep == 2) _saveFinancials();
-            if (_currentStep < _steps(draft).length - 1) {
-              setState(() => _currentStep++);
-            } else {
-              _submit();
-            }
-          },
-          onStepCancel: () {
-            if (_currentStep > 0) setState(() => _currentStep--);
-          },
-          onStepTapped: (i) => setState(() => _currentStep = i),
-          controlsBuilder: (context, details) => Padding(
-            padding: const EdgeInsets.only(top: 16),
-            child: Row(
-              children: [
-                FilledButton(
-                  style: FilledButton.styleFrom(backgroundColor: accent),
-                  onPressed: details.onStepContinue,
-                  child: Text(
-                    _currentStep == _steps(draft).length - 1
-                        ? "Başvuruyu Gönder"
-                        : "Devam",
-                  ),
-                ),
-                const SizedBox(width: 12),
-                if (_currentStep > 0)
-                  TextButton(
-                    onPressed: details.onStepCancel,
-                    child: const Text("Geri"),
-                  ),
-              ],
-            ),
+      body: FullAccessGate(
+        icon: Icons.handshake_outlined,
+        featureTitle: "Holding Ortaklığı",
+        featureDescription:
+            "Ortaklık başvurusu yapabilmek için önce C1 (Tam Yetki) "
+            "doğrulamasını tamamlaman gerekiyor.",
+        child: Theme(
+          data: Theme.of(context).copyWith(
+            colorScheme: Theme.of(
+              context,
+            ).colorScheme.copyWith(primary: accent),
           ),
-          steps: _steps(draft),
+          child: Stepper(
+            type: StepperType.vertical,
+            currentStep: _currentStep,
+            onStepContinue: () {
+              if (_currentStep == 0) _savePersonalInfo();
+              if (_currentStep == 2) _saveFinancials();
+              if (_currentStep < _steps(draft).length - 1) {
+                setState(() => _currentStep++);
+              } else {
+                _submit();
+              }
+            },
+            onStepCancel: () {
+              if (_currentStep > 0) setState(() => _currentStep--);
+            },
+            onStepTapped: (i) => setState(() => _currentStep = i),
+            controlsBuilder: (context, details) => Padding(
+              padding: const EdgeInsets.only(top: 16),
+              child: Row(
+                children: [
+                  FilledButton(
+                    style: FilledButton.styleFrom(backgroundColor: accent),
+                    onPressed: details.onStepContinue,
+                    child: Text(
+                      _currentStep == _steps(draft).length - 1
+                          ? "Başvuruyu Gönder"
+                          : "Devam",
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  if (_currentStep > 0)
+                    TextButton(
+                      onPressed: details.onStepCancel,
+                      child: const Text("Geri"),
+                    ),
+                ],
+              ),
+            ),
+            steps: _steps(draft),
+          ),
         ),
       ),
     );
@@ -723,14 +742,12 @@ class _AddAssetSheetState extends State<_AddAssetSheet> {
   }
 
   Future<void> _pickProof() async {
-    final result = await FilePicker.pickFiles(
+    final file = await FilePicker.pickFile(
       type: FileType.custom,
-      allowedExtensions: ['pdf', 'jpg', 'jpeg', 'png'],
-      withData: true,
+      allowedExtensions: const ['pdf', 'jpg', 'jpeg', 'png'],
     );
-    if (result.isEmpty) return;
-    final file = result.single;
-    Uint8List bytes = await file.readAsBytes();
+    if (file == null) return;
+    final Uint8List bytes = await file.readAsBytes();
     setState(() {
       _proofBytes = bytes;
       _proofFileName = file.name;

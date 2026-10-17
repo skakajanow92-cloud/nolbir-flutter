@@ -1,5 +1,5 @@
 import 'media_pick_result.dart';
-import 'local_media_storage_io.dart'
+import 'platform/local_media_storage_io.dart'
     if (dart.library.html) 'platform/local_media_storage_web.dart' as platform;
 
 /// Seçilen bir medyayı KALICI hale getirir — native'de gerçek bir dosyaya

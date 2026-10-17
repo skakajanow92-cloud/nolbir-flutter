@@ -80,9 +80,9 @@ class ApiClient {
   void _setupInterceptors() {
     dio.interceptors.add(
       InterceptorsWrapper(
-        onRequest: (options, handler) async {
+        onRequest: (options, handler) {
           if (!isSandboxed) {
-            final token = await ApiAuthContext.resolveToken();
+            final token = ApiAuthContext.token;
             if (token != null && token.isNotEmpty) {
               options.headers['Authorization'] = 'Bearer $token';
             }

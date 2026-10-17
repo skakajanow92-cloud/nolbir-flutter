@@ -4,12 +4,18 @@ import '../../../models/feed_card/shareholder_application_card.dart';
 import '../../../models/shareholder_application.dart';
 import '../../../models/form_card/shareholder_application_form_card.dart';
 import '../../../core/forms/form_view_registry.dart';
+import '../../verification/widgets/full_access_gate.dart';
 import '../application/shareholder_providers.dart';
 
 /// Ortaklık Başvurusu giriş kartı.
 /// Modül vurgu rengi: sıcak bronz — "kurumsal/holding" hissi, diğer
 /// modüllerin renklerinden ayrışan sıcak-nötr bir ton.
-class ShareholderApplicationCardView extends ConsumerWidget {
+///
+/// GÜNCELLEME: Bu modül artık C1 (Tam Yetki) doğrulaması gerektiriyor —
+/// `FullAccessGate` ile sarmalandı. C1 tamamlanmamışsa kart profil
+/// akışında GÖRÜNMEYE devam eder (kullanıcı özelliğin varlığını bilsin)
+/// ama içeriği normal CTA yerine kilit ekranına dönüşür.
+class ShareholderApplicationCardView extends StatelessWidget {
   final ShareholderApplicationCard card;
   const ShareholderApplicationCardView({super.key, required this.card});
 
@@ -18,8 +24,7 @@ class ShareholderApplicationCardView extends ConsumerWidget {
   static const _baseEnd = Color(0xFF1A140D);
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final draft = ref.watch(shareholderApplicationDraftProvider);
+  Widget build(BuildContext context) {
     final size = MediaQuery.of(context).size;
 
     return SizedBox(
@@ -36,65 +41,82 @@ class ShareholderApplicationCardView extends ConsumerWidget {
         child: SafeArea(
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 20),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const SizedBox(height: 8),
-                const Row(
-                  children: [
-                    Icon(Icons.handshake_outlined, color: moduleAccent, size: 20),
-                    SizedBox(width: 8),
-                    Text("Holding Ortaklığı",
-                        style: TextStyle(color: Colors.white54, fontSize: 14)),
-                  ],
-                ),
-                const SizedBox(height: 6),
-                Text(draft.status.label,
-                    style: const TextStyle(
-                        color: Colors.white, fontSize: 28, fontWeight: FontWeight.w700)),
-                const SizedBox(height: 8),
-                Text(
-                  draft.status == ShareholderApplicationStatus.approved
-                      ? "Tebrikler, artık bir ortaksın."
-                      : draft.status == ShareholderApplicationStatus.draft
-                          ? "Holdingimize ortak olmak için başvuru sürecini başlat."
-                          : "Başvurun ${_formatDate(draft.submittedAt)} tarihinde gönderildi.",
-                  style: const TextStyle(color: Colors.white54, fontSize: 13),
-                ),
-                const Spacer(),
-                if (draft.status != ShareholderApplicationStatus.approved)
-                  SizedBox(
-                    width: double.infinity,
-                    child: FilledButton(
-                      style: FilledButton.styleFrom(
-                        backgroundColor: moduleAccent,
-                        padding: const EdgeInsets.symmetric(vertical: 16),
-                      ),
-                      onPressed: () => _openWizard(context),
-                      child: Text(
-                        draft.status == ShareholderApplicationStatus.rejected
-                            ? "Başvuruyu Yeniden Gönder"
-                            : draft.status == ShareholderApplicationStatus.draft
-                                ? "Başvuruyu Başlat"
-                                : "Başvuruyu Düzenle",
-                      ),
-                    ),
-                  )
-                else
-                  const Row(
-                    children: [
-                      Icon(Icons.verified, color: Colors.greenAccent, size: 18),
-                      SizedBox(width: 6),
-                      Text("Ortak",
-                          style: TextStyle(color: Colors.greenAccent, fontSize: 13)),
-                    ],
-                  ),
-                const SizedBox(height: 32),
-              ],
+            child: FullAccessGate(
+              icon: Icons.handshake_outlined,
+              featureTitle: "Holding Ortaklığı",
+              featureDescription:
+                  "Ortaklık başvurusu yapabilmek için önce C1 (Tam Yetki) "
+                  "doğrulamasını tamamlaman gerekiyor.",
+              child: _ShareholderContent(),
             ),
           ),
         ),
       ),
+    );
+  }
+}
+
+class _ShareholderContent extends ConsumerWidget {
+  const _ShareholderContent();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final draft = ref.watch(shareholderApplicationDraftProvider);
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const SizedBox(height: 8),
+        const Row(
+          children: [
+            Icon(Icons.handshake_outlined,
+                color: ShareholderApplicationCardView.moduleAccent, size: 20),
+            SizedBox(width: 8),
+            Text("Holding Ortaklığı", style: TextStyle(color: Colors.white54, fontSize: 14)),
+          ],
+        ),
+        const SizedBox(height: 6),
+        Text(draft.status.label,
+            style:
+                const TextStyle(color: Colors.white, fontSize: 28, fontWeight: FontWeight.w700)),
+        const SizedBox(height: 8),
+        Text(
+          draft.status == ShareholderApplicationStatus.approved
+              ? "Tebrikler, artık bir ortaksın."
+              : draft.status == ShareholderApplicationStatus.draft
+                  ? "Holdingimize ortak olmak için başvuru sürecini başlat."
+                  : "Başvurun ${_formatDate(draft.submittedAt)} tarihinde gönderildi.",
+          style: const TextStyle(color: Colors.white54, fontSize: 13),
+        ),
+        const Spacer(),
+        if (draft.status != ShareholderApplicationStatus.approved)
+          SizedBox(
+            width: double.infinity,
+            child: FilledButton(
+              style: FilledButton.styleFrom(
+                backgroundColor: ShareholderApplicationCardView.moduleAccent,
+                padding: const EdgeInsets.symmetric(vertical: 16),
+              ),
+              onPressed: () => _openWizard(context),
+              child: Text(
+                draft.status == ShareholderApplicationStatus.rejected
+                    ? "Başvuruyu Yeniden Gönder"
+                    : draft.status == ShareholderApplicationStatus.draft
+                        ? "Başvuruyu Başlat"
+                        : "Başvuruyu Düzenle",
+              ),
+            ),
+          )
+        else
+          const Row(
+            children: [
+              Icon(Icons.verified, color: Colors.greenAccent, size: 18),
+              SizedBox(width: 6),
+              Text("Ortak", style: TextStyle(color: Colors.greenAccent, fontSize: 13)),
+            ],
+          ),
+        const SizedBox(height: 32),
+      ],
     );
   }
 

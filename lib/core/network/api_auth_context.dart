@@ -10,18 +10,12 @@ class ApiAuthContext {
 
   static String? token;
 
-  static Future<String?> Function()? tokenProvider;
-
-  static Future<String?> resolveToken() async =>
-      tokenProvider != null ? await tokenProvider!() : token;
-
   /// Backend'in modül/uygulama bazlı erişim kontrolü gibi ekstra header
   /// istediği durumlar için (ör. Nolbir'de "x-app-no").
   static final Map<String, String> extraHeaders = {};
 
   static void clear() {
     token = null;
-    tokenProvider = null;
     extraHeaders.clear();
   }
 }

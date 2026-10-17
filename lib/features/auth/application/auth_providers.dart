@@ -1,151 +1,95 @@
-import 'dart:async';
-
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
-
 import '../../../core/network/api_auth_context.dart';
+import '../../../core/storage/secure_token_storage.dart';
+import '../../../data/repositories/auth_repository.dart';
 
 part 'auth_providers.g.dart';
 
-// ---------------------------------------------------------------------------
-// Auth modeli ve arayüzü
-//
-// Şimdilik hiçbir backend yok: aşağıdaki [LocalAuthService] her şeyi bellekte
-// tutar (uygulama kapanınca kullanıcılar silinir). Kendi backend'in hazır
-// olunca yalnızca [AuthService] arayüzünü uygulayan yeni bir sınıf yazıp
-// [authServiceProvider]'ı ona yönlendirmen yeterli; UI ve [IsUser] değişmez.
-// ---------------------------------------------------------------------------
+/// Hangi `AuthRepository` implementasyonunun kullanılacağı — bugün mock,
+/// gerçek backend'e geçerken TEK satır: `MockAuthRepository()` ->
+/// `DioAuthRepository()`. Diğer tüm repository provider'larıyla
+/// (`cartRepositoryProvider`, `collectionRepositoryProvider`,
+/// `mediaUploaderProvider`) AYNI desen.
+@riverpod
+AuthRepository authRepository(Ref ref) => MockAuthRepository();
 
-/// UI'nin yakalayıp kullanıcıya gösterdiği hata.
-class AuthException implements Exception {
-  const AuthException(this.message);
-
-  final String message;
-
-  @override
-  String toString() => 'AuthException: $message';
-}
-
-class AuthUser {
-  const AuthUser({required this.uid, required this.email});
-
-  final String uid;
-  final String email;
-}
-
-abstract class AuthService {
-  AuthUser? get currentUser;
-
-  /// Oturum açıldığında/kapandığında yeni değer yayar (kapanınca null).
-  Stream<AuthUser?> get authStateChanges;
-
-  Future<void> signInWithEmail(String identifier, String password);
-
-  /// Başarılı kayıt sonrası kullanıcı otomatik oturum açmış olur.
-  Future<void> registerWithEmail(String email, String password);
-
-  Future<void> signOut();
-
-  /// API isteklerine eklenecek token. Backend yokken null döner.
-  Future<String?> getIdToken();
-}
-
-/// Yalnızca geliştirme içindir: kullanıcılar bellekte, şifreler düz metin
-/// tutulur. Üretimde KULLANMA.
-class LocalAuthService implements AuthService {
-  final Map<String, String> _passwordsByEmail = {};
-  final StreamController<AuthUser?> _controller =
-      StreamController<AuthUser?>.broadcast();
-
-  AuthUser? _currentUser;
-
-  @override
-  AuthUser? get currentUser => _currentUser;
-
-  @override
-  Stream<AuthUser?> get authStateChanges => _controller.stream;
-
-  String _normalize(String email) => email.trim().toLowerCase();
-
-  // Gerçek ağ gecikmesini taklit eder; yükleniyor durumunun görünmesi için.
-  Future<void> _fakeLatency() =>
-      Future<void>.delayed(const Duration(milliseconds: 300));
-
-  void _setUser(AuthUser? user) {
-    _currentUser = user;
-    _controller.add(user);
-  }
-
-  @override
-  Future<void> signInWithEmail(String identifier, String password) async {
-    await _fakeLatency();
-    final email = _normalize(identifier);
-    final stored = _passwordsByEmail[email];
-    if (stored == null || stored != password) {
-      throw const AuthException('E-posta veya şifre hatalı');
-    }
-    _setUser(AuthUser(uid: email, email: email));
-  }
-
-  @override
-  Future<void> registerWithEmail(String email, String password) async {
-    await _fakeLatency();
-    final normalized = _normalize(email);
-    if (_passwordsByEmail.containsKey(normalized)) {
-      throw const AuthException('Bu e-posta zaten kayıtlı');
-    }
-    _passwordsByEmail[normalized] = password;
-    _setUser(AuthUser(uid: normalized, email: normalized));
-  }
-
-  @override
-  Future<void> signOut() async {
-    _setUser(null);
-  }
-
-  @override
-  Future<String?> getIdToken() async => null;
-
-  void dispose() => _controller.close();
-}
-
-/// Backend geldiğinde burada [LocalAuthService] yerine gerçek servisi ver.
-final authServiceProvider = Provider<AuthService>((ref) {
-  final service = LocalAuthService();
-  ref.onDispose(service.dispose);
-  return service;
-});
-
-// ---------------------------------------------------------------------------
-// Giriş durumu
-// ---------------------------------------------------------------------------
-
-@Riverpod(keepAlive: true)
+/// Kullanıcının oturum durumu.
+///
+/// Artık GERÇEK bir akış: `login`/`register` `AuthRepository`'yi çağırır,
+/// başarılı olursa token'ı `SecureTokenStorage`'a kalıcı olarak yazar ve
+/// `ApiAuthContext.token`'ı günceller (böylece `ApiClient`'ın sonraki TÜM
+/// istekleri otomatik olarak yetkilendirilmiş olur). `build()` açılışta
+/// `SecureTokenStorage`'da kayıtlı bir token olup olmadığını kontrol eder —
+/// varsa oturum otomatik geri yüklenir, kullanıcı her uygulama açılışında
+/// yeniden giriş yapmak zorunda kalmaz.
+///
+/// NOT: appNo gibi hassas olmayan oturum verisi kasıtlı olarak burada
+/// tutulmuyor — `SecureTokenStorage`'ın sorumluluğu sadece token/refresh
+/// token (bkz. o dosyadaki doc comment). appNo şimdilik sadece
+/// `ApiAuthContext.extraHeaders`'a yazılıyor, kalıcı saklanması gerekirse
+/// bu iş `LocalStore` (Hive) tarafına taşınır.
+@riverpod
 class IsUser extends _$IsUser {
   @override
   bool build() {
-    final service = ref.watch(authServiceProvider);
-
-    ApiAuthContext.tokenProvider =
-        service.currentUser != null ? service.getIdToken : null;
-
-    final sub = service.authStateChanges.listen((u) {
-      state = u != null;
-      ApiAuthContext.tokenProvider = u != null ? service.getIdToken : null;
-    });
-    ref.onDispose(sub.cancel);
-    return service.currentUser != null;
+    _restoreSession();
+    return false; // ilk render'da senkron dönüş — kurtarma bitince state güncellenir
   }
 
-  Future<void> login({required String identifier, required String password}) =>
-      ref.read(authServiceProvider).signInWithEmail(identifier, password);
+  Future<void> _restoreSession() async {
+    final token = await SecureTokenStorage.readToken();
+    if (token == null || token.isEmpty) return;
+    ApiAuthContext.token = token;
+    state = true;
+  }
 
+  /// Giriş formunun "Giriş Yap" butonundan çağrılır.
+  /// identifier: T.C. kimlik no / e-posta / telefondan biri olabilir.
+  ///
+  /// Hata durumunda `ApiException` (veya mock'taki validasyon hatası)
+  /// fırlatılır — çağıran widget (`LoginRegisterCardView`) bunu
+  /// try/catch ile yakalayıp kullanıcıya gösterir, state DEĞİŞMEZ.
+  Future<void> login({required String identifier, required String password}) async {
+    final result = await ref
+        .read(authRepositoryProvider)
+        .login(identifier: identifier, password: password);
+    await _applySession(result);
+  }
+
+  /// Kayıt formunun "Kayıt Ol" butonundan çağrılır.
+  ///
+  /// VARSAYIM: Kayıt sonrası otomatik giriş yapılmış sayılıyor (yaygın bir
+  /// UX tercihi, mock'taki önceki davranışla aynı) — backend bağlanırken
+  /// bu davranış değişebilir, örneğin e-posta doğrulaması beklenen bir ara
+  /// adım eklenebilir (bkz. `models/form_card/email_verification_form_card.dart`,
+  /// henüz bağlanmadı).
   Future<void> register({
     required String email,
     required String password,
-    required String pin, // şimdilik kullanılmıyor, bkz. PIN notu
-  }) =>
-      ref.read(authServiceProvider).registerWithEmail(email, password);
+    required String pin,
+  }) async {
+    final result = await ref
+        .read(authRepositoryProvider)
+        .register(email: email, password: password, pin: pin);
+    await _applySession(result);
+  }
 
-  Future<void> logout() => ref.read(authServiceProvider).signOut();
+  Future<void> _applySession(AuthResult result) async {
+    await SecureTokenStorage.saveToken(result.token);
+    if (result.refreshToken != null) {
+      await SecureTokenStorage.saveRefreshToken(result.refreshToken!);
+    }
+    ApiAuthContext.token = result.token;
+    if (result.appNo != null) {
+      ApiAuthContext.extraHeaders["x-app-no"] = result.appNo!;
+    }
+    state = true;
+  }
+
+  Future<void> logout() async {
+    await ref.read(authRepositoryProvider).logout();
+    await SecureTokenStorage.clear();
+    ApiAuthContext.clear();
+    state = false;
+  }
 }

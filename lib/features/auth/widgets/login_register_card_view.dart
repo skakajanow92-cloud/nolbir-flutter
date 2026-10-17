@@ -13,6 +13,11 @@ import '../application/auth_providers.dart';
 ///
 /// Vurgu rengi: nötr arduvaz mavisi — bu bir "profil modülü" değil,
 /// modüllerin renk setiyle yarışmaması için kasıtlı olarak nötr seçildi.
+///
+/// GÜNCELLEME: `login`/`register` artık gerçek backend'e giden ASENKRON
+/// çağrılar (bkz. `auth_providers.dart`) — bu yüzden `_submit` artık bir
+/// yükleniyor durumu ve hata mesajı taşıyor; önceki senkron, hatasız
+/// sürümün aksine burada ağ hatası kullanıcıya görünür şekilde gösterilir.
 class LoginRegisterCardView extends ConsumerStatefulWidget {
   const LoginRegisterCardView({super.key});
 
@@ -31,6 +36,8 @@ class _LoginRegisterCardViewState extends ConsumerState<LoginRegisterCardView> {
   bool _isRegisterMode = false;
   bool _obscurePassword = true;
   bool _obscurePin = true;
+  bool _isSubmitting = false;
+  String? _errorMessage;
 
   final _identifierController = TextEditingController();
   final _loginPasswordController = TextEditingController();
@@ -52,35 +59,43 @@ class _LoginRegisterCardViewState extends ConsumerState<LoginRegisterCardView> {
     super.dispose();
   }
 
-  void _toggleMode() => setState(() => _isRegisterMode = !_isRegisterMode);
-  bool _loading = false;
+  void _toggleMode() => setState(() {
+    _isRegisterMode = !_isRegisterMode;
+    _errorMessage = null;
+  });
 
   Future<void> _submit() async {
-  if (!_formKey.currentState!.validate()) return;
-  setState(() => _loading = true);
-  final notifier = ref.read(isUserProvider.notifier);
-  try {
-    if (_isRegisterMode) {
-      await notifier.register(
-        email: _emailController.text.trim(),
-        password: _passwordController.text,
-        pin: _pinController.text,
-      );
-    } else {
-      await notifier.login(
-        identifier: _identifierController.text.trim(),
-        password: _loginPasswordController.text,
-      );
+    if (_isSubmitting) return;
+    if (!_formKey.currentState!.validate()) return;
+
+    setState(() {
+      _isSubmitting = true;
+      _errorMessage = null;
+    });
+
+    final notifier = ref.read(isUserProvider.notifier);
+    try {
+      if (_isRegisterMode) {
+        await notifier.register(
+          email: _emailController.text.trim(),
+          password: _passwordController.text,
+          pin: _pinController.text,
+        );
+      } else {
+        await notifier.login(
+          identifier: _identifierController.text.trim(),
+          password: _loginPasswordController.text,
+        );
+      }
+      // Başarılıysa isUserProvider true oldu -> ProfileTab zaten normal
+      // akışa geçecek, burada ekstra bir navigasyon gerekmiyor.
+    } catch (e) {
+      if (!mounted) return;
+      setState(() => _errorMessage = e.toString());
+    } finally {
+      if (mounted) setState(() => _isSubmitting = false);
     }
-  } on AuthException catch (e) {
-    if (mounted) {
-      ScaffoldMessenger.of(context)
-          .showSnackBar(SnackBar(content: Text(e.message)));
-    }
-  } finally {
-    if (mounted) setState(() => _loading = false);
   }
-}
 
   @override
   Widget build(BuildContext context) {
@@ -113,24 +128,75 @@ class _LoginRegisterCardViewState extends ConsumerState<LoginRegisterCardView> {
                       _isRegisterMode ? "Hesap Oluştur" : "Giriş Yap",
                       textAlign: TextAlign.center,
                       style: const TextStyle(
-                          color: Colors.white, fontSize: 24, fontWeight: FontWeight.w700),
+                        color: Colors.white,
+                        fontSize: 24,
+                        fontWeight: FontWeight.w700,
+                      ),
                     ),
                     const SizedBox(height: 28),
-                    if (_isRegisterMode) ..._registerFields() else ..._loginFields(),
+                    if (_isRegisterMode)
+                      ..._registerFields()
+                    else
+                      ..._loginFields(),
+                    if (_errorMessage != null) ...[
+                      const SizedBox(height: 14),
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 14,
+                          vertical: 10,
+                        ),
+                        decoration: BoxDecoration(
+                          color: Colors.redAccent.withValues(alpha: 0.12),
+                          borderRadius: BorderRadius.circular(10),
+                          border: Border.all(
+                            color: Colors.redAccent.withValues(alpha: 0.4),
+                          ),
+                        ),
+                        child: Row(
+                          children: [
+                            const Icon(
+                              Icons.error_outline,
+                              color: Colors.redAccent,
+                              size: 18,
+                            ),
+                            const SizedBox(width: 8),
+                            Expanded(
+                              child: Text(
+                                _errorMessage!,
+                                style: const TextStyle(
+                                  color: Colors.redAccent,
+                                  fontSize: 13,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
                     const SizedBox(height: 22),
                     FilledButton(
                       style: FilledButton.styleFrom(
                         backgroundColor: accent,
                         padding: const EdgeInsets.symmetric(vertical: 16),
                         shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12)),
+                          borderRadius: BorderRadius.circular(12),
+                        ),
                       ),
-                      onPressed: _loading ? null : _submit,
-                      child: Text(_isRegisterMode ? "Kayıt Ol" : "Giriş Yap"),
+                      onPressed: _isSubmitting ? null : _submit,
+                      child: _isSubmitting
+                          ? const SizedBox(
+                              width: 20,
+                              height: 20,
+                              child: CircularProgressIndicator(
+                                strokeWidth: 2.4,
+                                color: Colors.white,
+                              ),
+                            )
+                          : Text(_isRegisterMode ? "Kayıt Ol" : "Giriş Yap"),
                     ),
                     const SizedBox(height: 14),
                     TextButton(
-                      onPressed: _toggleMode,
+                      onPressed: _isSubmitting ? null : _toggleMode,
                       child: Text(
                         _isRegisterMode
                             ? "Zaten hesabın var mı? Giriş Yap"
@@ -163,7 +229,8 @@ class _LoginRegisterCardViewState extends ConsumerState<LoginRegisterCardView> {
         label: "Şifre",
         icon: Icons.lock_outline,
         obscure: _obscurePassword,
-        toggleObscure: () => setState(() => _obscurePassword = !_obscurePassword),
+        toggleObscure: () =>
+            setState(() => _obscurePassword = !_obscurePassword),
         validator: (v) => (v == null || v.isEmpty) ? "Şifre zorunlu" : null,
       ),
     ];
@@ -184,8 +251,10 @@ class _LoginRegisterCardViewState extends ConsumerState<LoginRegisterCardView> {
         label: "Şifre",
         icon: Icons.lock_outline,
         obscure: _obscurePassword,
-        toggleObscure: () => setState(() => _obscurePassword = !_obscurePassword),
-        validator: (v) => (v == null || v.length < 6) ? "En az 6 karakter olmalı" : null,
+        toggleObscure: () =>
+            setState(() => _obscurePassword = !_obscurePassword),
+        validator: (v) =>
+            (v == null || v.length < 6) ? "En az 6 karakter olmalı" : null,
       ),
       const SizedBox(height: 14),
       _field(
@@ -193,7 +262,8 @@ class _LoginRegisterCardViewState extends ConsumerState<LoginRegisterCardView> {
         label: "Şifre Tekrar",
         icon: Icons.lock_outline,
         obscure: _obscurePassword,
-        validator: (v) => v != _passwordController.text ? "Şifreler eşleşmiyor" : null,
+        validator: (v) =>
+            v != _passwordController.text ? "Şifreler eşleşmiyor" : null,
       ),
       const SizedBox(height: 14),
       _field(
@@ -214,7 +284,8 @@ class _LoginRegisterCardViewState extends ConsumerState<LoginRegisterCardView> {
         obscure: _obscurePin,
         keyboardType: TextInputType.number,
         maxLength: _pinLength,
-        validator: (v) => v != _pinController.text ? "PIN'ler eşleşmiyor" : null,
+        validator: (v) =>
+            v != _pinController.text ? "PIN'ler eşleşmiyor" : null,
       ),
     ];
   }
@@ -257,9 +328,12 @@ class _LoginRegisterCardViewState extends ConsumerState<LoginRegisterCardView> {
         suffixIcon: toggleObscure != null
             ? IconButton(
                 icon: Icon(
-                    obscure ? Icons.visibility_off_outlined : Icons.visibility_outlined,
-                    color: Colors.white38,
-                    size: 20),
+                  obscure
+                      ? Icons.visibility_off_outlined
+                      : Icons.visibility_outlined,
+                  color: Colors.white38,
+                  size: 20,
+                ),
                 onPressed: toggleObscure,
               )
             : null,

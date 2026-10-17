@@ -1,4 +1,4 @@
-import 'media_pick_result.dart';
+import '../media_pick_result.dart';
 
 /// Web'de kalıcı bir dosya sistemi yok — seçilen medya zaten `bytes`
 /// olarak bellekte duruyor (bkz. `MediaPicker`), bu yüzden yapılacak bir
