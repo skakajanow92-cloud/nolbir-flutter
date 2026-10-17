@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:firebase_core/firebase_core.dart';
 import 'app/card_detail_registrations.dart';
-import 'firebase_options.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:media_kit/media_kit.dart';
@@ -17,9 +15,6 @@ void main() async {
   registerAllCardDetails();
   await LocalStore.init();
   _enableImmersiveFullScreen();
-  // Firebase'i başlatın
-  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
-
   runApp(const ProviderScope(child: MyApp()));
 }
 
