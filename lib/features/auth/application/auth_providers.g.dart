@@ -40,7 +40,7 @@ final class IsUserProvider extends $NotifierProvider<IsUser, bool> {
   }
 }
 
-String _$isUserHash() => r'9ae1a7ff35e3ed6369a102e18fcbf236eb7e3c2e';
+String _$isUserHash() => r'a6fa7c1a9a13bcdddf8b7a5a19feb24c40f8db81';
 
 abstract class _$IsUser extends $Notifier<bool> {
   bool build();

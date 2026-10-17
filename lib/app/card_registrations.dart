@@ -1,3 +1,4 @@
+import '../features/admin/widgets/admin_card_registrations.dart';
 import '../features/auth/widgets/form_registrations.dart';
 import '../features/discovery/widgets/discovery_card_registrations.dart';
 import '../features/profile/widgets/profile_card_registrations.dart';
@@ -18,6 +19,7 @@ void registerAllCardViews() {
   registerVerificationCardViews();
   registerShareholderFormViews();
   registerShareholderCardViews();
+  registerAdminCardViews();
   registerProfileCardViews();
   registerCollectionCardViews();
   registerCartCardViews();

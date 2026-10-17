@@ -48,3 +48,4 @@ export 'vehicle_profile_card.dart';
 export 'hosting_profile_card.dart';
 export 'verification_profile_card.dart';
 export 'shareholder_application_card.dart';
+export 'admin_application_card.dart';
