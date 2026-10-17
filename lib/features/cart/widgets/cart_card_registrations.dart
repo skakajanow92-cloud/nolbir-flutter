@@ -7,6 +7,7 @@ import 'cart_summary_card_view.dart';
 import 'food_cart_card_view.dart';
 import 'market_cart_card_view.dart';
 import 'second_hand_cart_card_view.dart';
+import 'subscription_cart_card_view.dart';
 import 'ticket_cart_card_view.dart';
 import 'hotel_cart_card_view.dart';
 import 'pharmacy_cart_card_view.dart';
@@ -74,4 +75,10 @@ void registerCartCardViews() {
         HostingCartCardView(card: card as HostingCartCard),
   );
   ProfileModuleOrder.register<HostingCartCard>();
+
+  CardViewRegistry.register<SubscriptionCartCard>(
+    (context, card, isActive) =>
+        SubscriptionCartCardView(card: card as SubscriptionCartCard),
+  );
+  ProfileModuleOrder.register<SubscriptionCartCard>();
 }
