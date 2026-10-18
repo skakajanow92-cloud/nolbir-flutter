@@ -1125,6 +1125,59 @@ class MockDiscoveryRepository implements DiscoveryRepository {
     ),
   ];
 
+  static final List<PharmacyItemCard Function(String id)>
+  _pharmacyItemBuilders = [
+    (id) => PharmacyItemCard(
+      id: id,
+      pharmacyName: "Sağlık Eczanesi",
+      pharmacyLogoUrl: "",
+      itemName: "C Vitamini 1000mg",
+      description: "Takviye edici gıda, günlük bağışıklık desteği.",
+      price: 180,
+      discountedPrice: 149,
+      rating: 4.5,
+      reviewCount: 620,
+      activeIngredient: "Askorbik asit",
+      packageInfo: "30 tablet",
+    ),
+  ];
+
+  List<PharmacyItemCard> _buildPharmacyGridItems(int seed, int count) {
+    const names = ["Merkez Eczane", "Yıldız Eczane", "Şifa Eczanesi"];
+    const items = [
+      ("Parol 500mg", true, "Ağrı kesici/ateş düşürücü", "20 tablet"),
+      ("Augmentin BID 1000mg", true, "Antibiyotik", "14 tablet"),
+      ("Multivitamin Şurup", false, "Takviye edici gıda", "150 ml"),
+      ("Burun Spreyi", false, "Deniz suyu bazlı", "50 ml"),
+    ];
+    return List.generate(count, (i) {
+      final n = seed * 100 + i;
+      final item = items[n % items.length];
+      return PharmacyItemCard(
+        id: "pharm_${seed}_$n",
+        pharmacyName: names[n % names.length],
+        pharmacyLogoUrl: "",
+        itemName: item.$1,
+        description: item.$3,
+        requiresPrescription: item.$2,
+        price: 60.0 + (n % 10) * 15,
+        rating: 3.8 + (n % 12) / 10,
+        reviewCount: 40 + (n % 300),
+        packageInfo: item.$4,
+      );
+    });
+  }
+
+  static final List<PharmacySearchCard Function(String id)>
+  _pharmacySearchBuilders = [
+    (id) => PharmacySearchCard(
+      id: id,
+      platformName: "EczaneBul",
+      platformLogoUrl: "",
+      description: "Reçeteni gir, en yakın eczaneden hızlıca teslim al.",
+    ),
+  ];
+
   @override
   Future<List<FeedCard>> fetchFeed({
     required int page,
@@ -1132,11 +1185,11 @@ class MockDiscoveryRepository implements DiscoveryRepository {
   }) async {
     await Future.delayed(const Duration(milliseconds: 400));
 
-    if (page >= 35) return [];
+    if (page >= 38) return [];
 
     return List.generate(pageSize, (i) {
       final n = page * pageSize + i;
-      final type = n % 34; // 0: video, 1: ürün, 2: abonelik, 3: banka ürünü
+      final type = n % 37; // 0: video, 1: ürün, 2: abonelik, 3: banka ürünü
       switch (type) {
         case 0:
           return VideoCard(
@@ -1257,9 +1310,24 @@ class MockDiscoveryRepository implements DiscoveryRepository {
               _doctorAppointmentBuilders.length]("doctor$n");
         case 32:
           return _healthVideoCallCard;
-        default:
+        case 33:
           return _clinicProfileBuilders[n % _clinicProfileBuilders.length](
             "clinic$n",
+          );
+        case 34:
+          return _pharmacyItemBuilders[n % _pharmacyItemBuilders.length](
+            "pharmitem$n",
+          );
+        case 35:
+          return PharmacyGridCard(
+            id: "pharmgrid$n",
+            title: "Yakınındaki Eczaneler",
+            subtitle: "Reçeteli ve reçetesiz ürünler bir arada",
+            items: _buildPharmacyGridItems(n, 10),
+          );
+        default:
+          return _pharmacySearchBuilders[n % _pharmacySearchBuilders.length](
+            "pharmsearch$n",
           );
       }
     });

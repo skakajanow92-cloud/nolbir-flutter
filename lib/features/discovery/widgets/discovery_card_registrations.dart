@@ -20,6 +20,9 @@ import 'jewelry_catalog_card_view.dart';
 import 'jewelry_item_card_view.dart';
 import 'messages_list_card_view.dart';
 import 'netflix_feed_card_view.dart';
+import 'pharmacy_grid_card_view.dart';
+import 'pharmacy_item_card_view.dart';
+import 'pharmacy_search_card_view.dart';
 import 'popular_hotels_card_view.dart';
 import 'social_feed_card_view.dart';
 import 'spreadsheet_tool_card_view.dart';
@@ -171,5 +174,18 @@ void registerDiscoveryCardViews() {
   CardViewRegistry.register<ClinicProfileCard>(
     (context, card, isActive) =>
         ClinicProfileCardView(card: card as ClinicProfileCard),
+  );
+
+  CardViewRegistry.register<PharmacyItemCard>(
+    (context, card, isActive) =>
+        PharmacyItemCardView(card: card as PharmacyItemCard),
+  );
+  CardViewRegistry.register<PharmacyGridCard>(
+    (context, card, isActive) =>
+        PharmacyGridCardView(card: card as PharmacyGridCard),
+  );
+  CardViewRegistry.register<PharmacySearchCard>(
+    (context, card, isActive) =>
+        PharmacySearchCardView(card: card as PharmacySearchCard),
   );
 }
