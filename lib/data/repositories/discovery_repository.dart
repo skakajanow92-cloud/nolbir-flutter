@@ -1043,6 +1043,88 @@ class MockDiscoveryRepository implements DiscoveryRepository {
     ),
   ];
 
+  static final List<DoctorAppointmentCard Function(String id)>
+  _doctorAppointmentBuilders = [
+    (id) => DoctorAppointmentCard(
+      id: id,
+      doctorName: "Dr. Ayşe Kurt",
+      doctorPhotoUrl: "",
+      clinicName: "Yıldız Poliklinik",
+      specialty: MedicalSpecialty.psychiatrist,
+      bio: "15 yıllık klinik deneyim, yetişkin psikiyatrisi.",
+      consultationFee: 850,
+      rating: 4.8,
+      reviewCount: 420,
+      availableSlots: [
+        AppointmentSlot(
+          id: "s1",
+          dateTime: DateTime.now().add(const Duration(hours: 4)),
+        ),
+        AppointmentSlot(
+          id: "s2",
+          dateTime: DateTime.now().add(const Duration(days: 1, hours: 2)),
+        ),
+        AppointmentSlot(
+          id: "s3",
+          dateTime: DateTime.now().add(const Duration(days: 2)),
+          isOnline: false,
+        ),
+      ],
+    ),
+  ];
+
+  static final HealthVideoCallCard _healthVideoCallCard = HealthVideoCallCard(
+    id: "health_call_main",
+    upcomingAppointments: [
+      UpcomingHealthAppointment(
+        id: "ua1",
+        doctorName: "Dr. Mehmet Yıldız",
+        specialty: MedicalSpecialty.generalPractitioner,
+        scheduledAt: DateTime.now().add(const Duration(minutes: 2)),
+      ),
+      UpcomingHealthAppointment(
+        id: "ua2",
+        doctorName: "Dr. Ayşe Kurt",
+        specialty: MedicalSpecialty.psychiatrist,
+        scheduledAt: DateTime.now().add(const Duration(days: 1)),
+      ),
+    ],
+    instantSpecialties: const [
+      MedicalSpecialty.generalPractitioner,
+      MedicalSpecialty.dermatologist,
+      MedicalSpecialty.psychologist,
+    ],
+  );
+
+  static final List<ClinicProfileCard Function(String id)>
+  _clinicProfileBuilders = [
+    (id) => ClinicProfileCard(
+      id: id,
+      clinicName: "Yıldız Poliklinik",
+      logoUrl: "",
+      description:
+          "Şehir merkezinde 12 branşta hizmet veren modern poliklinik.",
+      specialties: const [
+        MedicalSpecialty.generalPractitioner,
+        MedicalSpecialty.dermatologist,
+        MedicalSpecialty.psychiatrist,
+      ],
+      doctors: const [
+        ClinicDoctorSummary(
+          name: "Dr. Ayşe Kurt",
+          specialty: MedicalSpecialty.psychiatrist,
+        ),
+        ClinicDoctorSummary(
+          name: "Dr. Mehmet Yıldız",
+          specialty: MedicalSpecialty.generalPractitioner,
+        ),
+      ],
+      address: "Bağdat Cad. No:45, Kadıköy, İstanbul",
+      rating: 4.5,
+      reviewCount: 680,
+    ),
+  ];
+
   @override
   Future<List<FeedCard>> fetchFeed({
     required int page,
@@ -1050,11 +1132,11 @@ class MockDiscoveryRepository implements DiscoveryRepository {
   }) async {
     await Future.delayed(const Duration(milliseconds: 400));
 
-    if (page >= 32) return [];
+    if (page >= 35) return [];
 
     return List.generate(pageSize, (i) {
       final n = page * pageSize + i;
-      final type = n % 31; // 0: video, 1: ürün, 2: abonelik, 3: banka ürünü
+      final type = n % 34; // 0: video, 1: ürün, 2: abonelik, 3: banka ürünü
       switch (type) {
         case 0:
           return VideoCard(
@@ -1166,9 +1248,18 @@ class MockDiscoveryRepository implements DiscoveryRepository {
           return _educationSeriesBuilders[n % _educationSeriesBuilders.length](
             "series$n",
           );
-        default:
+        case 30:
           return _courseSearchBuilders[n % _courseSearchBuilders.length](
             "coursesearch$n",
+          );
+        case 31:
+          return _doctorAppointmentBuilders[n %
+              _doctorAppointmentBuilders.length]("doctor$n");
+        case 32:
+          return _healthVideoCallCard;
+        default:
+          return _clinicProfileBuilders[n % _clinicProfileBuilders.length](
+            "clinic$n",
           );
       }
     });

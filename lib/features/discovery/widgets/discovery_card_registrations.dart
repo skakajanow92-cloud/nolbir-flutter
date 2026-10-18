@@ -2,16 +2,19 @@ import '../../../core/cart/card_view_registry.dart';
 import '../../../models/feed_card/feed_card.dart';
 import '../../../models/product_card/product_card.dart';
 import 'business_menu_card_view.dart';
+import 'clinic_profile_card_view.dart';
 import 'course_enrollment_card_view.dart';
 import 'course_search_card_view.dart';
 import 'custom_gift_order_card_view.dart';
 import 'custom_jewelry_order_card_view.dart';
 import 'dating_swipe_card_view.dart';
+import 'doctor_appointment_card_view.dart';
 import 'education_series_card_view.dart';
 import 'food_item_card_view.dart';
 import 'food_place_search_card_view.dart';
 import 'gift_catalog_card_view.dart';
 import 'gift_item_card_view.dart';
+import 'health_video_call_card_view.dart';
 import 'hotel_search_card_view.dart';
 import 'jewelry_catalog_card_view.dart';
 import 'jewelry_item_card_view.dart';
@@ -155,5 +158,18 @@ void registerDiscoveryCardViews() {
   CardViewRegistry.register<CourseSearchCard>(
     (context, card, isActive) =>
         CourseSearchCardView(card: card as CourseSearchCard),
+  );
+
+  CardViewRegistry.register<DoctorAppointmentCard>(
+    (context, card, isActive) =>
+        DoctorAppointmentCardView(card: card as DoctorAppointmentCard),
+  );
+  CardViewRegistry.register<HealthVideoCallCard>(
+    (context, card, isActive) =>
+        HealthVideoCallCardView(card: card as HealthVideoCallCard),
+  );
+  CardViewRegistry.register<ClinicProfileCard>(
+    (context, card, isActive) =>
+        ClinicProfileCardView(card: card as ClinicProfileCard),
   );
 }
