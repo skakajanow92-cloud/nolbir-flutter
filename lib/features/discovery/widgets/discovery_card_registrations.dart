@@ -2,9 +2,12 @@ import '../../../core/cart/card_view_registry.dart';
 import '../../../models/feed_card/feed_card.dart';
 import '../../../models/product_card/product_card.dart';
 import 'business_menu_card_view.dart';
+import 'course_enrollment_card_view.dart';
+import 'course_search_card_view.dart';
 import 'custom_gift_order_card_view.dart';
 import 'custom_jewelry_order_card_view.dart';
 import 'dating_swipe_card_view.dart';
+import 'education_series_card_view.dart';
 import 'food_item_card_view.dart';
 import 'food_place_search_card_view.dart';
 import 'gift_catalog_card_view.dart';
@@ -139,5 +142,18 @@ void registerDiscoveryCardViews() {
   CardViewRegistry.register<SpreadsheetToolCard>(
     (context, card, isActive) =>
         SpreadsheetToolCardView(card: card as SpreadsheetToolCard),
+  );
+
+  CardViewRegistry.register<CourseEnrollmentCard>(
+    (context, card, isActive) =>
+        CourseEnrollmentCardView(card: card as CourseEnrollmentCard),
+  );
+  CardViewRegistry.register<EducationSeriesCard>(
+    (context, card, isActive) =>
+        EducationSeriesCardView(card: card as EducationSeriesCard),
+  );
+  CardViewRegistry.register<CourseSearchCard>(
+    (context, card, isActive) =>
+        CourseSearchCardView(card: card as CourseSearchCard),
   );
 }

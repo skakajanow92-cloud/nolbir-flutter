@@ -934,6 +934,115 @@ class MockDiscoveryRepository implements DiscoveryRepository {
     id: "spreadsheet_tool_main",
   );
 
+  static final List<CourseEnrollmentCard Function(String id)>
+  _courseEnrollmentBuilders = [
+    (id) => CourseEnrollmentCard(
+      id: id,
+      providerName: "Dil Atölyesi",
+      providerLogoUrl: "",
+      isSchool: false,
+      courseTitle: "İngilizce B2 Konuşma Kulübü",
+      description: "Haftada 3 gün canlı konuşma pratiği, küçük gruplar.",
+      format: CourseFormat.online,
+      language: "İngilizce",
+      level: CourseLevel.intermediate,
+      seasonStart: DateTime.now().add(const Duration(days: 10)),
+      seasonEnd: DateTime.now().add(const Duration(days: 70)),
+      enrollmentDeadline: DateTime.now().add(const Duration(days: 7)),
+      seatsTotal: 20,
+      seatsTaken: 14,
+      price: 1200,
+      discountedPrice: 950,
+      rating: 4.6,
+      reviewCount: 312,
+    ),
+    (id) => CourseEnrollmentCard(
+      id: id,
+      providerName: "Güneş Koleji",
+      providerLogoUrl: "",
+      isSchool: true,
+      courseTitle: "2026-2027 Güz Dönemi Kayıtları",
+      description:
+          "Ortaokul ve lise kademeleri için yeni dönem kayıtları açıldı.",
+      format: CourseFormat.inPerson,
+      country: "Türkiye",
+      district: "Kadıköy, İstanbul",
+      language: "Türkçe",
+      seasonStart: DateTime.now().add(const Duration(days: 30)),
+      seasonEnd: DateTime.now().add(const Duration(days: 270)),
+      enrollmentDeadline: DateTime.now().add(const Duration(days: 20)),
+      seatsTotal: 120,
+      seatsTaken: 118,
+      price: 45000,
+      rating: 4.2,
+      reviewCount: 89,
+    ),
+  ];
+
+  static final List<EducationSeriesCard Function(String id)>
+  _educationSeriesBuilders = [
+    (id) => EducationSeriesCard(
+      id: id,
+      seriesName: "Sıfırdan Veri Bilimi",
+      description:
+          "Python temellerinden makine öğrenmesine uzanan kapsamlı seri.",
+      language: "Türkçe",
+      level: CourseLevel.beginner,
+      monthlyPrice: 149.9,
+      rating: 4.7,
+      reviewCount: 1024,
+      instructors: const [
+        SeriesInstructor(id: "i1", name: "Elif Arslan", title: "Veri Bilimci"),
+        SeriesInstructor(id: "i2", name: "Tolga Keskin", title: "ML Mühendisi"),
+      ],
+      seedLessons: [
+        SeriesLesson(
+          id: "l1",
+          title: "Python'a Giriş",
+          contentType: LessonContentType.video,
+          instructor: const SeriesInstructor(
+            id: "i1",
+            name: "Elif Arslan",
+            title: "Veri Bilimci",
+          ),
+          videoDuration: const Duration(minutes: 22),
+          addedAt: DateTime.now().subtract(const Duration(days: 3)),
+        ),
+        SeriesLesson(
+          id: "l2",
+          title: "Ders Notları: NumPy Temelleri",
+          contentType: LessonContentType.pdf,
+          instructor: const SeriesInstructor(
+            id: "i1",
+            name: "Elif Arslan",
+            title: "Veri Bilimci",
+          ),
+          pageCount: 14,
+          addedAt: DateTime.now().subtract(const Duration(days: 2)),
+        ),
+      ],
+    ),
+  ];
+
+  static final List<CourseSearchCard Function(String id)>
+  _courseSearchBuilders = [
+    (id) => CourseSearchCard(
+      id: id,
+      platformName: "KursBul",
+      platformLogoUrl: "",
+      description:
+          "Binlerce kurs ve eğitim serisi arasından sana uygun olanı bul.",
+      subjects: const [
+        "Yazılım",
+        "Dil Eğitimi",
+        "Sınav Hazırlık",
+        "Müzik",
+        "Tasarım",
+      ],
+      languages: const ["Türkçe", "İngilizce", "Almanca"],
+    ),
+  ];
+
   @override
   Future<List<FeedCard>> fetchFeed({
     required int page,
@@ -941,11 +1050,11 @@ class MockDiscoveryRepository implements DiscoveryRepository {
   }) async {
     await Future.delayed(const Duration(milliseconds: 400));
 
-    if (page >= 29) return [];
+    if (page >= 32) return [];
 
     return List.generate(pageSize, (i) {
       final n = page * pageSize + i;
-      final type = n % 28; // 0: video, 1: ürün, 2: abonelik, 3: banka ürünü
+      final type = n % 31; // 0: video, 1: ürün, 2: abonelik, 3: banka ürünü
       switch (type) {
         case 0:
           return VideoCard(
@@ -1048,8 +1157,19 @@ class MockDiscoveryRepository implements DiscoveryRepository {
           return _writingToolCard;
         case 26:
           return _spreadsheetToolCard;
-        default:
+        case 27:
           return _messagesListCard;
+        case 28:
+          return _courseEnrollmentBuilders[n %
+              _courseEnrollmentBuilders.length]("course$n");
+        case 29:
+          return _educationSeriesBuilders[n % _educationSeriesBuilders.length](
+            "series$n",
+          );
+        default:
+          return _courseSearchBuilders[n % _courseSearchBuilders.length](
+            "coursesearch$n",
+          );
       }
     });
   }
