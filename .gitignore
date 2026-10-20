@@ -53,3 +53,6 @@ firmware/.vscode/ipch/
 
 # Nodejs build & local files
 node_modules/
+
+#sunucu uzerindeki gizli yapilandirma ayarlari
+.env

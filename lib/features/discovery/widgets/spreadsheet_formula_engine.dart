@@ -36,8 +36,9 @@ String evaluateCell(
   int col, {
   int depth = 0,
 }) {
-  if (row < 0 || row >= grid.length || col < 0 || col >= grid[row].length)
+  if (row < 0 || row >= grid.length || col < 0 || col >= grid[row].length) {
     return "";
+  }
   final raw = grid[row][col].trim();
   if (!raw.startsWith('=')) return raw;
   if (depth > 20) return "#DÖNGÜ";
@@ -118,8 +119,9 @@ double? _evaluateArithmetic(String expr) {
     if (clean[pos] == '(') {
       pos++;
       final value = parseExpr();
-      if (value == null || pos >= clean.length || clean[pos] != ')')
+      if (value == null || pos >= clean.length || clean[pos] != ')') {
         return null;
+      }
       pos++;
       return value;
     }

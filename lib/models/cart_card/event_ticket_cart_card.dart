@@ -52,8 +52,9 @@ class EventTicketCartCard extends FeedCard implements Collectible {
       for (var j = i + 1; j < sorted.length; j++) {
         final a = sorted[i].eventDateTime!;
         final b = sorted[j].eventDateTime!;
-        if (b.difference(a).inHours >= 3)
+        if (b.difference(a).inHours >= 3) {
           break; // sıralı olduğu için sonrası da uzak
+        }
         final sameDay =
             a.year == b.year && a.month == b.month && a.day == b.day;
         if (sameDay) conflicts.add((sorted[i], sorted[j]));

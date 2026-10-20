@@ -62,7 +62,7 @@ class CargoProfileCardView extends StatelessWidget {
                           padding: const EdgeInsets.symmetric(horizontal: 20),
                           scrollDirection: Axis.horizontal,
                           itemCount: active.length,
-                          separatorBuilder: (_, __) =>
+                          separatorBuilder: (_, _) =>
                               const SizedBox(width: 12),
                           itemBuilder: (context, i) => _ShipmentMiniCard(
                             shipment: active[i],
@@ -81,7 +81,7 @@ class CargoProfileCardView extends StatelessWidget {
                           padding: const EdgeInsets.symmetric(horizontal: 20),
                           scrollDirection: Axis.horizontal,
                           itemCount: past.length,
-                          separatorBuilder: (_, __) =>
+                          separatorBuilder: (_, _) =>
                               const SizedBox(width: 12),
                           itemBuilder: (context, i) =>
                               _ShipmentMiniCard(shipment: past[i], muted: true),
@@ -121,7 +121,7 @@ class CargoProfileCardView extends StatelessWidget {
                           padding: const EdgeInsets.symmetric(horizontal: 20),
                           scrollDirection: Axis.horizontal,
                           itemCount: card.favoriteCouriers.length,
-                          separatorBuilder: (_, __) =>
+                          separatorBuilder: (_, _) =>
                               const SizedBox(width: 12),
                           itemBuilder: (_, i) => _CourierMiniCard(
                             courier: card.favoriteCouriers[i],

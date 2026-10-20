@@ -40,7 +40,7 @@ class DetailPanel extends StatelessWidget {
                 duration: const Duration(milliseconds: 220),
                 layoutBuilder: (current, previous) => Stack(
                   fit: StackFit.expand,
-                  children: [...previous, if (current != null) current],
+                  children: [...previous, ?current],
                 ),
                 child: KeyedSubtree(
                   // Aynı kartın verisi güncellenirse (aynı id) animasyonsuz

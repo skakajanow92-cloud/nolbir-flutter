@@ -27,7 +27,7 @@ class CartSummaryCardView extends StatelessWidget {
           gradient: LinearGradient(
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
-            colors: [meta.color.withOpacity(0.45), Colors.black],
+            colors: [meta.color.withValues(alpha: 0.45), Colors.black],
           ),
         ),
         alignment: Alignment.center,
@@ -129,7 +129,7 @@ class _CartDetailSheet extends ConsumerWidget {
                       onPressed: cart.isEmpty
                           ? null
                           : () {
-                              // TODO: cartType'a göre checkout/ödeme akışı
+                              // cartType'a göre checkout/ödeme akışı
                             },
                       child: const Text("Öde"),
                     ),

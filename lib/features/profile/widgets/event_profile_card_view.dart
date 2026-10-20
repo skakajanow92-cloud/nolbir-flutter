@@ -94,7 +94,7 @@ class EventProfileCardView extends StatelessWidget {
                           padding: const EdgeInsets.symmetric(horizontal: 20),
                           scrollDirection: Axis.horizontal,
                           itemCount: upcoming.length,
-                          separatorBuilder: (_, __) =>
+                          separatorBuilder: (_, _) =>
                               const SizedBox(width: 12),
                           itemBuilder: (_, i) => _TicketMiniCard(
                             ticket: upcoming[i],
@@ -113,7 +113,7 @@ class EventProfileCardView extends StatelessWidget {
                           padding: const EdgeInsets.symmetric(horizontal: 20),
                           scrollDirection: Axis.horizontal,
                           itemCount: past.length,
-                          separatorBuilder: (_, __) =>
+                          separatorBuilder: (_, _) =>
                               const SizedBox(width: 12),
                           itemBuilder: (_, i) =>
                               _TicketMiniCard(ticket: past[i], muted: true),

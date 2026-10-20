@@ -2,6 +2,7 @@
 /// ayracı nokta, ondalık ayracı virgül). Kart view dosyalarındaki özel
 /// `_formatDate` / `_formatMoney` kopyalarının ortak karşılığı — yeni kod
 /// bunları kullanır, eski view'lar sırası geldikçe buraya taşınabilir.
+library;
 
 String _two(int n) => n.toString().padLeft(2, '0');
 

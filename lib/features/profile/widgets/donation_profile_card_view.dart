@@ -63,7 +63,7 @@ class DonationProfileCardView extends StatelessWidget {
                           padding: const EdgeInsets.symmetric(horizontal: 20),
                           scrollDirection: Axis.horizontal,
                           itemCount: card.affiliations.length,
-                          separatorBuilder: (_, __) => const SizedBox(width: 12),
+                          separatorBuilder: (_, _) => const SizedBox(width: 12),
                           itemBuilder: (_, i) =>
                               _AffiliationMiniCard(affiliation: card.affiliations[i]),
                         ),
@@ -79,7 +79,7 @@ class DonationProfileCardView extends StatelessWidget {
                           padding: const EdgeInsets.symmetric(horizontal: 20),
                           scrollDirection: Axis.horizontal,
                           itemCount: card.donations.length,
-                          separatorBuilder: (_, __) => const SizedBox(width: 12),
+                          separatorBuilder: (_, _) => const SizedBox(width: 12),
                           itemBuilder: (_, i) =>
                               _DonationMiniCard(donation: card.donations[i]),
                         ),

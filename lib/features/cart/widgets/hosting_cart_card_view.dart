@@ -91,7 +91,7 @@ class HostingCartCardView extends StatelessWidget {
                           padding: const EdgeInsets.symmetric(horizontal: 20),
                           scrollDirection: Axis.horizontal,
                           itemCount: card.priceComparisons.length,
-                          separatorBuilder: (_, __) =>
+                          separatorBuilder: (_, _) =>
                               const SizedBox(width: 12),
                           itemBuilder: (context, i) => _ComparisonMiniCard(
                             group: card.priceComparisons[i],
@@ -111,7 +111,7 @@ class HostingCartCardView extends StatelessWidget {
                           padding: const EdgeInsets.symmetric(horizontal: 20),
                           scrollDirection: Axis.horizontal,
                           itemCount: card.addOns.length,
-                          separatorBuilder: (_, __) =>
+                          separatorBuilder: (_, _) =>
                               const SizedBox(width: 12),
                           itemBuilder: (_, i) =>
                               _AddOnMiniCard(addOn: card.addOns[i]),

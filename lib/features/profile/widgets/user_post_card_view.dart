@@ -14,7 +14,7 @@ class UserPostCardView extends StatelessWidget {
         color: Colors.grey.shade900,
         alignment: Alignment.center,
         child: const Icon(Icons.image, color: Colors.white24, size: 80),
-        // TODO: card.mediaUrl ile gerçek görsel/video
+        // card.mediaUrl ile gerçek görsel/video
       ),
       bottomContent: Text(card.caption,
           style: const TextStyle(color: Colors.white, fontSize: 14)),

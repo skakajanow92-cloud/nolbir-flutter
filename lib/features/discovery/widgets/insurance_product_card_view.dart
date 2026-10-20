@@ -203,7 +203,7 @@ class _CompanyLogo extends StatelessWidget {
               child: Image.network(
                 logoUrl,
                 fit: BoxFit.cover,
-                errorBuilder: (_, __, ___) =>
+                errorBuilder: (_, _, _) =>
                     const Icon(Icons.shield_outlined, color: Colors.white54),
               ),
             ),
@@ -269,7 +269,7 @@ class _ImageGallery extends StatelessWidget {
         padding: const EdgeInsets.symmetric(horizontal: 20),
         scrollDirection: Axis.horizontal,
         itemCount: imageUrls.length,
-        separatorBuilder: (_, __) => const SizedBox(width: 10),
+        separatorBuilder: (_, _) => const SizedBox(width: 10),
         itemBuilder: (_, i) => ClipRRect(
           borderRadius: BorderRadius.circular(14),
           child: Container(
@@ -278,7 +278,7 @@ class _ImageGallery extends StatelessWidget {
             child: Image.network(
               imageUrls[i],
               fit: BoxFit.cover,
-              errorBuilder: (_, __, ___) =>
+              errorBuilder: (_, _, _) =>
                   const Icon(Icons.image_outlined, color: Colors.white24),
             ),
           ),
@@ -380,7 +380,7 @@ class _ActionRow extends StatelessWidget {
             style: FilledButton.styleFrom(
                 backgroundColor: InsuranceProductCardView.accent),
             onPressed: () {
-              // TODO: teklif/başvuru akışı — form sistemine bağlanacak
+              // teklif/başvuru akışı — form sistemine bağlanacak
             },
             child: const Text("Teklif al"),
           ),

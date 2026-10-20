@@ -156,7 +156,7 @@ class _Avatar extends StatelessWidget {
                   width: 98,
                   height: 98,
                   fit: BoxFit.cover,
-                  errorBuilder: (_, __, ___) => Text(
+                  errorBuilder: (_, _, _) => Text(
                     initials,
                     style: const TextStyle(color: Colors.white70, fontSize: 32),
                   ),

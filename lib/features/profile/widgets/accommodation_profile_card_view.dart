@@ -73,7 +73,7 @@ class AccommodationProfileCardView extends StatelessWidget {
                         padding: const EdgeInsets.symmetric(horizontal: 20),
                         scrollDirection: Axis.horizontal,
                         itemCount: upcoming.length,
-                        separatorBuilder: (_, __) => const SizedBox(width: 12),
+                        separatorBuilder: (_, _) => const SizedBox(width: 12),
                         itemBuilder: (_, i) =>
                             _ReservationMiniCard(reservation: upcoming[i], muted: false),
                       ),
@@ -96,7 +96,7 @@ class AccommodationProfileCardView extends StatelessWidget {
                         padding: const EdgeInsets.symmetric(horizontal: 20),
                         scrollDirection: Axis.horizontal,
                         itemCount: past.length,
-                        separatorBuilder: (_, __) => const SizedBox(width: 12),
+                        separatorBuilder: (_, _) => const SizedBox(width: 12),
                         itemBuilder: (_, i) =>
                             _ReservationMiniCard(reservation: past[i], muted: true),
                       ),

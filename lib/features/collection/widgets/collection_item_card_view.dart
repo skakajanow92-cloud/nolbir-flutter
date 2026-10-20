@@ -16,7 +16,7 @@ class CollectionItemCardView extends ConsumerWidget {
         color: Colors.grey.shade900,
         alignment: Alignment.center,
         child: const Icon(Icons.bookmark, color: Colors.white24, size: 80),
-        // TODO: card.previewUrl ile gerçek önizleme
+        //  card.previewUrl ile gerçek önizleme
       ),
       bottomContent: Text(card.title,
           style: const TextStyle(
@@ -26,7 +26,7 @@ class CollectionItemCardView extends ConsumerWidget {
           icon: Icons.open_in_new,
           label: "Aç",
           onTap: () {
-            // TODO: card.originalCard tipine göre orijinal ekrana yönlendir
+            // card.originalCard tipine göre orijinal ekrana yönlendir
           },
         ),
         CardActionButton(

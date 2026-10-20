@@ -58,7 +58,7 @@ class ClinicProfileCardView extends StatelessWidget {
               padding: const EdgeInsets.symmetric(horizontal: 20),
               scrollDirection: Axis.horizontal,
               itemCount: card.doctors.length,
-              separatorBuilder: (_, __) => const SizedBox(width: 14),
+              separatorBuilder: (_, _) => const SizedBox(width: 14),
               itemBuilder: (_, i) => _DoctorChip(doctor: card.doctors[i]),
             ),
           ),

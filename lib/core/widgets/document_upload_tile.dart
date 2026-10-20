@@ -188,7 +188,7 @@ class _Preview extends StatelessWidget {
           width: 40,
           height: 40,
           fit: BoxFit.cover,
-          errorBuilder: (_, __, ___) => _fileIcon(),
+          errorBuilder: (_, _, _) => _fileIcon(),
         ),
       );
     }

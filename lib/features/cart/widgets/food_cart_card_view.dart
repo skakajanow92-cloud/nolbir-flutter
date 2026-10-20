@@ -82,7 +82,7 @@ class FoodCartCardView extends StatelessWidget {
                           padding: const EdgeInsets.symmetric(horizontal: 20),
                           scrollDirection: Axis.horizontal,
                           itemCount: card.nearbyBusinesses.length,
-                          separatorBuilder: (_, __) => const SizedBox(width: 12),
+                          separatorBuilder: (_, _) => const SizedBox(width: 12),
                           itemBuilder: (_, i) =>
                               _BusinessMiniCard(business: card.nearbyBusinesses[i]),
                         ),
@@ -99,7 +99,7 @@ class FoodCartCardView extends StatelessWidget {
                           padding: const EdgeInsets.symmetric(horizontal: 20),
                           scrollDirection: Axis.horizontal,
                           itemCount: card.highRatedDishes.length,
-                          separatorBuilder: (_, __) => const SizedBox(width: 12),
+                          separatorBuilder: (_, _) => const SizedBox(width: 12),
                           itemBuilder: (_, i) =>
                               _DishMiniCard(dish: card.highRatedDishes[i]),
                         ),

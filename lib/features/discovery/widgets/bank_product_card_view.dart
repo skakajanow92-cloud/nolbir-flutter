@@ -130,7 +130,7 @@ class _BankLogo extends StatelessWidget {
               child: Image.network(
                 logoUrl,
                 fit: BoxFit.cover,
-                errorBuilder: (_, __, ___) =>
+                errorBuilder: (_, _, _) =>
                     const Icon(Icons.account_balance, color: Colors.white54),
               ),
             ),
@@ -177,7 +177,7 @@ class _ImageGallery extends StatelessWidget {
         padding: const EdgeInsets.symmetric(horizontal: 20),
         scrollDirection: Axis.horizontal,
         itemCount: imageUrls.length,
-        separatorBuilder: (_, __) => const SizedBox(width: 10),
+        separatorBuilder: (_, _) => const SizedBox(width: 10),
         itemBuilder: (_, i) => ClipRRect(
           borderRadius: BorderRadius.circular(14),
           child: Container(
@@ -186,7 +186,7 @@ class _ImageGallery extends StatelessWidget {
             child: Image.network(
               imageUrls[i],
               fit: BoxFit.cover,
-              errorBuilder: (_, __, ___) =>
+              errorBuilder: (_, _, _) =>
                   const Icon(Icons.image_outlined, color: Colors.white24),
             ),
           ),
@@ -336,7 +336,7 @@ class _ActionRow extends StatelessWidget {
           child: FilledButton(
             style: FilledButton.styleFrom(backgroundColor: BankProductCardView.accent),
             onPressed: () {
-              // TODO: başvuru/hesap açma akışı — form sistemine bağlanacak
+              // başvuru/hesap açma akışı — form sistemine bağlanacak
             },
             child: Text(_primaryLabel),
           ),

@@ -230,7 +230,7 @@ class _CollectionRow extends StatelessWidget {
             padding: const EdgeInsets.symmetric(horizontal: 16),
             scrollDirection: Axis.horizontal,
             itemCount: collection.titles.length,
-            separatorBuilder: (_, __) => const SizedBox(width: 10),
+            separatorBuilder: (_, _) => const SizedBox(width: 10),
             itemBuilder: (_, i) => _PosterTile(
               title: collection.titles[i],
               isLocked: collection.isAdultCollection && !hasAdultAccess,

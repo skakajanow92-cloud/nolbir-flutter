@@ -77,7 +77,7 @@ class SecondHandCartCardView extends StatelessWidget {
                           padding: const EdgeInsets.symmetric(horizontal: 20),
                           scrollDirection: Axis.horizontal,
                           itemCount: card.similarListings.length,
-                          separatorBuilder: (_, __) => const SizedBox(width: 12),
+                          separatorBuilder: (_, _) => const SizedBox(width: 12),
                           itemBuilder: (context, i) =>
                               _ListingGroupMiniCard(group: card.similarListings[i]),
                         ),
@@ -93,7 +93,7 @@ class SecondHandCartCardView extends StatelessWidget {
                           padding: const EdgeInsets.symmetric(horizontal: 20),
                           scrollDirection: Axis.horizontal,
                           itemCount: card.recommendations.length,
-                          separatorBuilder: (_, __) => const SizedBox(width: 12),
+                          separatorBuilder: (_, _) => const SizedBox(width: 12),
                           itemBuilder: (_, i) =>
                               _RecommendationMiniCard(listing: card.recommendations[i]),
                         ),

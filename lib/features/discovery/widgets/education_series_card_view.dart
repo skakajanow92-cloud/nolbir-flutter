@@ -101,7 +101,7 @@ class _EducationSeriesCardViewState extends State<EducationSeriesCardView> {
               padding: const EdgeInsets.symmetric(horizontal: 20),
               scrollDirection: Axis.horizontal,
               itemCount: widget.card.instructors.length,
-              separatorBuilder: (_, __) => const SizedBox(width: 10),
+              separatorBuilder: (_, _) => const SizedBox(width: 10),
               itemBuilder: (_, i) =>
                   _InstructorChip(instructor: widget.card.instructors[i]),
             ),

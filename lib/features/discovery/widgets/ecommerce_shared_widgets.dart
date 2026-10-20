@@ -425,8 +425,9 @@ class PriceRow extends StatelessWidget {
   double get _effective => discountedPrice ?? price;
 
   int? get _discountPercent {
-    if (discountedPrice == null || discountedPrice! >= price || price == 0)
+    if (discountedPrice == null || discountedPrice! >= price || price == 0) {
       return null;
+    }
     return (((price - discountedPrice!) / price) * 100).round();
   }
 

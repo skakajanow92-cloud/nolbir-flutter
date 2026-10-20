@@ -147,7 +147,7 @@ class _PhotoBackground extends StatelessWidget {
     return Image.network(
       photoUrl!,
       fit: BoxFit.cover,
-      errorBuilder: (_, __, ___) => const DecoratedBox(
+      errorBuilder: (_, _, _) => const DecoratedBox(
         decoration: BoxDecoration(color: DatingProfileCardView._base),
         child: Center(
           child: Icon(Icons.person_outline, color: Colors.white24, size: 88),

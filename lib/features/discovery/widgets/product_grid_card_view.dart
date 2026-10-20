@@ -119,7 +119,7 @@ class _GridTile extends StatelessWidget {
                         ? Image.network(
                             product.imageUrls.first,
                             fit: BoxFit.cover,
-                            errorBuilder: (_, __, ___) => const Icon(
+                            errorBuilder: (_, _, _) => const Icon(
                               Icons.image_outlined,
                               color: Colors.white24,
                             ),

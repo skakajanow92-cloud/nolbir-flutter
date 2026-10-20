@@ -82,8 +82,9 @@ class FoodItemCard extends FeedCard implements Collectible {
   double get effectivePrice => discountedPrice ?? price;
 
   int? get discountPercent {
-    if (discountedPrice == null || discountedPrice! >= price || price == 0)
+    if (discountedPrice == null || discountedPrice! >= price || price == 0) {
       return null;
+    }
     return (((price - discountedPrice!) / price) * 100).round();
   }
 

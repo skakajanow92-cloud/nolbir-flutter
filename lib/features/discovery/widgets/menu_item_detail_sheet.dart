@@ -73,7 +73,7 @@ class _MenuItemDetailSheetState extends ConsumerState<MenuItemDetailSheet> {
                     item.imageUrl,
                     height: 160,
                     fit: BoxFit.cover,
-                    errorBuilder: (_, __, ___) => Container(
+                    errorBuilder: (_, _, _) => Container(
                       height: 160,
                       color: Colors.white.withValues(alpha: 0.05),
                       child: const Icon(

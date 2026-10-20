@@ -16,7 +16,7 @@ import 'collection_repository.dart';
 /// to/from-JSON yazmak ayrı, kapsamlı bir iş — muhtemelen
 /// `CardViewRegistry` ile aynı ilkede bir "kart serileştirme registry'si"
 /// gerektirecek. `collection_item_card_view.dart`'taki "Aç" aksiyonu
-/// zaten TODO olduğu için bu sınırlama şu an hiçbir şeyi kırmıyor —
+/// zaten olduğu için bu sınırlama şu an hiçbir şeyi kırmıyor —
 /// koleksiyon listesi (başlık/önizleme/silme) uygulama kapanıp açılsa
 /// bile tam olarak çalışır.
 class LocalCollectionRepository implements CollectionRepository {

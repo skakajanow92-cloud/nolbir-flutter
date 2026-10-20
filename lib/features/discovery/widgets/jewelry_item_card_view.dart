@@ -3,7 +3,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/widgets/card_page_scaffold.dart';
 import '../../../models/product_card/product_card.dart';
 import '../../../models/cart.dart';
-import '../../../models/product_card/jewelry_item_card.dart';
 import '../../cart/application/cart_providers.dart';
 import '../../collection/widgets/save_to_collection_button.dart';
 import 'ecommerce_shared_widgets.dart';

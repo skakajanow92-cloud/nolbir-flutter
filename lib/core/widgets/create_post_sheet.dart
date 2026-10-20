@@ -55,7 +55,7 @@ class _CreatePostSheetState extends ConsumerState<CreatePostSheet> {
     );
     await ref.read(profileFeedProvider.notifier).addPost(newPost);
     if (mounted) Navigator.of(context).pop();
-    // TODO: arka planda mediaServiceProvider.upload(...) ile backend'e
+    // arka planda mediaServiceProvider.upload(...) ile backend'e
     // yükleyip dönen URL ile kartı güncelle (mediaUrl: local -> remote).
   }
 

@@ -62,7 +62,7 @@ class InsuranceProfileCardView extends StatelessWidget {
                         padding: const EdgeInsets.symmetric(horizontal: 20),
                         scrollDirection: Axis.horizontal,
                         itemCount: card.policies.length,
-                        separatorBuilder: (_, __) => const SizedBox(width: 12),
+                        separatorBuilder: (_, _) => const SizedBox(width: 12),
                         itemBuilder: (context, i) =>
                             _PolicyMiniCard(policy: card.policies[i]),
                       ),

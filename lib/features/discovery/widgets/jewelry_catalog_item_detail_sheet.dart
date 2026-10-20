@@ -65,7 +65,7 @@ class JewelryCatalogItemDetailSheet extends ConsumerWidget {
                     item.imageUrl,
                     height: 180,
                     fit: BoxFit.cover,
-                    errorBuilder: (_, __, ___) => Container(
+                    errorBuilder: (_, _, _) => Container(
                       height: 180,
                       color: Colors.white.withValues(alpha: 0.05),
                       child: const Icon(

@@ -801,7 +801,7 @@ class _AddAssetSheetState extends State<_AddAssetSheet> {
             ),
             const SizedBox(height: 16),
             DropdownButtonFormField<AssetType>(
-              value: _type,
+              initialValue: _type,
               dropdownColor: const Color(0xFF17141C),
               style: const TextStyle(color: Colors.white),
               decoration: const InputDecoration(

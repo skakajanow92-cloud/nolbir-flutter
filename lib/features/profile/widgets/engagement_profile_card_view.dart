@@ -66,7 +66,7 @@ class EngagementProfileCardView extends StatelessWidget {
                           padding: const EdgeInsets.symmetric(horizontal: 20),
                           scrollDirection: Axis.horizontal,
                           itemCount: card.referrals.length,
-                          separatorBuilder: (_, __) =>
+                          separatorBuilder: (_, _) =>
                               const SizedBox(width: 12),
                           itemBuilder: (_, i) =>
                               _ReferralMiniCard(referral: card.referrals[i]),
@@ -86,7 +86,7 @@ class EngagementProfileCardView extends StatelessWidget {
                           padding: const EdgeInsets.symmetric(horizontal: 20),
                           scrollDirection: Axis.horizontal,
                           itemCount: card.topDiscussions.length,
-                          separatorBuilder: (_, __) =>
+                          separatorBuilder: (_, _) =>
                               const SizedBox(width: 12),
                           itemBuilder: (_, i) => _DiscussionMiniCard(
                             discussion: card.topDiscussions[i],

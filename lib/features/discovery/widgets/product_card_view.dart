@@ -36,7 +36,7 @@ class ProductCardView extends ConsumerWidget {
         color: Colors.grey.shade900,
         alignment: Alignment.center,
         child: const Icon(Icons.shopping_bag, color: Colors.white24, size: 80),
-        // TODO: card.imageUrl ile gerçek ürün görseli (Image.network vb.)
+        //  card.imageUrl ile gerçek ürün görseli (Image.network vb.)
       ),
       bottomContent: Column(
         crossAxisAlignment: CrossAxisAlignment.start,

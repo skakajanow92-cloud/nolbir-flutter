@@ -64,7 +64,9 @@ class _PrintDocumentDialogState extends State<PrintDocumentDialog> {
               for (final printer in _mockPrinters)
                 RadioListTile<String>(
                   value: printer.name,
+                  // ignore: deprecated_member_use
                   groupValue: _selectedPrinter,
+                  // ignore: deprecated_member_use
                   onChanged: printer.isOnline
                       ? (v) => setState(() => _selectedPrinter = v)
                       : null,

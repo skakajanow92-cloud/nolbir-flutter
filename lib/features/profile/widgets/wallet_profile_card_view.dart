@@ -57,7 +57,7 @@ class WalletProfileCardView extends StatelessWidget {
                         padding: const EdgeInsets.symmetric(horizontal: 20),
                         scrollDirection: Axis.horizontal,
                         itemCount: card.accounts.length,
-                        separatorBuilder: (_, __) => const SizedBox(width: 12),
+                        separatorBuilder: (_, _) => const SizedBox(width: 12),
                         itemBuilder: (_, i) =>
                             _AccountMiniCard(account: card.accounts[i]),
                       ),
@@ -73,7 +73,7 @@ class WalletProfileCardView extends StatelessWidget {
                         padding: const EdgeInsets.symmetric(horizontal: 20),
                         scrollDirection: Axis.horizontal,
                         itemCount: card.creditCards.length,
-                        separatorBuilder: (_, __) => const SizedBox(width: 12),
+                        separatorBuilder: (_, _) => const SizedBox(width: 12),
                         itemBuilder: (_, i) =>
                             _CreditCardMiniCard(card: card.creditCards[i]),
                       ),

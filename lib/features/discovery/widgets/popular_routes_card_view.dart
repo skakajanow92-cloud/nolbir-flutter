@@ -73,7 +73,7 @@ class _RouteTile extends StatelessWidget {
           Image.network(
             route.imageUrl,
             fit: BoxFit.cover,
-            errorBuilder: (_, __, ___) => Container(
+            errorBuilder: (_, _, _) => Container(
               color: Colors.white.withValues(alpha: 0.06),
               child: const Icon(
                 Icons.landscape_outlined,
