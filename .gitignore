@@ -3,6 +3,7 @@
 *.log
 *.pyc
 *.swp
+*.swo
 .DS_Store
 .atom/
 .build/
@@ -57,3 +58,15 @@ node_modules/
 #sunucu uzerindeki gizli yapilandirma ayarlari
 /shared/old
 .env
+
+# Sanal Ortam Klasörleri (venv veya .venv)
+venv/
+.venv/
+env/
+.env/
+
+# Python Derleme ve Önbellek Dosyaları
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
