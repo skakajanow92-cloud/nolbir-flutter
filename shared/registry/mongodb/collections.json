@@ -1,0 +1,151 @@
+{
+  "version": 1,
+  "database": "nolbir_db",
+  "notes": [
+    "Postgres tek doğruluk kaynağı; user_profiles yalnızca okuma kopyasıdır (RabbitMQ sync.mongodb kuyruğu doldurur; kaynak: sync_outbox, tablo = users).",
+    "syncSeq = Postgres sync_outbox.id. Upsert filtresi { syncSeq: { $lt: gelen } } olmalı; böylece retry/yeniden sıralama eski veriyi yeni verinin üstüne yazamaz.",
+    "Para alanları Decimal128 (bsonType 'decimal'); Node tarafında big.js ile string olarak çevrilir, float kullanılmaz.",
+    "userId her koleksiyonda Postgres users.id değeridir (int)."
+  ],
+  "collections": [
+    {
+      "name": "user_profiles",
+      "description": "users tablosunun okuma kopyası + Postgres'te tutulmayan esnek profil alanları.",
+      "validationLevel": "moderate",
+      "validationAction": "error",
+      "validator": {
+        "$jsonSchema": {
+          "bsonType": "object",
+          "required": ["userId", "email", "syncSeq", "syncedAt"],
+          "properties": {
+            "userId": { "bsonType": ["int", "long"] },
+            "userName": { "bsonType": ["string", "null"], "maxLength": 20 },
+            "fullName": { "bsonType": ["string", "null"], "maxLength": 100 },
+            "email": { "bsonType": "string", "maxLength": 100 },
+            "gender": { "bsonType": ["int", "null"] },
+            "nationalityCountryCode": { "bsonType": ["int", "null"] },
+            "verifiedTier": { "bsonType": ["int", "null"] },
+            "isActive": { "bsonType": "bool" },
+            "createdAt": { "bsonType": ["date", "null"] },
+            "identityVerifiedAt": { "bsonType": ["date", "null"] },
+            "bio": { "bsonType": ["string", "null"], "maxLength": 500 },
+            "avatarAssetId": { "bsonType": ["string", "null"], "description": "Postgres media_assets kaydının id'si" },
+            "links": { "bsonType": "array", "items": { "bsonType": "object" } },
+            "extra": { "bsonType": "object", "description": "Şemasız genişleme alanı" },
+            "syncSeq": { "bsonType": ["int", "long"] },
+            "syncedAt": { "bsonType": "date" }
+          }
+        }
+      },
+      "indexes": [
+        { "name": "uq_user_profiles_userId", "key": { "userId": 1 }, "unique": true },
+        { "name": "uq_user_profiles_email_lower", "key": { "email": 1 }, "unique": true, "collation": { "locale": "en", "strength": 2 } },
+        { "name": "ix_user_profiles_userName", "key": { "userName": 1 }, "collation": { "locale": "en", "strength": 2 }, "sparse": true }
+      ]
+    },
+    {
+      "name": "user_settings",
+      "description": "Kullanıcıya ait ayar mekanizmaları. Kullanıcı başına tek doküman.",
+      "validationLevel": "moderate",
+      "validationAction": "error",
+      "validator": {
+        "$jsonSchema": {
+          "bsonType": "object",
+          "required": ["userId", "schemaVersion", "updatedAt"],
+          "properties": {
+            "userId": { "bsonType": ["int", "long"] },
+            "schemaVersion": { "bsonType": "int", "minimum": 1 },
+            "locale": { "bsonType": "string", "maxLength": 15 },
+            "timezone": { "bsonType": "string", "maxLength": 64 },
+            "currency": { "bsonType": "string", "minLength": 3, "maxLength": 3 },
+            "ui": {
+              "bsonType": "object",
+              "properties": {
+                "theme": { "enum": ["system", "light", "dark"] }
+              }
+            },
+            "notifications": {
+              "bsonType": "object",
+              "properties": {
+                "email": { "bsonType": "bool" },
+                "push": { "bsonType": "bool" },
+                "sms": { "bsonType": "bool" },
+                "channels": { "bsonType": "object", "description": "Kanal/konu bazlı aç-kapa: { orders: true, social: false, ... }" }
+              }
+            },
+            "privacy": {
+              "bsonType": "object",
+              "properties": {
+                "profileVisibility": { "enum": ["public", "followers", "private"] },
+                "showOnlineStatus": { "bsonType": "bool" },
+                "allowMessagesFrom": { "enum": ["everyone", "followers", "nobody"] }
+              }
+            },
+            "custom": { "bsonType": "object", "description": "Modül/uygulama bazlı serbest ayarlar" },
+            "updatedAt": { "bsonType": "date" }
+          }
+        }
+      },
+      "indexes": [
+        { "name": "uq_user_settings_userId", "key": { "userId": 1 }, "unique": true }
+      ]
+    },
+    {
+      "name": "user_carts",
+      "description": "Kullanıcının birden fazla sepet türü (varsayılan, istek listesi, sonra al, ...). Tür başına en fazla bir aktif sepet.",
+      "validationLevel": "moderate",
+      "validationAction": "error",
+      "validator": {
+        "$jsonSchema": {
+          "bsonType": "object",
+          "required": ["userId", "type", "status", "items", "currency", "createdAt", "updatedAt"],
+          "properties": {
+            "userId": { "bsonType": ["int", "long"] },
+            "type": { "bsonType": "string", "maxLength": 32, "description": "default | wishlist | saved_for_later | ..." },
+            "status": { "enum": ["active", "checked_out", "abandoned", "merged"] },
+            "name": { "bsonType": ["string", "null"], "maxLength": 100 },
+            "currency": { "bsonType": "string", "minLength": 3, "maxLength": 3 },
+            "items": {
+              "bsonType": "array",
+              "maxItems": 200,
+              "items": {
+                "bsonType": "object",
+                "required": ["productId", "quantity", "unitPrice", "addedAt"],
+                "properties": {
+                  "productId": { "bsonType": "string" },
+                  "sellerId": { "bsonType": ["string", "null"] },
+                  "variant": { "bsonType": ["object", "null"] },
+                  "quantity": { "bsonType": "int", "minimum": 1, "maximum": 999 },
+                  "unitPrice": { "bsonType": "decimal", "description": "Sepete eklendiği andaki fiyat (anlık görüntü)" },
+                  "note": { "bsonType": ["string", "null"], "maxLength": 300 },
+                  "addedAt": { "bsonType": "date" }
+                }
+              }
+            },
+            "totals": {
+              "bsonType": "object",
+              "properties": {
+                "subtotal": { "bsonType": "decimal" },
+                "itemCount": { "bsonType": "int" }
+              }
+            },
+            "meta": { "bsonType": "object" },
+            "expiresAt": { "bsonType": ["date", "null"], "description": "Sadece abandoned sepetlerde set edilir; TTL indeksi siler" },
+            "createdAt": { "bsonType": "date" },
+            "updatedAt": { "bsonType": "date" }
+          }
+        }
+      },
+      "indexes": [
+        {
+          "name": "uq_user_carts_active_per_type",
+          "key": { "userId": 1, "type": 1 },
+          "unique": true,
+          "partialFilterExpression": { "status": "active" }
+        },
+        { "name": "ix_user_carts_user_status", "key": { "userId": 1, "status": 1, "updatedAt": -1 } },
+        { "name": "ttl_user_carts_expiresAt", "key": { "expiresAt": 1 }, "expireAfterSeconds": 0 }
+      ]
+    }
+  ]
+}

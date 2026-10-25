@@ -55,4 +55,5 @@ firmware/.vscode/ipch/
 node_modules/
 
 #sunucu uzerindeki gizli yapilandirma ayarlari
+/shared/old
 .env

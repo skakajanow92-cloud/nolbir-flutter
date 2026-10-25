@@ -1,0 +1,64 @@
+{
+  "version": 1,
+  "notes": [
+    "Redis kalıcı veri deposu değildir: buradaki her şey Postgres/Mongo'dan yeniden üretilebilir veya kısa ömürlüdür.",
+    "Tüm anahtarların TTL'i vardır; TTL'siz anahtar açmak yasak (docker-compose'ta maxmemory politikası yok, bellek şişer).",
+    "Oturum işlemleri functions/sessions.lua içindeki FCALL fonksiyonlarıyla yapılır; HSET/DEL'i elle yazma.",
+    "Oturum kapatma tetikleyicileri: kullanıcı pasife alındı (redis.users.update ve payload'da is_active=false; fiziksel silme yasak olduğundan silme = pasife alma), şifre değişimi, 'tüm cihazlardan çık'."
+  ],
+  "functions": {
+    "library": "nolbir_sessions",
+    "file": "functions/sessions.lua",
+    "calls": {
+      "create": "FCALL nolbir_session_create 2 sess:{sid} user:sessions:{userId} <ttlSn> <maxOturum> <nowMs> <sid> field value [field value ...]",
+      "revoke": "FCALL nolbir_session_revoke 2 sess:{sid} user:sessions:{userId} <sid>",
+      "revokeAll": "FCALL nolbir_session_revoke_all 1 user:sessions:{userId}"
+    }
+  },
+  "keys": [
+    {
+      "pattern": "sess:{sid}",
+      "type": "hash",
+      "ttl": "7d (kayan değil; refresh ile yeniden oluşturulur)",
+      "fields": ["userId", "deviceId", "ip", "userAgent", "tier", "createdAt", "lastSeenAt"],
+      "owner": "nodejs",
+      "description": "Aktif oturum. JWT içindeki sid bu anahtarla doğrulanır; anahtar yoksa token geçersizdir."
+    },
+    {
+      "pattern": "user:sessions:{userId}",
+      "type": "zset",
+      "ttl": "oturum TTL'i ile aynı",
+      "owner": "nodejs",
+      "description": "Kullanıcının oturum listesi (skor = oluşturulma ms). Cihaz limiti ve toplu çıkış için."
+    },
+    {
+      "pattern": "cache:user:{userId}",
+      "type": "string(json)",
+      "ttl": "10m",
+      "owner": "nodejs",
+      "description": "user_profiles okuma önbelleği. sync.redis kuyruğu users güncellemesinde bu anahtarı siler."
+    },
+    {
+      "pattern": "otp:{purpose}:{identifier}",
+      "type": "hash",
+      "ttl": "5m",
+      "fields": ["codeHash", "attempts"],
+      "owner": "nodejs",
+      "description": "Tek kullanımlık doğrulama kodu. Kod düz metin saklanmaz; attempts aşılırsa anahtar silinir."
+    },
+    {
+      "pattern": "rl:{...}",
+      "type": "string",
+      "ttl": "@fastify/rate-limit yönetir",
+      "owner": "nodejs",
+      "description": "Rate limit sayaçları. @fastify/rate-limit'e nameSpace: 'rl:' verilir."
+    },
+    {
+      "pattern": "lock:{resource}",
+      "type": "string",
+      "ttl": "10s-60s",
+      "owner": "nodejs, python",
+      "description": "Kısa süreli dağıtık kilit (SET NX PX). Örn. lock:cart:{userId}."
+    }
+  ]
+}

@@ -1,0 +1,51 @@
+{
+  "version": 1,
+  "notes": [
+    "Neo4j yalnızca İLİŞKİ grafiğidir; düğümlerde sadece kimlik + filtre için gereken minimum alanlar tutulur. Detay okuma MongoDB'den yapılır.",
+    "Yüksek hacimli, zamana bağlı olaylar (görüntüleme, tıklama) buraya yazılmaz; ilişki olarak yalnızca kalıcı bağlar tutulur.",
+    "syncSeq = Postgres sync_outbox.id (kuyruk: sync.neo4j); upsert yalnızca daha yeni seq geldiğinde yazar."
+  ],
+  "nodes": {
+    "User": {
+      "key": "userId",
+      "properties": ["userId", "userName", "isActive", "verifiedTier", "syncSeq"]
+    },
+    "Seller": {
+      "key": "sellerId",
+      "description": "Satıcı kurum. Postgres'te ilgili tablo eklendiğinde senkronize edilir.",
+      "properties": ["sellerId", "name", "isActive", "syncSeq"]
+    },
+    "Product": {
+      "key": "productId",
+      "description": "Ürün. Postgres'te ilgili tablo eklendiğinde senkronize edilir.",
+      "properties": ["productId", "title", "isActive", "syncSeq"]
+    }
+  },
+  "relationships": {
+    "FOLLOWS":    { "from": "User", "to": ["User", "Seller"], "properties": ["since"] },
+    "BLOCKED":    { "from": "User", "to": "User", "properties": ["since"] },
+    "MANAGES":    { "from": "User", "to": "Seller", "properties": ["role", "since"], "description": "Kurumu yöneten/çalışan kullanıcı; role: owner | admin | staff" },
+    "PURCHASED":  { "from": "User", "to": "Product", "properties": ["firstAt", "lastAt", "count"], "description": "Tek ilişki üzerinde sayaç; her satın alma için ayrı ilişki oluşturulmaz" },
+    "LIKED":      { "from": "User", "to": "Product", "properties": ["at"] },
+    "SELLS":      { "from": "Seller", "to": "Product", "properties": ["since"] }
+  },
+  "constraints": [
+    "CREATE CONSTRAINT user_id_unique IF NOT EXISTS FOR (u:User) REQUIRE u.userId IS UNIQUE",
+    "CREATE CONSTRAINT seller_id_unique IF NOT EXISTS FOR (s:Seller) REQUIRE s.sellerId IS UNIQUE",
+    "CREATE CONSTRAINT product_id_unique IF NOT EXISTS FOR (p:Product) REQUIRE p.productId IS UNIQUE"
+  ],
+  "indexes": [
+    "CREATE INDEX user_name_idx IF NOT EXISTS FOR (u:User) ON (u.userName)",
+    "CREATE INDEX follows_since_idx IF NOT EXISTS FOR ()-[r:FOLLOWS]-() ON (r.since)",
+    "CREATE INDEX liked_at_idx IF NOT EXISTS FOR ()-[r:LIKED]-() ON (r.at)"
+  ],
+  "queries": {
+    "user.upsert": "MERGE (u:User {userId: $userId}) ON CREATE SET u.syncSeq = -1 WITH u WHERE u.syncSeq < $syncSeq SET u.userName = $userName, u.isActive = $isActive, u.verifiedTier = $verifiedTier, u.syncSeq = $syncSeq RETURN u.userId AS userId",
+    "user.delete": "MATCH (u:User {userId: $userId}) DETACH DELETE u",
+    "user.follow": "MATCH (a:User {userId: $fromId}), (b:User {userId: $toId}) WHERE a <> b AND NOT (b)-[:BLOCKED]->(a) MERGE (a)-[r:FOLLOWS]->(b) ON CREATE SET r.since = datetime() RETURN r.since AS since",
+    "user.unfollow": "MATCH (:User {userId: $fromId})-[r:FOLLOWS]->(:User {userId: $toId}) DELETE r",
+    "user.followers": "MATCH (f:User)-[r:FOLLOWS]->(:User {userId: $userId}) WHERE f.isActive ORDER BY r.since DESC SKIP $skip LIMIT $limit RETURN f.userId AS userId, r.since AS since",
+    "user.following": "MATCH (:User {userId: $userId})-[r:FOLLOWS]->(t:User) WHERE t.isActive ORDER BY r.since DESC SKIP $skip LIMIT $limit RETURN t.userId AS userId, r.since AS since",
+    "user.suggestions": "MATCH (:User {userId: $userId})-[:FOLLOWS]->(:User)-[:FOLLOWS]->(s:User) WHERE s.userId <> $userId AND s.isActive AND NOT (:User {userId: $userId})-[:FOLLOWS|BLOCKED]->(s) RETURN s.userId AS userId, count(*) AS mutuals ORDER BY mutuals DESC LIMIT $limit"
+  }
+}
