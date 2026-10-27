@@ -1,64 +1,104 @@
 {
-  "version": 1,
-  "notes": [
-    "Redis kalıcı veri deposu değildir: buradaki her şey Postgres/Mongo'dan yeniden üretilebilir veya kısa ömürlüdür.",
-    "Tüm anahtarların TTL'i vardır; TTL'siz anahtar açmak yasak (docker-compose'ta maxmemory politikası yok, bellek şişer).",
-    "Oturum işlemleri functions/sessions.lua içindeki FCALL fonksiyonlarıyla yapılır; HSET/DEL'i elle yazma.",
-    "Oturum kapatma tetikleyicileri: kullanıcı pasife alındı (redis.users.update ve payload'da is_active=false; fiziksel silme yasak olduğundan silme = pasife alma), şifre değişimi, 'tüm cihazlardan çık'."
+  "version": 2,
+  "rules": [
+    "Her anahtarın TTL'i vardır; TTL'siz anahtar yasak.",
+    "Referans/önbellek anahtarlarında tüketici DEĞER YAZMAZ, anahtarı SİLER (DEL); değeri okuyucu Mongo/Postgres'ten yeniden kurar.",
+    "Kimlik/parola alanları (password_hash, digital_pin) Redis'e asla yazılmaz.",
+    "Kurum askıya alma, lisans tekilliği ve para hareketleri gibi kararlar Redis’ten değil yalnızca Postgres’ten verilir. Önbellek sadece gösterim/hızlı okuma içindir, sync gecikirse eski veri dönebilir."
   ],
-  "functions": {
-    "library": "nolbir_sessions",
-    "file": "functions/sessions.lua",
-    "calls": {
-      "create": "FCALL nolbir_session_create 2 sess:{sid} user:sessions:{userId} <ttlSn> <maxOturum> <nowMs> <sid> field value [field value ...]",
-      "revoke": "FCALL nolbir_session_revoke 2 sess:{sid} user:sessions:{userId} <sid>",
-      "revokeAll": "FCALL nolbir_session_revoke_all 1 user:sessions:{userId}"
-    }
-  },
   "keys": [
     {
-      "pattern": "sess:{sid}",
+      "pattern": "ref:currencies",
       "type": "hash",
-      "ttl": "7d (kayan değil; refresh ile yeniden oluşturulur)",
-      "fields": ["userId", "deviceId", "ip", "userAgent", "tier", "createdAt", "lastSeenAt"],
-      "owner": "nodejs",
-      "description": "Aktif oturum. JWT içindeki sid bu anahtarla doğrulanır; anahtar yoksa token geçersizdir."
+      "ttl": "1h",
+      "source": "supported_currencies",
+      "fields": "<currencyCode> -> JSON { name, decimalPlaces, isActive, walletColumnsProvisioned }",
+      "invalidate": "supported_currencies olayında DEL"
     },
     {
-      "pattern": "user:sessions:{userId}",
-      "type": "zset",
-      "ttl": "oturum TTL'i ile aynı",
-      "owner": "nodejs",
-      "description": "Kullanıcının oturum listesi (skor = oluşturulma ms). Cihaz limiti ve toplu çıkış için."
+      "pattern": "ref:tax:{countryCode}",
+      "type": "string(json)",
+      "ttl": "1h",
+      "source": "tax_rates_and_rules",
+      "description": "Ülkenin aktif vergi kuralları. Geçerlilik tarihi okuma anında uygulanır, önbellekte filtrelenmez.",
+      "invalidate": "tax_rates_and_rules olayında ilgili ülkenin anahtarı DEL"
     },
     {
       "pattern": "cache:user:{userId}",
       "type": "string(json)",
       "ttl": "10m",
-      "owner": "nodejs",
-      "description": "user_profiles okuma önbelleği. sync.redis kuyruğu users güncellemesinde bu anahtarı siler."
+      "source": "users",
+      "invalidate": "users olayında DEL"
     },
     {
-      "pattern": "otp:{purpose}:{identifier}",
+      "pattern": "sess:{sid}",
       "type": "hash",
-      "ttl": "5m",
-      "fields": ["codeHash", "attempts"],
-      "owner": "nodejs",
-      "description": "Tek kullanımlık doğrulama kodu. Kod düz metin saklanmaz; attempts aşılırsa anahtar silinir."
+      "ttl": "7d",
+      "source": "users",
+      "fields": [
+        "userId",
+        "deviceId",
+        "ip",
+        "userAgent",
+        "createdAt",
+        "lastSeenAt"
+      ],
+      "invalidate": "users.is_active=false olduğunda kullanıcının tüm oturumları kapatılır"
     },
     {
-      "pattern": "rl:{...}",
-      "type": "string",
-      "ttl": "@fastify/rate-limit yönetir",
-      "owner": "nodejs",
-      "description": "Rate limit sayaçları. @fastify/rate-limit'e nameSpace: 'rl:' verilir."
+      "pattern": "user:sessions:{userId}",
+      "type": "zset",
+      "ttl": "oturum TTL'i ile aynı",
+      "source": "users",
+      "description": "Üye = sid, skor = oluşturulma ms; cihaz limiti ve toplu çıkış için."
     },
     {
-      "pattern": "lock:{resource}",
-      "type": "string",
-      "ttl": "10s-60s",
-      "owner": "nodejs, python",
-      "description": "Kısa süreli dağıtık kilit (SET NX PX). Örn. lock:cart:{userId}."
+      "pattern": "cache:institution:{institutionId}",
+      "type": "string(json)",
+      "ttl": "10m",
+      "source": "institutions",
+      "description": "Kurum okuma önbelleği. Okuyucu Mongo'dan, o da yoksa Postgres'ten kurar.",
+      "invalidate": "institutions olayında DEL"
+    },
+    {
+      "pattern": "cache:licenses:{institutionId}",
+      "type": "string(json)",
+      "ttl": "10m",
+      "source": "institution_licenses",
+      "description": "Kurumun lisans listesi. Geçerlilik tarihi (valid_from/valid_until) okuma anında uygulanır, önbellekte filtrelenmez.",
+      "invalidate": "institution_licenses olayında ilgili kurumun anahtarı DEL"
+    },
+    {
+      "pattern": "ref:jurisdiction:{countryCode}",
+      "type": "string(json)",
+      "ttl": "1h",
+      "source": "jurisdiction_rules",
+      "description": "Ülkenin aktif hakemlik/fesih kuralları. Geçerlilik tarihi (effectiveFrom/Until) okuma anında uygulanır, önbellekte filtrelenmez.",
+      "invalidate": "jurisdiction_rules olayında ilgili ülkenin anahtarı DEL"
+    },
+    {
+      "pattern": "ref:verification:requirements",
+      "type": "string(json)",
+      "ttl": "1h",
+      "source": "verification_requirements",
+      "description": "Aktif seviye gereksinimleri (tüm ülkeler). Geçerlilik tarihi okuma anında uygulanır.",
+      "invalidate": "verification_requirements olayında DEL"
+    },
+    {
+      "pattern": "cache:verification:{userId}",
+      "type": "string(json)",
+      "ttl": "10m",
+      "source": "user_verification_levels",
+      "description": "Kullanıcının geçerli doğrulama seviyeleri, gösterim amaçlı. valid_until okuma anında kontrol edilir.",
+      "invalidate": "user_verification_levels olayında ilgili kullanıcının anahtarı DEL"
+    },
+    {
+      "pattern": "cache:privileges:{institutionId}",
+      "type": "string(json)",
+      "ttl": "10m",
+      "source": "institution_privilege_grants",
+      "description": "Kurumun geçerli imtiyazları, gösterim amaçlı. Komisyon indirimi gibi parasal etkiler Redis'ten değil Postgres'ten uygulanır.",
+      "invalidate": "institution_privilege_grants olayında ilgili kurumun anahtarı DEL"
     }
   ]
 }

@@ -1,0 +1,80 @@
+{
+    "version": 1,
+    "rules": [
+        "Influx yalnızca analitik/gösterge içindir (Grafana). Tutarlar float'tır; kuruşu kuruşuna doğruluk için Postgres defteri esastır.",
+        "Kategorik etiketler (currency, side) enum_maps.json'daki sayısal kodun string hâlidir.",
+        "Tekrar teslim güvenliği: aynı measurement + etiket kümesi + zaman damgası üstüne yazar. Zaman damgası = created_at (µs) * 1000 + (outboxId % 1000) ns; deterministik olduğu için tekrar teslim aynı noktayı üretir."
+    ],
+    "buckets": [
+        {
+            "name": "sensor_data",
+            "retentionSeconds": 0,
+            "description": "IoT/sensör verisi (docker init ile oluşur)."
+        },
+        {
+            "name": "ledger_metrics",
+            "retentionSeconds": 0,
+            "description": "Defter hareketleri analitiği; hacim büyürse aylık/günlük toplama task'ı (Flux) eklenir."
+        },
+        {
+            "name": "institution_metrics",
+            "retentionSeconds": 0,
+            "description": "Kurum operasyonel/SLA metrikleri."
+        },
+        {
+            "name": "reserve_metrics",
+            "retentionSeconds": 0,
+            "description": "Rezerv hesap mutabakat izleme (Grafana)."
+        }
+    ],
+    "measurements": [
+        {
+            "bucket": "ledger_metrics",
+            "name": "ledger_movements",
+            "source": "journal_entry_lines (operation=INSERT)",
+            "tags": {
+                "institution_id": "journal_entry_lines.institution_id",
+                "account_id": "journal_entry_lines.account_id",
+                "currency": "journal_entry_lines.currency",
+                "side": "ledger_side kodu: debit_amount>0 ise 0, değilse 1"
+            },
+            "fields": {
+                "amount": "float: tutarlı olan taraf"
+            }
+        },
+        {
+            "bucket": "institution_metrics",
+            "name": "sla_measurements",
+            "source": "institution_sla_metrics (operation=INSERT)",
+            "tags": {
+                "institution_id": "institution_sla_metrics.institution_id",
+                "metric_type": "sla_metric_type kodu",
+                "unit": "measurement_unit kodu",
+                "penalty_currency": "currency_code kodu"
+            },
+            "fields": {
+                "target": "float",
+                "actual": "float",
+                "violated": "bool (is_violated)",
+                "penalty": "float (penalty_amount)"
+            },
+            "timestamp": "measured_at (µs) * 1000 + (outboxId % 1000) ns"
+        },
+        {
+            "bucket": "reserve_metrics",
+            "name": "reserve_reconciliation",
+            "source": "reserve_reconciliations (operation=INSERT ve UPDATE)",
+            "tags": {
+                "real_world_account_id": "reserve_reconciliations.real_world_account_id"
+            },
+            "fields": {
+                "bank_balance": "float (bank_reported_balance)",
+                "ledger_balance": "float",
+                "difference": "float",
+                "status": "int (reconciliation_status kodu)"
+            },
+            "timestamp": "as_of_date 00:00 UTC (ns)",
+            "note": "Bu ölçümde bilerek outboxId eki yoktur: (hesap, tarih) tekil olduğu için UPDATE olayı aynı noktanın üstüne yazar. Durum etiket değil alan olduğundan seri çatallanmaz."
+        }
+    ]
+}

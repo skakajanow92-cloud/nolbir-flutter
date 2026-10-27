@@ -1,51 +1,129 @@
 {
-  "version": 1,
-  "notes": [
-    "Neo4j yalnızca İLİŞKİ grafiğidir; düğümlerde sadece kimlik + filtre için gereken minimum alanlar tutulur. Detay okuma MongoDB'den yapılır.",
-    "Yüksek hacimli, zamana bağlı olaylar (görüntüleme, tıklama) buraya yazılmaz; ilişki olarak yalnızca kalıcı bağlar tutulur.",
-    "syncSeq = Postgres sync_outbox.id (kuyruk: sync.neo4j); upsert yalnızca daha yeni seq geldiğinde yazar."
+  "version": 2,
+  "rules": [
+    "Neo4j yalnızca ilişki grafiğidir; düğümde kimlik + filtre için minimum alan tutulur, detay Mongo'dan okunur.",
+    "Her düğümde syncSeq (= sync_outbox.id) bulunur; upsert yalnızca daha yeni seq geldiğinde yazar."
   ],
   "nodes": {
     "User": {
-      "key": "userId",
-      "properties": ["userId", "userName", "isActive", "verifiedTier", "syncSeq"]
+      "table": "users",
+      "key": {
+        "id": "userId"
+      },
+      "properties": [
+        "user_name",
+        "is_active"
+      ]
     },
-    "Seller": {
-      "key": "sellerId",
-      "description": "Satıcı kurum. Postgres'te ilgili tablo eklendiğinde senkronize edilir.",
-      "properties": ["sellerId", "name", "isActive", "syncSeq"]
+    "Institution": {
+      "table": "institutions",
+      "key": {
+        "id": "institutionId"
+      },
+      "properties": [
+        "institution_name",
+        "country_code",
+        "is_active",
+        "compliance_status"
+      ]
     },
-    "Product": {
-      "key": "productId",
-      "description": "Ürün. Postgres'te ilgili tablo eklendiğinde senkronize edilir.",
-      "properties": ["productId", "title", "isActive", "syncSeq"]
+    "Consortium": {
+      "table": "consortiums",
+      "key": {
+        "id": "consortiumId"
+      },
+      "properties": [
+        "consortium_name",
+        "consortium_code",
+        "consortium_type",
+        "is_active"
+      ]
     }
   },
   "relationships": {
-    "FOLLOWS":    { "from": "User", "to": ["User", "Seller"], "properties": ["since"] },
-    "BLOCKED":    { "from": "User", "to": "User", "properties": ["since"] },
-    "MANAGES":    { "from": "User", "to": "Seller", "properties": ["role", "since"], "description": "Kurumu yöneten/çalışan kullanıcı; role: owner | admin | staff" },
-    "PURCHASED":  { "from": "User", "to": "Product", "properties": ["firstAt", "lastAt", "count"], "description": "Tek ilişki üzerinde sayaç; her satın alma için ayrı ilişki oluşturulmaz" },
-    "LIKED":      { "from": "User", "to": "Product", "properties": ["at"] },
-    "SELLS":      { "from": "Seller", "to": "Product", "properties": ["since"] }
+    "SHAREHOLDER_OF": {
+      "from": "User",
+      "to": "Institution",
+      "table": "institution_shareholders",
+      "key": [
+        "user_id",
+        "institution_id"
+      ],
+      "properties": [
+        "share_percentage",
+        "partner_type",
+        "board_member",
+        "created_at"
+      ],
+      "lifecycle": "Yalnızca is_active = true iken vardır; is_active=false olunca ilişki silinir (exited kayıtlar Postgres/Mongo'da kalır)."
+    },
+    "WORKS_AT": {
+      "from": "User",
+      "to": "Institution",
+      "table": "worker_institution_positions",
+      "key": [
+        "id"
+      ],
+      "properties": [
+        "id (positionId)",
+        "position_type",
+        "branch_id",
+        "started_at"
+      ],
+      "lifecycle": "Yalnızca is_active = true iken vardır; is_active=false olunca ilişki silinir. Aynı kurumda birden fazla pozisyon olabileceği için anahtar positionId'dir."
+    },
+    "MEMBER_OF": {
+      "from": "Institution",
+      "to": "Consortium",
+      "table": "consortium_members",
+      "key": [
+        "institution_id",
+        "consortium_id"
+      ],
+      "properties": [
+        "member_role",
+        "joined_at"
+      ],
+      "lifecycle": "Yalnızca is_active = true iken vardır; pasife alınınca ilişki silinir."
+    },
+    "LEADS": {
+      "from": "Institution",
+      "to": "Consortium",
+      "table": "consortiums",
+      "key": [
+        "lead_institution_id",
+        "id"
+      ],
+      "properties": [],
+      "lifecycle": "lead_institution_id değişince eski ilişki silinir, yenisi kurulur; NULL ise ilişki yoktur."
+    },
+    "B2B_AGREEMENT": {
+      "from": "Institution (buyer)",
+      "to": "Institution (seller)",
+      "table": "b2b_corporate_agreements",
+      "key": [
+        "id"
+      ],
+      "properties": [
+        "id (agreementId)",
+        "agreement_target",
+        "discount_percentage",
+        "valid_from",
+        "valid_until"
+      ],
+      "lifecycle": "is_active = true iken vardır. Süre bitimi (valid_until) filtre özelliğidir; geçerlilik okuma anında kontrol edilir."
+    }
   },
   "constraints": [
     "CREATE CONSTRAINT user_id_unique IF NOT EXISTS FOR (u:User) REQUIRE u.userId IS UNIQUE",
-    "CREATE CONSTRAINT seller_id_unique IF NOT EXISTS FOR (s:Seller) REQUIRE s.sellerId IS UNIQUE",
-    "CREATE CONSTRAINT product_id_unique IF NOT EXISTS FOR (p:Product) REQUIRE p.productId IS UNIQUE"
+    "CREATE CONSTRAINT institution_id_unique IF NOT EXISTS FOR (i:Institution) REQUIRE i.institutionId IS UNIQUE",
+    "CREATE CONSTRAINT works_at_position_unique IF NOT EXISTS FOR ()-[r:WORKS_AT]-() REQUIRE r.positionId IS UNIQUE",
+    "CREATE CONSTRAINT consortium_id_unique IF NOT EXISTS FOR (c:Consortium) REQUIRE c.consortiumId IS UNIQUE",
+    "CREATE CONSTRAINT b2b_agreement_unique IF NOT EXISTS FOR ()-[r:B2B_AGREEMENT]-() REQUIRE r.agreementId IS UNIQUE"
   ],
   "indexes": [
     "CREATE INDEX user_name_idx IF NOT EXISTS FOR (u:User) ON (u.userName)",
-    "CREATE INDEX follows_since_idx IF NOT EXISTS FOR ()-[r:FOLLOWS]-() ON (r.since)",
-    "CREATE INDEX liked_at_idx IF NOT EXISTS FOR ()-[r:LIKED]-() ON (r.at)"
-  ],
-  "queries": {
-    "user.upsert": "MERGE (u:User {userId: $userId}) ON CREATE SET u.syncSeq = -1 WITH u WHERE u.syncSeq < $syncSeq SET u.userName = $userName, u.isActive = $isActive, u.verifiedTier = $verifiedTier, u.syncSeq = $syncSeq RETURN u.userId AS userId",
-    "user.delete": "MATCH (u:User {userId: $userId}) DETACH DELETE u",
-    "user.follow": "MATCH (a:User {userId: $fromId}), (b:User {userId: $toId}) WHERE a <> b AND NOT (b)-[:BLOCKED]->(a) MERGE (a)-[r:FOLLOWS]->(b) ON CREATE SET r.since = datetime() RETURN r.since AS since",
-    "user.unfollow": "MATCH (:User {userId: $fromId})-[r:FOLLOWS]->(:User {userId: $toId}) DELETE r",
-    "user.followers": "MATCH (f:User)-[r:FOLLOWS]->(:User {userId: $userId}) WHERE f.isActive ORDER BY r.since DESC SKIP $skip LIMIT $limit RETURN f.userId AS userId, r.since AS since",
-    "user.following": "MATCH (:User {userId: $userId})-[r:FOLLOWS]->(t:User) WHERE t.isActive ORDER BY r.since DESC SKIP $skip LIMIT $limit RETURN t.userId AS userId, r.since AS since",
-    "user.suggestions": "MATCH (:User {userId: $userId})-[:FOLLOWS]->(:User)-[:FOLLOWS]->(s:User) WHERE s.userId <> $userId AND s.isActive AND NOT (:User {userId: $userId})-[:FOLLOWS|BLOCKED]->(s) RETURN s.userId AS userId, count(*) AS mutuals ORDER BY mutuals DESC LIMIT $limit"
-  }
+    "CREATE INDEX institution_country_idx IF NOT EXISTS FOR (i:Institution) ON (i.countryCode)",
+    "CREATE INDEX shareholder_of_board_idx IF NOT EXISTS FOR ()-[r:SHAREHOLDER_OF]-() ON (r.boardMember)"
+  ]
 }

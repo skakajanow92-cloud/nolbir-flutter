@@ -1752,7 +1752,7 @@ WHERE status <> 0; -- iptal edilmemiş/geçerli fişler için tekil olsun
 -- Sistemin genel urun bilgilerini tutar herhangi bir urun veya hizmet turu
 CREATE TABLE IF NOT EXISTS listings (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    category_code SMALLINT NOT NULL,-- İlgili App altındaki modül/lisans kategorisi
+    category_code SMALLINT NOT NULL,
     institution_id INTEGER REFERENCES institutions(id) ON DELETE RESTRICT,
     worker_id INTEGER REFERENCES workers(id) ON DELETE RESTRICT,   -- bireysel worker satıcıysa
     listing_title VARCHAR(200) NOT NULL,

@@ -1,0 +1,45 @@
+{
+    "version": 1,
+    "rules": [
+        "Bucket adları enum_maps.json minio_bucket ile birebir aynıdır; media_assets.minio_bucket SMALLINT kodu burayı gösterir.",
+        "Yükleme önce media-quarantine'e düşer; tarama temiz çıkınca ilgili bucket'a taşınır, bulaşıksa karantinada kalır.",
+        "Object key biçimi: <ownerUserId>/<assetId>/<dosya>; segmentler media-hls altında <assetId>/ klasöründe."
+    ],
+    "buckets": [
+        {
+            "code": 0,
+            "name": "media-quarantine",
+            "access": "private",
+            "lifecycleDays": 7,
+            "description": "Taranmamış / bulaşık dosyalar. 7 gün sonra silinir."
+        },
+        {
+            "code": 1,
+            "name": "media-private",
+            "access": "private",
+            "lifecycleDays": 0,
+            "description": "Sahibine özel dosyalar (presigned URL ile)."
+        },
+        {
+            "code": 2,
+            "name": "media-public",
+            "access": "public-read",
+            "lifecycleDays": 0,
+            "description": "Herkese açık dosyalar."
+        },
+        {
+            "code": 3,
+            "name": "media-hls",
+            "access": "private",
+            "lifecycleDays": 0,
+            "description": "Transcode edilmiş video segmentleri (HLS)."
+        },
+        {
+            "code": 4,
+            "name": "media-thumbnails",
+            "access": "public-read",
+            "lifecycleDays": 0,
+            "description": "Küçük resimler."
+        }
+    ]
+}

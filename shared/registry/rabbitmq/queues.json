@@ -1,18 +1,5 @@
 {
-  "version": 2,
-  "notes": [
-    "Akış: Postgres tetikleyici (fn_emit_sync_event) -> sync_outbox -> Node.js yayıncı -> nolbir.sync -> sync.<hedef> kuyrukları -> tüketici worker.",
-    "Yayıncı sync_outbox satırındaki her hedef için AYRI mesaj yayınlar: routing key = <hedef küçük harf>.<tablo>.<işlem küçük harf>, örn. mongodb.users.update, neo4j.users.update, redis.users.update.",
-    "Yayıncı mesajı kalıcı (persistent) ve publisher-confirm ile yayınlar; tüm hedefler için confirm gelince sync_outbox satırı işlendi olarak işaretlenir (processed_at). Başarısızlıkta attempt_count/last_error güncellenir.",
-    "Mesaj gövdesi sync_outbox.payload'dır (kolon adları snake_case; Mongo/Neo4j şemaları camelCase olduğu için tüketici çevirir, smallint enum'lar enums/columnMap.json ile).",
-    "Header'lar: outboxId (= syncSeq, sync_outbox.id), aggregateType, aggregateId, operation, occurredAt (created_at).",
-    "Tüketici kuralları: manuel ack, prefetch 20-50. Geçici hata -> nack(requeue=false): <kuyruk>.retry'a düşer, 30 sn sonra geri gelir. x-death sayısı retry.maxAttempts'i aşarsa mesaj <kuyruk>.dlq'ya publish edilir ve ack'lenir.",
-    "Tüketiciler idempotent olmalıdır (aynı mesaj iki kez gelebilir, sıra bozulabilir): upsert'te outboxId (syncSeq) karşılaştırması bunu sağlar. Hedefte oluşan Mongo ObjectId / Neo4j düğüm kimliği external_read_model_refs tablosuna provision.* olayıyla geri bildirilebilir.",
-    "Her hedef kendi kuyruğunu dinler; bir hedefin çökmesi diğerlerini etkilemez.",
-    "Geri yazım döngüsü yok: provisioning_* kolonları users tetikleyicisinde payload dışı bırakıldığı için worker'ın Postgres'e yazması yeni outbox olayı üretmez.",
-    "iot_telemetry_staging bu akışın DIŞINDA: MQTT -> staging -> Python worker -> InfluxDB ayrı bir yoldur.",
-    "media_security_scan kuyruğu mevcut sistemde zaten var; bu dosyaya taşınacaksa aynı şemaya (retry/dlq) alınabilir."
-  ],
+  "version": 3,
   "vhost": "/",
   "retry": {
     "ttlMs": 30000,
@@ -22,198 +9,76 @@
     {
       "name": "nolbir.sync",
       "type": "topic",
-      "durable": true,
-      "description": "Tüm senkronizasyon olayları. Publisher: sync_outbox yayıncısı (<hedef>.<tablo>.<işlem>) ve worker'lar (provision.<tablo>.<done|failed>)."
+      "durable": true
     },
     {
       "name": "nolbir.retry",
       "type": "direct",
-      "durable": true,
-      "description": "Başarısız mesajlar buradan <kuyruk>.retry bekleme kuyruğuna gider."
+      "durable": true
     }
   ],
-  "queues": [
-    {
-      "name": "sync.mongodb",
-      "durable": true,
-      "description": "MONGODB hedefli olaylar: okuma kopyası upsert (user_profiles, ileride listings, marketplace_orders...)",
-      "arguments": {
-        "x-dead-letter-exchange": "nolbir.retry",
-        "x-dead-letter-routing-key": "sync.mongodb.retry"
-      }
-    },
-    {
-      "name": "sync.mongodb.retry",
-      "durable": true,
-      "description": "30 sn bekler, sonra sync.mongodb kuyruğuna döner",
-      "arguments": {
-        "x-message-ttl": 30000,
-        "x-dead-letter-exchange": "",
-        "x-dead-letter-routing-key": "sync.mongodb"
-      }
-    },
-    {
-      "name": "sync.mongodb.dlq",
-      "durable": true,
-      "description": "Azami deneme aşıldı; elle incelenir. Tüketici yok.",
-      "arguments": {}
-    },
-    {
-      "name": "sync.neo4j",
-      "durable": true,
-      "description": "NEO4J hedefli olaylar: düğüm/ilişki güncelleme (users, ratings, collaboration_agreements...)",
-      "arguments": {
-        "x-dead-letter-exchange": "nolbir.retry",
-        "x-dead-letter-routing-key": "sync.neo4j.retry"
-      }
-    },
-    {
-      "name": "sync.neo4j.retry",
-      "durable": true,
-      "description": "30 sn bekler, sonra sync.neo4j kuyruğuna döner",
-      "arguments": {
-        "x-message-ttl": 30000,
-        "x-dead-letter-exchange": "",
-        "x-dead-letter-routing-key": "sync.neo4j"
-      }
-    },
-    {
-      "name": "sync.neo4j.dlq",
-      "durable": true,
-      "description": "Azami deneme aşıldı; elle incelenir. Tüketici yok.",
-      "arguments": {}
-    },
-    {
-      "name": "sync.redis",
-      "durable": true,
-      "description": "REDIS hedefli olaylar: önbellek silme/yenileme, oturum kapatma",
-      "arguments": {
-        "x-dead-letter-exchange": "nolbir.retry",
-        "x-dead-letter-routing-key": "sync.redis.retry"
-      }
-    },
-    {
-      "name": "sync.redis.retry",
-      "durable": true,
-      "description": "30 sn bekler, sonra sync.redis kuyruğuna döner",
-      "arguments": {
-        "x-message-ttl": 30000,
-        "x-dead-letter-exchange": "",
-        "x-dead-letter-routing-key": "sync.redis"
-      }
-    },
-    {
-      "name": "sync.redis.dlq",
-      "durable": true,
-      "description": "Azami deneme aşıldı; elle incelenir. Tüketici yok.",
-      "arguments": {}
-    },
-    {
-      "name": "sync.influxdb",
-      "durable": true,
-      "description": "INFLUXDB hedefli olaylar: zaman-serisi yazımı (institution_sla_metrics, logistics_status_events)",
-      "arguments": {
-        "x-dead-letter-exchange": "nolbir.retry",
-        "x-dead-letter-routing-key": "sync.influxdb.retry"
-      }
-    },
-    {
-      "name": "sync.influxdb.retry",
-      "durable": true,
-      "description": "30 sn bekler, sonra sync.influxdb kuyruğuna döner",
-      "arguments": {
-        "x-message-ttl": 30000,
-        "x-dead-letter-exchange": "",
-        "x-dead-letter-routing-key": "sync.influxdb"
-      }
-    },
-    {
-      "name": "sync.influxdb.dlq",
-      "durable": true,
-      "description": "Azami deneme aşıldı; elle incelenir. Tüketici yok.",
-      "arguments": {}
-    },
-    {
-      "name": "sync.pg.provisioning",
-      "durable": true,
-      "description": "Worker sonuçları -> Postgres users.provisioning_status / provisioning_error geri yazımı",
-      "arguments": {
-        "x-dead-letter-exchange": "nolbir.retry",
-        "x-dead-letter-routing-key": "sync.pg.provisioning.retry"
-      }
-    },
-    {
-      "name": "sync.pg.provisioning.retry",
-      "durable": true,
-      "description": "30 sn bekler, sonra sync.pg.provisioning kuyruğuna döner",
-      "arguments": {
-        "x-message-ttl": 30000,
-        "x-dead-letter-exchange": "",
-        "x-dead-letter-routing-key": "sync.pg.provisioning"
-      }
-    },
-    {
-      "name": "sync.pg.provisioning.dlq",
-      "durable": true,
-      "description": "Azami deneme aşıldı; elle incelenir. Tüketici yok.",
-      "arguments": {}
-    }
+  "targets": [
+    "mongodb",
+    "neo4j",
+    "redis",
+    "influxdb"
   ],
-  "bindings": [
-    {
-      "exchange": "nolbir.sync",
-      "queue": "sync.mongodb",
-      "routing_key": "mongodb.#"
+  "perTarget": {
+    "queue": {
+      "name": "sync.<t>",
+      "durable": true,
+      "args": {
+        "x-dead-letter-exchange": "nolbir.retry",
+        "x-dead-letter-routing-key": "sync.<t>.retry"
+      },
+      "binding": {
+        "exchange": "nolbir.sync",
+        "routingKey": "<t>.#"
+      }
     },
-    {
-      "exchange": "nolbir.retry",
-      "queue": "sync.mongodb.retry",
-      "routing_key": "sync.mongodb.retry"
+    "retryQueue": {
+      "name": "sync.<t>.retry",
+      "durable": true,
+      "args": {
+        "x-message-ttl": 30000,
+        "x-dead-letter-exchange": "",
+        "x-dead-letter-routing-key": "sync.<t>"
+      },
+      "binding": {
+        "exchange": "nolbir.retry",
+        "routingKey": "sync.<t>.retry"
+      }
     },
-    {
-      "exchange": "nolbir.sync",
-      "queue": "sync.neo4j",
-      "routing_key": "neo4j.#"
-    },
-    {
-      "exchange": "nolbir.retry",
-      "queue": "sync.neo4j.retry",
-      "routing_key": "sync.neo4j.retry"
-    },
-    {
-      "exchange": "nolbir.sync",
-      "queue": "sync.redis",
-      "routing_key": "redis.#"
-    },
-    {
-      "exchange": "nolbir.retry",
-      "queue": "sync.redis.retry",
-      "routing_key": "sync.redis.retry"
-    },
-    {
-      "exchange": "nolbir.sync",
-      "queue": "sync.influxdb",
-      "routing_key": "influxdb.#"
-    },
-    {
-      "exchange": "nolbir.retry",
-      "queue": "sync.influxdb.retry",
-      "routing_key": "sync.influxdb.retry"
-    },
-    {
-      "exchange": "nolbir.sync",
-      "queue": "sync.pg.provisioning",
-      "routing_key": "provision.#"
-    },
-    {
-      "exchange": "nolbir.retry",
-      "queue": "sync.pg.provisioning.retry",
-      "routing_key": "sync.pg.provisioning.retry"
+    "dlq": {
+      "name": "sync.<t>.dlq",
+      "durable": true,
+      "args": {},
+      "note": "Elle incelenir, tüketici yok."
     }
+  },
+  "routingKey": "<sync_target adı küçük harf>.<tablo>.<data_operation adı küçük harf>",
+  "messageHeaders": [
+    "outboxId",
+    "aggregateType",
+    "aggregateId",
+    "operation",
+    "occurredAt"
   ],
-  "routingKeys": {
-    "<mongodb|neo4j|redis|influxdb>.<tablo>.<insert|update|delete>": "sync_outbox olayı; hedef listesi sync_routing_rules.target_systems'ten gelir",
-    "provision.<tablo>.done": "{ id, target: 'MONGODB'|'NEO4J'|'REDIS', syncSeq, externalRef? }",
-    "provision.<tablo>.failed": "{ id, target, error, syncSeq }"
-  }
+  "workTargets": [
+    {
+      "name": "ai_analysis",
+      "queue": "work.ai_analysis",
+      "binding": "ai_analysis.approvals.insert"
+    },
+    {
+      "name": "media_scan",
+      "queue": "work.media_scan",
+      "binding": "media_scan.media_assets.insert"
+    },
+    {
+      "name": "media_transcode",
+      "queue": "work.media_transcode",
+      "binding": "media_transcode.media_assets.insert"
+    }
+  ]
 }

@@ -1,0 +1,501 @@
+{
+  "version": 1,
+  "enums": {
+    "sync_target": {
+      "0": "MONGODB",
+      "1": "NEO4J",
+      "2": "INFLUXDB",
+      "3": "REDIS",
+      "4": "MINIO",
+      "5": "AI_ANALYSIS",
+      "6": "MEDIA_SCAN",
+      "7": "MEDIA_TRANSCODE"
+    },
+    "data_operation": {
+      "0": "INSERT",
+      "1": "UPDATE",
+      "2": "DELETE"
+    },
+    "sync_outbox_status": {
+      "0": "PENDING",
+      "1": "PROCESSED",
+      "2": "FAILED"
+    },
+    "currency_code": {
+      "0": "SAP",
+      "1": "USD",
+      "2": "EUR",
+      "3": "TRY",
+      "4": "TMT"
+    },
+    "country_code": {
+      "0": "TURKMENISTAN",
+      "1": "TURKIYE",
+      "2": "IRAN",
+      "3": "RUSSIYA"
+    },
+    "tax_type": {
+      "0": "VAT_KDV",
+      "1": "WITHHOLDING_STOPAJ",
+      "2": "STAMP_TAX",
+      "3": "CORPORATE"
+    },
+    "gender": {
+      "0": "UNSPECIFIED",
+      "1": "MALE",
+      "2": "FEMALE"
+    },
+    "provisioning_status": {
+      "0": "PENDING",
+      "1": "DONE",
+      "2": "FAILED"
+    },
+    "state_or_region": {},
+    "tax_category": {},
+    "genesis_action": {},
+    "genesis_module": {},
+    "approval_status": {
+      "0": "PENDING",
+      "1": "APPROVED",
+      "2": "REJECTED",
+      "3": "EXPIRED",
+      "4": "CANCELLED"
+    },
+    "requester_role": {
+      "0": "USER",
+      "1": "SHAREHOLDER",
+      "2": "WORKER"
+    },
+    "approval_type": {},
+    "voter_type": {
+      "0": "SHAREHOLDER",
+      "1": "WORKER"
+    },
+    "mqtt_access": {
+      "0": "READ",
+      "1": "WRITE",
+      "2": "READ_WRITE"
+    },
+    "media_category": {},
+    "media_entity_type": {},
+    "media_visibility": {
+      "0": "PRIVATE",
+      "1": "PUBLIC"
+    },
+    "media_status": {
+      "0": "ACTIVE",
+      "1": "UPLOADING",
+      "2": "QUARANTINED",
+      "3": "DELETED"
+    },
+    "transcoding_status": {
+      "0": "PENDING",
+      "1": "PROCESSING",
+      "2": "DONE",
+      "3": "FAILED",
+      "4": "NOT_REQUIRED"
+    },
+    "scan_result": {
+      "0": "PENDING",
+      "1": "CLEAN",
+      "2": "INFECTED",
+      "3": "ERROR"
+    },
+    "minio_bucket": {
+      "0": "media-quarantine",
+      "1": "media-private",
+      "2": "media-public",
+      "3": "media-hls",
+      "4": "media-thumbnails"
+    },
+    "mime_type": {
+      "0": "image/jpeg",
+      "1": "image/png",
+      "2": "image/webp",
+      "3": "video/mp4",
+      "4": "application/pdf"
+    },
+    "legal_form": {},
+    "compliance_status": {
+      "0": "ACTIVE",
+      "1": "SUSPENDED_TEMP",
+      "2": "BANNED_PERMANENT"
+    },
+    "license_type": {
+      "0": "OPERATIONS_UI_MANAGEMENT",
+      "1": "FINANCE_BANK_AGREEMENTS",
+      "2": "VERIFICATION_INTERVIEWS"
+    },
+    "license_status": {
+      "0": "ACTIVE",
+      "1": "SUSPENDED",
+      "2": "CANCELLED",
+      "3": "EXPIRED"
+    },
+    "partner_bank_status": {
+      "0": "PENDING",
+      "1": "ACTIVE",
+      "2": "SUSPENDED",
+      "3": "TERMINATED",
+      "4": "EXPIRED"
+    },
+    "account_type": {},
+    "account_role": {
+      "0": "OWN_EXTERNAL",
+      "1": "PLATFORM_RESERVE",
+      "2": "PLATFORM_OPERATING"
+    },
+    "verification_status": {
+      "0": "PENDING",
+      "1": "VERIFIED",
+      "2": "REJECTED"
+    },
+    "account_category": {
+      "0": "ASSET",
+      "1": "LIABILITY",
+      "2": "EQUITY",
+      "3": "REVENUE",
+      "4": "EXPENSE"
+    },
+    "journal_entry_status": {
+      "0": "DRAFT",
+      "1": "POSTED",
+      "2": "REVERSED"
+    },
+    "journal_reference_type": {},
+    "ledger_side": {
+      "0": "DEBIT",
+      "1": "CREDIT"
+    },
+    "document_type": {
+      "0": "PASSPORT",
+      "1": "NATIONAL_ID",
+      "2": "RESIDENCE_PERMIT",
+      "3": "CITIZENSHIP_CERTIFICATE"
+    },
+    "wallet_type": {
+      "0": "USER",
+      "1": "INSTITUTION",
+      "2": "WORKER"
+    },
+    "wallet_status": {
+      "0": "ACTIVE",
+      "1": "PENDING_CLOSURE",
+      "2": "CLOSED",
+      "3": "FROZEN"
+    },
+    "wallet_closure_reason": {},
+    "transaction_type": {},
+    "transaction_status": {
+      "0": "PENDING",
+      "1": "COMPLETED",
+      "2": "FAILED",
+      "3": "REVERSED",
+      "4": "CANCELLED"
+    },
+    "jurisdiction_rule_code": {
+      "0": "EMPLOYMENT_NOTICE",
+      "1": "EMPLOYMENT_SEVERANCE",
+      "2": "LEAVE_PAYOUT",
+      "3": "PARTNER_EXIT_ENTITLEMENT",
+      "4": "DISPUTE_PROCESS"
+    },
+    "jurisdiction_rule_domain": {
+      "0": "EMPLOYEE_EXIT",
+      "1": "PARTNER_EXIT",
+      "2": "DISPUTE_ARBITRATION"
+    },
+    "termination_type": {},
+    "position_type": {},
+    "partner_type": {},
+    "sla_metric_type": {
+      "0": "DELIVERY_LATENCY",
+      "1": "UPTIME_PERCENTAGE",
+      "2": "RESPONSE_TIME"
+    },
+    "measurement_unit": {
+      "0": "MINUTES",
+      "1": "PERCENTAGE",
+      "2": "HOURS"
+    },
+    "verification_level": {
+      "0": "A1_EMAIL",
+      "1": "A2_PHONE",
+      "2": "B1_LOCAL_DOCUMENT",
+      "3": "B2_GLOBAL_DOCUMENT",
+      "4": "C1_ADVANCED"
+    },
+    "verification_level_status": {
+      "0": "VALID",
+      "1": "EXPIRED",
+      "2": "REVOKED"
+    },
+    "verification_method": {
+      "0": "IN_PERSON",
+      "1": "LIVE_CALL"
+    },
+    "identity_session_status": {
+      "0": "SCHEDULED",
+      "1": "COMPLETED",
+      "2": "CANCELLED",
+      "3": "NO_SHOW"
+    },
+    "verification_operation": {},
+    "campaign_scope": {
+      "0": "INTRA",
+      "1": "CROSS",
+      "2": "GLOBAL"
+    },
+    "discount_type": {
+      "0": "PERCENTAGE",
+      "1": "FIXED_AMOUNT"
+    },
+    "user_badge_level": {},
+    "consortium_type": {},
+    "consortium_member_role": {
+      "0": "MEMBER",
+      "1": "FOUNDER",
+      "2": "RESOURCE_PROVIDER"
+    },
+    "resource_type": {
+      "0": "VEHICLES",
+      "1": "LIQUIDITY"
+    },
+    "resource_unit": {
+      "0": "UNIT",
+      "1": "VEHICLE"
+    },
+    "agreement_target": {
+      "0": "EMPLOYEES",
+      "1": "SHAREHOLDERS",
+      "2": "SUPPLY"
+    },
+    "resource_usage_status": {
+      "0": "PENDING",
+      "1": "APPROVED",
+      "2": "REJECTED"
+    },
+    "filing_status": {
+      "0": "OPEN",
+      "1": "FILED",
+      "2": "PAID",
+      "3": "OVERDUE"
+    },
+    "accrual_kind": {
+      "0": "ACCRUAL",
+      "1": "REVERSAL",
+      "2": "PENALTY"
+    },
+    "business_category": {
+      "0": "FURNITURE",
+      "1": "FOOD"
+    },
+    "privilege_tier_code": {
+      "0": "FEATURED_ELIGIBLE",
+      "1": "PRIORITY_SUPPORT",
+      "2": "RELAXED_REVIEW_WINDOW"
+    },
+    "privilege_basis": {
+      "0": "AVERAGE_SCORE",
+      "1": "TRANSACTION_VOLUME",
+      "2": "COMPLIANCE_SCORE"
+    },
+    "formation_application_status": {
+      "0": "PENDING",
+      "1": "APPROVED",
+      "2": "REJECTED"
+    },
+    "branch_application_status": {
+      "0": "PENDING",
+      "1": "APPROVED",
+      "2": "REJECTED"
+    },
+    "permit_type": {
+      "0": "BUSINESS_OPERATION",
+      "1": "FOOD",
+      "2": "HEALTH",
+      "3": "TRADE_REGISTRY"
+    },
+    "payroll_status": {
+      "0": "DRAFT",
+      "1": "APPROVED",
+      "2": "PAID",
+      "3": "CANCELLED"
+    },
+    "payroll_line_type": {
+      "0": "BASE_SALARY",
+      "1": "COMMISSION",
+      "2": "INCOME_TAX",
+      "3": "SOCIAL_SECURITY",
+      "4": "OTHER_TAX",
+      "5": "OTHER_DEDUCTION",
+      "6": "NET_PAYMENT"
+    },
+    "distribution_status": {
+      "0": "PENDING_APPROVAL",
+      "1": "APPROVED",
+      "2": "DISTRIBUTED",
+      "3": "CANCELLED"
+    },
+    "movement_direction": {
+      "0": "INBOUND",
+      "1": "OUTBOUND"
+    },
+    "bank_movement_status": {
+      "0": "UNMATCHED",
+      "1": "MATCHED",
+      "2": "REFUNDED",
+      "3": "CANCELLED"
+    },
+    "deposit_request_status": {
+      "0": "AWAITING_TRANSFER",
+      "1": "RECEIPT_UPLOADED",
+      "2": "UNDER_REVIEW",
+      "3": "COMPLETED",
+      "4": "REJECTED",
+      "5": "EXPIRED"
+    },
+    "reconciliation_status": {
+      "0": "PENDING",
+      "1": "BALANCED",
+      "2": "DIFFERENCE",
+      "3": "DIFFERENCE_EXPLAINED"
+    },
+    "tax_remittance_status": {
+      "0": "PENDING",
+      "1": "SUBMITTED",
+      "2": "CONFIRMED",
+      "3": "FAILED",
+      "4": "CANCELLED"
+    }
+  },
+  "columns": {
+    "sync_routing_rules.target_systems": "sync_target",
+    "sync_outbox.target_systems": "sync_target",
+    "sync_outbox.operation": "data_operation",
+    "sync_outbox.sync_outbox_status": "sync_outbox_status",
+    "audit_logs.action": "data_operation",
+    "supported_currencies.currency_code": "currency_code",
+    "government_tax_authorities.country_code": "country_code",
+    "government_tax_authorities.accepted_currency": "currency_code",
+    "tax_rates_and_rules.country_code": "country_code",
+    "tax_rates_and_rules.state_or_region": "state_or_region",
+    "tax_rates_and_rules.tax_type": "tax_type",
+    "tax_rates_and_rules.category_code": "tax_category",
+    "users.nationality_country_code": "country_code",
+    "users.gender": "gender",
+    "users.provisioning_status": "provisioning_status",
+    "genesis_audit_log.action": "genesis_action",
+    "genesis_audit_log.modules_added": "genesis_module",
+    "approvals.requester_role": "requester_role",
+    "approvals.approval_type": "approval_type",
+    "approvals.approval_status": "approval_status",
+    "approval_eligible_voters.voter_type": "voter_type",
+    "approval_votes.voter_type": "voter_type",
+    "mqtt_acl.rw": "mqtt_access",
+    "media_assets.category": "media_category",
+    "media_assets.entity_type": "media_entity_type",
+    "media_assets.visibility": "media_visibility",
+    "media_assets.minio_bucket": "minio_bucket",
+    "media_assets.transcoding_status": "transcoding_status",
+    "media_assets.scan_result": "scan_result",
+    "media_assets.mime_type": "mime_type",
+    "media_assets.media_status": "media_status",
+    "institutions.legal_form": "legal_form",
+    "institutions.country_code": "country_code",
+    "institutions.currency": "currency_code",
+    "institutions.compliance_status": "compliance_status",
+    "license_types.license_type": "license_type",
+    "institution_licenses.license_type": "license_type",
+    "institution_licenses.country_code": "country_code",
+    "institution_licenses.license_status": "license_status",
+    "partner_banks.country_code": "country_code",
+    "partner_banks.partner_bank_status": "partner_bank_status",
+    "real_world_accounts.account_type": "account_type",
+    "real_world_accounts.account_role": "account_role",
+    "real_world_accounts.country_code": "country_code",
+    "real_world_accounts.currency": "currency_code",
+    "real_world_accounts.verification_status": "verification_status",
+    "chart_of_accounts.account_category": "account_category",
+    "chart_of_accounts.currency": "currency_code",
+    "journal_entries.reference_type": "journal_reference_type",
+    "journal_entries.journal_entry_status": "journal_entry_status",
+    "journal_entry_lines.currency": "currency_code",
+    "user_country_documents.country_code": "country_code",
+    "user_country_documents.document_type": "document_type",
+    "user_country_documents.verification_status": "verification_status",
+    "wallets.wallet_type": "wallet_type",
+    "wallets.currency": "currency_code",
+    "wallets.wallet_status": "wallet_status",
+    "wallets.closure_reason": "wallet_closure_reason",
+    "transactions.currency": "currency_code",
+    "transactions.tx_type": "transaction_type",
+    "transactions.transaction_status": "transaction_status",
+    "jurisdiction_rule_types.rule_code": "jurisdiction_rule_code",
+    "jurisdiction_rule_types.rule_domain": "jurisdiction_rule_domain",
+    "jurisdiction_rules.country_code": "country_code",
+    "jurisdiction_rules.state_or_region": "state_or_region",
+    "jurisdiction_rules.rule_code": "jurisdiction_rule_code",
+    "jurisdiction_rules.termination_type": "termination_type",
+    "jurisdiction_rules.position_type": "position_type",
+    "institution_shareholders.partner_type": "partner_type",
+    "institution_sla_metrics.metric_type": "sla_metric_type",
+    "institution_sla_metrics.unit_of_measure": "measurement_unit",
+    "institution_sla_metrics.penalty_currency": "currency_code",
+    "institution_branches.country_code": "country_code",
+    "worker_institution_positions.position_type": "position_type",
+    "worker_institution_positions.currency": "currency_code",
+    "worker_institution_positions.termination_type": "termination_type",
+    "identity_verification_sessions.verification_method": "verification_method",
+    "identity_verification_sessions.target_verification_tier": "verification_level",
+    "identity_verification_sessions.session_status": "identity_session_status",
+    "user_verification_levels.verification_level": "verification_level",
+    "user_verification_levels.verification_status": "verification_level_status",
+    "verification_requirements.operation_type": "verification_operation",
+    "verification_requirements.country_code": "country_code",
+    "verification_requirements.required_level": "verification_level",
+    "promotions.campaign_scope": "campaign_scope",
+    "promotions.discount_type": "discount_type",
+    "promotions.currency": "currency_code",
+    "promotions.required_user_badge_level": "user_badge_level",
+    "promotion_redemptions.currency": "currency_code",
+    "consortiums.consortium_type": "consortium_type",
+    "consortium_members.member_role": "consortium_member_role",
+    "consortium_resource_pools.resource_type": "resource_type",
+    "consortium_resource_pools.unit_symbol": "resource_unit",
+    "consortium_resource_pools.currency": "currency_code",
+    "b2b_corporate_agreements.agreement_target": "agreement_target",
+    "consortium_resource_usage.currency": "currency_code",
+    "consortium_resource_usage.consortium_resource_usage_status": "resource_usage_status",
+    "institution_government_tax_accounts.currency": "currency_code",
+    "tax_filing_periods.currency": "currency_code",
+    "tax_filing_periods.filing_status": "filing_status",
+    "tax_accruals.accrual_kind": "accrual_kind",
+    "tax_accruals.currency": "currency_code",
+    "institution_privilege_tiers.category_code": "business_category",
+    "institution_privilege_tiers.tier_code": "privilege_tier_code",
+    "institution_privilege_tiers.basis": "privilege_basis",
+    "institution_privilege_grants.category_code": "business_category",
+    "institution_formation_applications.country_code": "country_code",
+    "institution_formation_applications.legal_form": "legal_form",
+    "institution_formation_applications.institution_formation_application_status": "formation_application_status",
+    "institution_branch_applications.country_code": "country_code",
+    "institution_branch_applications.institution_branch_application_status": "branch_application_status",
+    "institution_business_permits.country_code": "country_code",
+    "institution_business_permits.permit_type": "permit_type",
+    "institution_business_permits.verification_status": "verification_status",
+    "payroll_runs.currency": "currency_code",
+    "payroll_runs.payroll_status": "payroll_status",
+    "payroll_lines.line_type": "payroll_line_type",
+    "profit_distributions.currency": "currency_code",
+    "profit_distributions.distribution_status": "distribution_status",
+    "real_world_account_movements.direction": "movement_direction",
+    "real_world_account_movements.currency": "currency_code",
+    "real_world_account_movements.movement_status": "bank_movement_status",
+    "institution_deposit_requests.currency": "currency_code",
+    "institution_deposit_requests.deposit_request_status": "deposit_request_status",
+    "reserve_reconciliations.reconciliation_status": "reconciliation_status",
+    "government_tax_remittances.currency": "currency_code",
+    "government_tax_remittances.government_tax_remittance_status": "tax_remittance_status"
+  }
+}
