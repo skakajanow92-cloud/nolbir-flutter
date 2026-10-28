@@ -99,6 +99,46 @@
       "source": "institution_privilege_grants",
       "description": "Kurumun geçerli imtiyazları, gösterim amaçlı. Komisyon indirimi gibi parasal etkiler Redis'ten değil Postgres'ten uygulanır.",
       "invalidate": "institution_privilege_grants olayında ilgili kurumun anahtarı DEL"
+    },
+    {
+      "pattern": "ref:commissions",
+      "type": "hash",
+      "ttl": "1h",
+      "source": "system_commissions",
+      "fields": "<currency>:<userType>:<txType> -> JSON { baseRate, promoRate, promoExpiry }",
+      "description": "Komisyon oranları, gösterim/teklif amaçlı. promo_expiry okuma anında uygulanır. Fiilen kesilen komisyon her zaman Postgres'te hesaplanır.",
+      "invalidate": "system_commissions olayında DEL"
+    },
+    {
+      "pattern": "ref:feature_flags",
+      "type": "hash",
+      "ttl": "1h",
+      "source": "system_feature_flags",
+      "fields": "<featureKey> -> JSON { isEnabled, rules }",
+      "description": "Arayüzü şekillendiren bayraklar. Para hareketini durduran kill-switch'ler Redis'ten değil Postgres'ten kontrol edilir (senkronizasyon gecikirse anahtar etkisiz kalmasın).",
+      "invalidate": "system_feature_flags olayında DEL"
+    },
+    {
+      "pattern": "ref:fx:{baseCurrency}:{targetCurrency}",
+      "type": "hash",
+      "ttl": "5m",
+      "source": "currency_exchange_rates",
+      "fields": [
+        "sourceId",
+        "buyRate",
+        "sellRate",
+        "fetchedAt"
+      ],
+      "description": "Çift için en güncel kur. Kaynak önceliği ve max_rate_age_seconds okuma anında uygulanır; okuyucu Postgres'ten kurar (kurlar Mongo'ya gitmez).",
+      "invalidate": "currency_exchange_rates INSERT olayında ilgili çiftin anahtarı DEL"
+    },
+    {
+      "pattern": "ref:commission_rules",
+      "type": "string(json)",
+      "ttl": "1h",
+      "source": "commission_rules",
+      "description": "Aktif komisyon kuralları, gösterim/teklif amaçlı. Geçerlilik tarihi (effectiveFrom/Until) okuma anında uygulanır. Kesilen komisyon her zaman Postgres'te hesaplanır.",
+      "invalidate": "commission_rules olayında DEL"
     }
   ]
 }

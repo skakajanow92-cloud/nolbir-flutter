@@ -77,7 +77,6 @@
       "2": "READ_WRITE"
     },
     "media_category": {},
-    "media_entity_type": {},
     "media_visibility": {
       "0": "PRIVATE",
       "1": "PUBLIC"
@@ -162,7 +161,6 @@
       "1": "POSTED",
       "2": "REVERSED"
     },
-    "journal_reference_type": {},
     "ledger_side": {
       "0": "DEBIT",
       "1": "CREDIT"
@@ -367,6 +365,114 @@
       "2": "CONFIRMED",
       "3": "FAILED",
       "4": "CANCELLED"
+    },
+    "voucher_batch_status": {
+      "0": "PENDING_APPROVAL",
+      "1": "APPROVED",
+      "2": "ISSUED",
+      "3": "CANCELLED"
+    },
+    "wallet_hold_purpose": {
+      "0": "ORDER",
+      "1": "BID",
+      "2": "RESERVATION"
+    },
+    "wallet_hold_status": {
+      "0": "ACTIVE",
+      "1": "RELEASED",
+      "2": "CAPTURED",
+      "3": "EXPIRED"
+    },
+    "reference_entity_type": {},
+    "escrow_status": {
+      "0": "HELD",
+      "1": "RELEASED",
+      "2": "REFUNDED",
+      "3": "DISPUTED",
+      "4": "EXPIRED"
+    },
+    "worker_permission_key": {},
+    "feature_key": {},
+    "gdpr_request_type": {
+      "0": "ANONYMIZATION",
+      "1": "DATA_EXPORT",
+      "2": "ERASURE"
+    },
+    "gdpr_request_status": {
+      "0": "PENDING",
+      "1": "UNDER_REVIEW",
+      "2": "APPROVED",
+      "3": "REJECTED",
+      "4": "COMPLETED"
+    },
+    "exchange_source_type": {
+      "0": "CENTRAL_BANK",
+      "1": "COMMERCIAL_BANK",
+      "2": "MARKET_PROVIDER"
+    },
+    "conversion_reason": {
+      "0": "USER_REQUEST",
+      "1": "WALLET_CLOSURE"
+    },
+    "conversion_status": {
+      "0": "QUOTE",
+      "1": "COMPLETED",
+      "2": "EXPIRED",
+      "3": "CANCELLED"
+    },
+    "commission_actor_type": {
+      "0": "USER",
+      "1": "WORKER",
+      "2": "INSTITUTION"
+    },
+    "commission_type": {
+      "0": "PERCENTAGE",
+      "1": "FIXED_AMOUNT"
+    },
+    "operating_rule_key": {},
+    "compliance_result": {
+      "0": "PASS",
+      "1": "FAIL",
+      "2": "WARNING"
+    },
+    "dispute_type": {
+      "0": "DISPUTE",
+      "1": "REFUND_REQUEST",
+      "2": "ESCROW_RESOLUTION"
+    },
+    "dispute_reason": {
+      "0": "DEFECTIVE_SERVICE",
+      "1": "NON_DELIVERY",
+      "2": "FRAUD_SUSPECT"
+    },
+    "dispute_status": {
+      "0": "OPEN",
+      "1": "UNDER_REVIEW",
+      "2": "APPROVED",
+      "3": "REJECTED",
+      "4": "CANCELLED"
+    },
+    "complaint_reason_category": {},
+    "complaint_status": {
+      "0": "OPEN",
+      "1": "UNDER_REVIEW",
+      "2": "RESOLVED",
+      "3": "DISMISSED"
+    },
+    "notification_sender_type": {
+      "0": "SYSTEM",
+      "1": "INSTITUTION"
+    },
+    "notification_target_scope": {
+      "0": "ALL_USERS",
+      "1": "INSTITUTION",
+      "2": "SPECIFIC_USERS",
+      "3": "FILTERED"
+    },
+    "notification_severity": {
+      "0": "INFO",
+      "1": "WARNING",
+      "2": "CRITICAL"
     }
   },
   "columns": {
@@ -394,7 +500,7 @@
     "approval_votes.voter_type": "voter_type",
     "mqtt_acl.rw": "mqtt_access",
     "media_assets.category": "media_category",
-    "media_assets.entity_type": "media_entity_type",
+    "media_assets.entity_type": "reference_entity_type",
     "media_assets.visibility": "media_visibility",
     "media_assets.minio_bucket": "minio_bucket",
     "media_assets.transcoding_status": "transcoding_status",
@@ -418,7 +524,7 @@
     "real_world_accounts.verification_status": "verification_status",
     "chart_of_accounts.account_category": "account_category",
     "chart_of_accounts.currency": "currency_code",
-    "journal_entries.reference_type": "journal_reference_type",
+    "journal_entries.reference_type": "reference_entity_type",
     "journal_entries.journal_entry_status": "journal_entry_status",
     "journal_entry_lines.currency": "currency_code",
     "user_country_documents.country_code": "country_code",
@@ -496,6 +602,53 @@
     "institution_deposit_requests.deposit_request_status": "deposit_request_status",
     "reserve_reconciliations.reconciliation_status": "reconciliation_status",
     "government_tax_remittances.currency": "currency_code",
-    "government_tax_remittances.government_tax_remittance_status": "tax_remittance_status"
+    "government_tax_remittances.government_tax_remittance_status": "tax_remittance_status",
+    "voucher_batches.currency": "currency_code",
+    "voucher_batches.batch_status": "voucher_batch_status",
+    "vouchers.currency": "currency_code",
+    "system_commissions.currency": "currency_code",
+    "system_commissions.user_type": "wallet_type",
+    "system_commissions.tx_type": "transaction_type",
+    "wallet_holds.currency": "currency_code",
+    "wallet_holds.purpose": "wallet_hold_purpose",
+    "wallet_holds.reference_type": "reference_entity_type",
+    "wallet_holds.wallet_hold_status": "wallet_hold_status",
+    "escrow_records.currency": "currency_code",
+    "escrow_records.escrow_status": "escrow_status",
+    "worker_permission_catalog.permission_key": "worker_permission_key",
+    "gdpr_anonymization_requests.request_type": "gdpr_request_type",
+    "gdpr_anonymization_requests.request_status": "gdpr_request_status",
+    "system_feature_flags.feature_key": "feature_key",
+    "exchange_rate_sources.country_code": "country_code",
+    "exchange_rate_sources.source_type": "exchange_source_type",
+    "currency_exchange_rates.base_currency": "currency_code",
+    "currency_exchange_rates.target_currency": "currency_code",
+    "currency_conversions.from_wallet_type": "wallet_type",
+    "currency_conversions.to_wallet_type": "wallet_type",
+    "currency_conversions.from_currency": "currency_code",
+    "currency_conversions.to_currency": "currency_code",
+    "currency_conversions.conversion_reason": "conversion_reason",
+    "currency_conversions.conversion_status": "conversion_status",
+    "commission_rules.category_code": "business_category",
+    "commission_rules.actor_type": "commission_actor_type",
+    "commission_rules.commission_type": "commission_type",
+    "commission_rules.currency": "currency_code",
+    "transaction_commissions.charged_actor_type": "commission_actor_type",
+    "transaction_commissions.currency": "currency_code",
+    "institution_operating_rules.category_code": "business_category",
+    "institution_operating_rules.rule_key": "operating_rule_key",
+    "institution_compliance_checks.check_result": "compliance_result",
+    "transaction_disputes_and_refunds.dispute_type": "dispute_type",
+    "transaction_disputes_and_refunds.currency": "currency_code",
+    "transaction_disputes_and_refunds.reason_code": "dispute_reason",
+    "transaction_disputes_and_refunds.transaction_dispute_and_refund_status": "dispute_status",
+    "complaints.reporter_role": "requester_role",
+    "complaints.target_role": "requester_role",
+    "complaints.reason_category": "complaint_reason_category",
+    "complaints.complaint_status": "complaint_status",
+    "notification_campaigns.sender_type": "notification_sender_type",
+    "notification_campaigns.target_scope": "notification_target_scope",
+    "notification_campaigns.target_nationality_codes": "country_code",
+    "notification_campaigns.notification_campaign_severity": "notification_severity"
   }
 }

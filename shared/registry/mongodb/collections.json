@@ -1806,6 +1806,541 @@
           "sparse": true
         }
       ]
+    },
+    {
+      "name": "voucher_batches",
+      "table": "voucher_batches",
+      "key": {
+        "id": "id"
+      },
+      "exclude": [
+        "created_by_user_id",
+        "approved_by_user_id"
+      ],
+      "indexes": [
+        {
+          "name": "uq_vb_id",
+          "key": {
+            "id": 1
+          },
+          "unique": true
+        },
+        {
+          "name": "ix_vb_issuer",
+          "key": {
+            "issuerInstitutionId": 1,
+            "createdAt": -1
+          }
+        },
+        {
+          "name": "ix_vb_status",
+          "key": {
+            "batchStatus": 1
+          }
+        }
+      ]
+    },
+    {
+      "name": "system_commissions",
+      "table": "system_commissions",
+      "key": {
+        "id": "id"
+      },
+      "exclude": [
+        "updated_by_user_id"
+      ],
+      "indexes": [
+        {
+          "name": "uq_sc_id",
+          "key": {
+            "id": 1
+          },
+          "unique": true
+        },
+        {
+          "name": "uq_sc_scope",
+          "key": {
+            "currency": 1,
+            "userType": 1,
+            "txType": 1
+          },
+          "unique": true
+        }
+      ]
+    },
+    {
+      "name": "escrow_records",
+      "table": "escrow_records",
+      "key": {
+        "id": "id"
+      },
+      "exclude": [],
+      "notes": "Postgres PK (id, created_at) bileşik; outbox aggregate_id yalnızca id'dir (UUID).",
+      "indexes": [
+        {
+          "name": "uq_escrow_id",
+          "key": {
+            "id": 1
+          },
+          "unique": true
+        },
+        {
+          "name": "ix_escrow_payer",
+          "key": {
+            "payerWalletId": 1,
+            "createdAt": -1
+          }
+        },
+        {
+          "name": "ix_escrow_payee",
+          "key": {
+            "payeeWalletId": 1,
+            "createdAt": -1
+          }
+        },
+        {
+          "name": "ix_escrow_tx",
+          "key": {
+            "transactionId": 1
+          }
+        },
+        {
+          "name": "ix_escrow_status_expiry",
+          "key": {
+            "escrowStatus": 1,
+            "expiresAt": 1
+          }
+        }
+      ]
+    },
+    {
+      "name": "worker_permission_catalog",
+      "table": "worker_permission_catalog",
+      "key": {
+        "id": "id"
+      },
+      "exclude": [],
+      "indexes": [
+        {
+          "name": "uq_wpc_id",
+          "key": {
+            "id": 1
+          },
+          "unique": true
+        },
+        {
+          "name": "uq_wpc_key",
+          "key": {
+            "permissionKey": 1
+          },
+          "unique": true
+        },
+        {
+          "name": "ix_wpc_active",
+          "key": {
+            "isActive": 1
+          }
+        }
+      ]
+    },
+    {
+      "name": "worker_position_permissions",
+      "table": "worker_position_permissions",
+      "key": {
+        "id": "id"
+      },
+      "exclude": [
+        "granted_by_user_id",
+        "revoked_by_user_id"
+      ],
+      "indexes": [
+        {
+          "name": "uq_wpp_id",
+          "key": {
+            "id": 1
+          },
+          "unique": true
+        },
+        {
+          "name": "uq_wpp_position_permission",
+          "key": {
+            "positionId": 1,
+            "permissionId": 1
+          },
+          "unique": true
+        },
+        {
+          "name": "ix_wpp_position_active",
+          "key": {
+            "positionId": 1,
+            "isActive": 1
+          }
+        }
+      ]
+    },
+    {
+      "name": "system_feature_flags",
+      "table": "system_feature_flags",
+      "key": {
+        "id": "id"
+      },
+      "exclude": [
+        "updated_by_user_id"
+      ],
+      "indexes": [
+        {
+          "name": "uq_sff_id",
+          "key": {
+            "id": 1
+          },
+          "unique": true
+        },
+        {
+          "name": "uq_sff_key",
+          "key": {
+            "featureKey": 1
+          },
+          "unique": true
+        }
+      ]
+    },
+    {
+      "name": "exchange_rate_sources",
+      "table": "exchange_rate_sources",
+      "key": {
+        "id": "id"
+      },
+      "exclude": [],
+      "indexes": [
+        {
+          "name": "uq_ers_id",
+          "key": {
+            "id": 1
+          },
+          "unique": true
+        },
+        {
+          "name": "ix_ers_country",
+          "key": {
+            "countryCode": 1,
+            "isActive": 1,
+            "priority": 1
+          }
+        }
+      ]
+    },
+    {
+      "name": "currency_conversions",
+      "table": "currency_conversions",
+      "key": {
+        "id": "id"
+      },
+      "exclude": [],
+      "indexes": [
+        {
+          "name": "uq_cc_id",
+          "key": {
+            "id": 1
+          },
+          "unique": true
+        },
+        {
+          "name": "ix_cc_user",
+          "key": {
+            "userId": 1,
+            "createdAt": -1
+          }
+        },
+        {
+          "name": "ix_cc_status_expiry",
+          "key": {
+            "conversionStatus": 1,
+            "quoteExpiresAt": 1
+          }
+        }
+      ]
+    },
+    {
+      "name": "commission_rules",
+      "table": "commission_rules",
+      "key": {
+        "id": "id"
+      },
+      "exclude": [],
+      "indexes": [
+        {
+          "name": "uq_cr_id",
+          "key": {
+            "id": 1
+          },
+          "unique": true
+        },
+        {
+          "name": "ix_cr_lookup",
+          "key": {
+            "categoryCode": 1,
+            "actorType": 1,
+            "isActive": 1
+          }
+        }
+      ]
+    },
+    {
+      "name": "transaction_commissions",
+      "table": "transaction_commissions",
+      "key": {
+        "id": "id"
+      },
+      "exclude": [],
+      "indexes": [
+        {
+          "name": "uq_tc_id",
+          "key": {
+            "id": 1
+          },
+          "unique": true
+        },
+        {
+          "name": "ix_tc_tx",
+          "key": {
+            "transactionId": 1
+          }
+        },
+        {
+          "name": "ix_tc_user",
+          "key": {
+            "chargedUserId": 1,
+            "createdAt": -1
+          },
+          "sparse": true
+        },
+        {
+          "name": "ix_tc_institution",
+          "key": {
+            "chargedInstitutionId": 1,
+            "createdAt": -1
+          },
+          "sparse": true
+        },
+        {
+          "name": "ix_tc_wallet",
+          "key": {
+            "systemWalletId": 1,
+            "createdAt": -1
+          },
+          "sparse": true
+        }
+      ]
+    },
+    {
+      "name": "institution_operating_rules",
+      "table": "institution_operating_rules",
+      "key": {
+        "id": "id"
+      },
+      "exclude": [],
+      "indexes": [
+        {
+          "name": "uq_ior_id",
+          "key": {
+            "id": 1
+          },
+          "unique": true
+        },
+        {
+          "name": "uq_ior_rule",
+          "key": {
+            "categoryCode": 1,
+            "ruleKey": 1
+          },
+          "unique": true
+        },
+        {
+          "name": "ix_ior_lookup",
+          "key": {
+            "categoryCode": 1,
+            "isActive": 1
+          }
+        }
+      ]
+    },
+    {
+      "name": "institution_compliance_checks",
+      "table": "institution_compliance_checks",
+      "key": {
+        "id": "id"
+      },
+      "exclude": [],
+      "indexes": [
+        {
+          "name": "uq_icc_id",
+          "key": {
+            "id": 1
+          },
+          "unique": true
+        },
+        {
+          "name": "ix_icc_institution",
+          "key": {
+            "institutionId": 1,
+            "checkedAt": -1
+          }
+        },
+        {
+          "name": "ix_icc_result",
+          "key": {
+            "checkResult": 1,
+            "checkedAt": -1
+          }
+        }
+      ]
+    },
+    {
+      "name": "transaction_disputes_and_refunds",
+      "table": "transaction_disputes_and_refunds",
+      "key": {
+        "id": "id"
+      },
+      "exclude": [
+        "resolved_by_user_id"
+      ],
+      "indexes": [
+        {
+          "name": "uq_tdr_id",
+          "key": {
+            "id": 1
+          },
+          "unique": true
+        },
+        {
+          "name": "ix_tdr_tx",
+          "key": {
+            "transactionId": 1
+          }
+        },
+        {
+          "name": "ix_tdr_user",
+          "key": {
+            "requestedByUserId": 1,
+            "createdAt": -1
+          }
+        },
+        {
+          "name": "ix_tdr_status",
+          "key": {
+            "transactionDisputeAndRefundStatus": 1,
+            "createdAt": -1
+          }
+        }
+      ]
+    },
+    {
+      "name": "complaints",
+      "table": "complaints",
+      "key": {
+        "id": "id"
+      },
+      "exclude": [
+        "admin_note"
+      ],
+      "indexes": [
+        {
+          "name": "uq_complaints_id",
+          "key": {
+            "id": 1
+          },
+          "unique": true
+        },
+        {
+          "name": "ix_complaints_reporter",
+          "key": {
+            "reporterRootId": 1,
+            "createdAt": -1
+          }
+        },
+        {
+          "name": "ix_complaints_target",
+          "key": {
+            "targetRootId": 1,
+            "createdAt": -1
+          },
+          "sparse": true
+        },
+        {
+          "name": "ix_complaints_status_route",
+          "key": {
+            "complaintStatus": 1,
+            "routedTo": 1,
+            "createdAt": -1
+          }
+        }
+      ]
+    },
+    {
+      "name": "notification_campaigns",
+      "table": "notification_campaigns",
+      "key": {
+        "id": "id"
+      },
+      "exclude": [
+        "sender_user_id",
+        "target_user_ids"
+      ],
+      "indexes": [
+        {
+          "name": "uq_nc_id",
+          "key": {
+            "id": 1
+          },
+          "unique": true
+        },
+        {
+          "name": "ix_nc_created",
+          "key": {
+            "createdAt": -1
+          }
+        },
+        {
+          "name": "ix_nc_scope",
+          "key": {
+            "targetScope": 1,
+            "createdAt": -1
+          }
+        }
+      ]
+    },
+    {
+      "name": "notification_deliveries",
+      "table": "notification_deliveries",
+      "key": {
+        "id": "id"
+      },
+      "exclude": [],
+      "indexes": [
+        {
+          "name": "uq_nd_id",
+          "key": {
+            "id": 1
+          },
+          "unique": true
+        },
+        {
+          "name": "uq_nd_campaign_user",
+          "key": {
+            "campaignId": 1,
+            "userId": 1
+          },
+          "unique": true
+        },
+        {
+          "name": "ix_nd_inbox",
+          "key": {
+            "userId": 1,
+            "isRead": 1,
+            "createdAt": -1
+          }
+        }
+      ]
     }
   ]
 }

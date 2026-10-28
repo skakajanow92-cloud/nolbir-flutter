@@ -79,6 +79,14 @@
       "name": "media_transcode",
       "queue": "work.media_transcode",
       "binding": "media_transcode.media_assets.insert"
+    },
+    {
+      "name": "ai_analysis",
+      "queue": "work.ai_analysis",
+      "bindings": [
+        "ai_analysis.approvals.insert",
+        "ai_analysis.complaints.insert"
+      ]
     }
   ]
 }

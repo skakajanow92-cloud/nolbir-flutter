@@ -25,6 +25,11 @@
             "name": "reserve_metrics",
             "retentionSeconds": 0,
             "description": "Rezerv hesap mutabakat izleme (Grafana)."
+        },
+        {
+            "name": "fx_metrics",
+            "retentionSeconds": 0,
+            "description": "Kur geçmişi (Grafana). Hacim büyürse retention veya aşağı örnekleme eklenir."
         }
     ],
     "measurements": [
@@ -75,6 +80,22 @@
             },
             "timestamp": "as_of_date 00:00 UTC (ns)",
             "note": "Bu ölçümde bilerek outboxId eki yoktur: (hesap, tarih) tekil olduğu için UPDATE olayı aynı noktanın üstüne yazar. Durum etiket değil alan olduğundan seri çatallanmaz."
+        },
+        {
+            "bucket": "fx_metrics",
+            "name": "exchange_rates",
+            "source": "currency_exchange_rates (operation=INSERT)",
+            "tags": {
+                "source_id": "currency_exchange_rates.source_id",
+                "base_currency": "currency_code kodu",
+                "target_currency": "currency_code kodu"
+            },
+            "fields": {
+                "buy_rate": "float",
+                "sell_rate": "float"
+            },
+            "timestamp": "fetched_at (µs) * 1000 ns",
+            "note": "(source, base, target, fetched_at) Postgres'te tekil olduğu için outboxId eki gerekmez; tekrar teslim aynı noktanın üstüne yazar."
         }
     ]
 }
