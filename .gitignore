@@ -57,7 +57,7 @@ node_modules/
 
 #sunucu uzerindeki gizli yapilandirma ayarlari
 /shared/old
-env
+.env
 
 # Sanal Ortam Klasörleri (venv veya .venv)
 venv/
