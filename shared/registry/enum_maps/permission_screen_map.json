@@ -1,0 +1,5285 @@
+{
+ "version": 1,
+ "rules": [
+  "Yetki kararı yalnızca Postgres'ten (worker_position_permissions) verilir; Redis/Mongo gösterim içindir. Flutter ekran listesini yetkilerden türetir, ama her API çağrısı yetkiyi yeniden doğrular.",
+  "Kodlar: modül kodu = sıra*100; yetki ve ekran kodları modül kodu + 1..98 (yetkiler en fazla 48). Yetki ve ekran numaraları ayrı kod uzaylarıdır; aynı modül içinde yan yana yaşar. Mevcut kodlar değişmez ve silinmez, pasife alınır.",
+  "worker_permission_catalog.permission_key = permissions[].code; screen_key = permissions[].primary_screen (yetkiyi gerektiren ilk ekranın route'u). Ekran gösterimi için esas kaynak screens[].requires_all'dır: ekran, listedeki TÜM yetkiler pozisyonda aktifse görünür.",
+  "audience: INSTITUTION = kurum çalışma alanı (/inst/*), PLATFORM = platform şirketlerinin çalışma alanı (/ops, /fin, /verify, /arb, /audit), USER = herkesin kullanıcı uygulaması (/app/*, yetki gerektirmez).",
+  "required_licenses_any boş değilse modül yalnızca kurumun listedeki lisanslardan en az birine sahip olması halinde açılır; PLATFORM modülleri ilgili platform lisansını ister. Lisanssız kurumun ilgili yetkileri verilemez.",
+  "is_default_for_employee=true yetkiler maaşlı çalışana ve komisyonlu çalışana otomatik verilir (yalnızca INSTITUTION_PROFILE_VIEW, BRANCH_VIEW, EMPLOYEE_SELF_SERVICE). Ortak pozisyonlarında (position_type 2 ve 3) yetki preset'ten verilir.",
+  "four_eyes=true işlemlerde kaydı hazırlayan ile onaylayan aynı kişi olamaz (şemadaki chk_*_two_people kısıtlarıyla uyumlu). Aynı pozisyon hem hazırlama hem onay yetkisine sahip olabilir (yönetici ortak), ama kendi kaydını onaylayamaz.",
+  "is_sensitive=true yetkiler verilirken ve kullanılırken audit_logs'a yazılır; verilmesi WORKER_PERMISSIONS_MANAGE ister ve verenin kendisinde de aynı yetki olmalıdır.",
+  "Ortak oylaması (approval_votes) yetkiyle değil approval_eligible_voters ile belirlenir; BOARD_APPROVALS_VIEW yalnızca onay kuyruğunu görme yetkisidir, oy hakkı vermez.",
+  "enum_maps.worker_permission_key bu dosyadan üretilir (code -> key)."
+ ],
+ "four_eyes_pairs": [
+  {
+   "prepare": "PAYROLL_PREPARE",
+   "approve": "PAYROLL_APPROVE"
+  },
+  {
+   "prepare": "INSTITUTION_TRANSFER_INITIATE",
+   "approve": "INSTITUTION_TRANSFER_APPROVE"
+  },
+  {
+   "prepare": "DEPOSIT_VERIFY",
+   "approve": "DEPOSIT_APPROVE"
+  },
+  {
+   "prepare": "RESERVE_RECONCILE",
+   "approve": "RESERVE_RECONCILE_APPROVE"
+  },
+  {
+   "prepare": "VOUCHER_BATCH_CREATE",
+   "approve": "VOUCHER_BATCH_APPROVE"
+  },
+  {
+   "prepare": "CLAIM_PAYOUT_ISSUE",
+   "approve": "CLAIM_PAYOUT_APPROVE"
+  }
+ ],
+ "modules": [
+  {
+   "code": 100,
+   "key": "INSTITUTION_ADMIN",
+   "name": "Kurum Yönetimi",
+   "audience": "INSTITUTION",
+   "required_licenses_any": []
+  },
+  {
+   "code": 200,
+   "key": "BRANCH_MANAGEMENT",
+   "name": "Şube Yönetimi",
+   "audience": "INSTITUTION",
+   "required_licenses_any": []
+  },
+  {
+   "code": 300,
+   "key": "WORKFORCE_HR",
+   "name": "Personel ve İK",
+   "audience": "INSTITUTION",
+   "required_licenses_any": []
+  },
+  {
+   "code": 400,
+   "key": "PAYROLL",
+   "name": "Bordro",
+   "audience": "INSTITUTION",
+   "required_licenses_any": []
+  },
+  {
+   "code": 500,
+   "key": "FINANCE_ACCOUNTING",
+   "name": "Muhasebe",
+   "audience": "INSTITUTION",
+   "required_licenses_any": []
+  },
+  {
+   "code": 600,
+   "key": "WALLET_TREASURY",
+   "name": "Cüzdan ve Hazine",
+   "audience": "INSTITUTION",
+   "required_licenses_any": []
+  },
+  {
+   "code": 700,
+   "key": "TAX",
+   "name": "Vergi",
+   "audience": "INSTITUTION",
+   "required_licenses_any": []
+  },
+  {
+   "code": 800,
+   "key": "SALES_POS",
+   "name": "Kasa ve Satış",
+   "audience": "INSTITUTION",
+   "required_licenses_any": []
+  },
+  {
+   "code": 900,
+   "key": "LISTINGS_CATALOG",
+   "name": "İlan ve Katalog",
+   "audience": "INSTITUTION",
+   "required_licenses_any": []
+  },
+  {
+   "code": 1000,
+   "key": "INVENTORY",
+   "name": "Stok",
+   "audience": "INSTITUTION",
+   "required_licenses_any": []
+  },
+  {
+   "code": 1100,
+   "key": "ORDERS",
+   "name": "Sipariş Yönetimi",
+   "audience": "INSTITUTION",
+   "required_licenses_any": []
+  },
+  {
+   "code": 1200,
+   "key": "BOOKINGS",
+   "name": "Rezervasyon ve Randevu",
+   "audience": "INSTITUTION",
+   "required_licenses_any": []
+  },
+  {
+   "code": 1300,
+   "key": "LOGISTICS_OPS",
+   "name": "Sevkiyat ve Teslimat",
+   "audience": "INSTITUTION",
+   "required_licenses_any": [
+    "FREIGHT_LOGISTICS",
+    "CARGO_SHIPPING",
+    "COURIER_LAST_MILE",
+    "TAXI_RIDE_HAILING",
+    "VEHICLE_RENTAL"
+   ]
+  },
+  {
+   "code": 1400,
+   "key": "PRODUCTION_SUPPLY",
+   "name": "Üretim ve Hammadde",
+   "audience": "INSTITUTION",
+   "required_licenses_any": [
+    "MANUFACTURING",
+    "FOOD_PROCESSING",
+    "BAKERY_PATISSERIE",
+    "CATERING_FOOD_SERVICE",
+    "RESTAURANT_CAFE",
+    "FURNITURE_HOME_GOODS",
+    "CROP_FARMING",
+    "LIVESTOCK",
+    "FISHERY_AQUACULTURE"
+   ]
+  },
+  {
+   "code": 1500,
+   "key": "B2B_CONSORTIUM",
+   "name": "B2B ve Konsorsiyum",
+   "audience": "INSTITUTION",
+   "required_licenses_any": []
+  },
+  {
+   "code": 1600,
+   "key": "CUSTOMER_SERVICE",
+   "name": "Müşteri Hizmetleri",
+   "audience": "INSTITUTION",
+   "required_licenses_any": []
+  },
+  {
+   "code": 1700,
+   "key": "PROMOTIONS",
+   "name": "Promosyon ve Bildirim",
+   "audience": "INSTITUTION",
+   "required_licenses_any": []
+  },
+  {
+   "code": 1800,
+   "key": "GOVERNANCE",
+   "name": "Ortaklık ve Yönetişim",
+   "audience": "INSTITUTION",
+   "required_licenses_any": []
+  },
+  {
+   "code": 1900,
+   "key": "COMPLIANCE_LEGAL",
+   "name": "Uyum ve Sözleşmeler",
+   "audience": "INSTITUTION",
+   "required_licenses_any": []
+  },
+  {
+   "code": 2000,
+   "key": "ASSETS",
+   "name": "Varlık Yönetimi",
+   "audience": "INSTITUTION",
+   "required_licenses_any": []
+  },
+  {
+   "code": 2100,
+   "key": "INSURANCE_OPS",
+   "name": "Sigorta Operasyonları",
+   "audience": "INSTITUTION",
+   "required_licenses_any": [
+    "INSURANCE_PROVIDER",
+    "INSURANCE_AGENCY"
+   ]
+  },
+  {
+   "code": 2200,
+   "key": "EDUCATION_OPS",
+   "name": "Eğitim Operasyonları",
+   "audience": "INSTITUTION",
+   "required_licenses_any": [
+    "SCHOOL_K12",
+    "HIGHER_EDUCATION",
+    "VOCATIONAL_TRAINING",
+    "COURSES_TUTORING",
+    "ONLINE_EDUCATION"
+   ]
+  },
+  {
+   "code": 2300,
+   "key": "MEDIA_CONTENT",
+   "name": "İçerik Yönetimi",
+   "audience": "INSTITUTION",
+   "required_licenses_any": [
+    "NEWS_MEDIA",
+    "STREAMING_VIDEO",
+    "DOCUMENTARY_PRODUCTION",
+    "MUSIC_PUBLISHING",
+    "GAMES_ENTERTAINMENT",
+    "ONLINE_EDUCATION"
+   ]
+  },
+  {
+   "code": 2400,
+   "key": "BETTING_OPS",
+   "name": "Bahis Operasyonları",
+   "audience": "INSTITUTION",
+   "required_licenses_any": [
+    "BETTING_GAMING"
+   ]
+  },
+  {
+   "code": 2500,
+   "key": "HEALTH_OPS",
+   "name": "Sağlık Operasyonları",
+   "audience": "INSTITUTION",
+   "required_licenses_any": [
+    "HOSPITAL",
+    "HEALTH_CENTER_CLINIC",
+    "DENTAL_CARE",
+    "DIAGNOSTIC_LAB",
+    "PHARMACY",
+    "MEDICAL_DEVICES",
+    "VETERINARY"
+   ]
+  },
+  {
+   "code": 2600,
+   "key": "FINANCIAL_OPS",
+   "name": "Finansal Ürün ve Nakit Operasyonları",
+   "audience": "INSTITUTION",
+   "required_licenses_any": [
+    "BANKING",
+    "PAYMENT_SERVICES",
+    "INVESTMENT_PORTFOLIO_MANAGEMENT",
+    "LENDING_LEASING",
+    "CURRENCY_EXCHANGE_OFFICE",
+    "CASH_AGENT"
+   ]
+  },
+  {
+   "code": 2700,
+   "key": "SAAS_HOSTING_OPS",
+   "name": "Abonelik ve Kaynak Operasyonları",
+   "audience": "INSTITUTION",
+   "required_licenses_any": [
+    "SOFTWARE_SAAS",
+    "HOSTING_CLOUD_RESOURCES",
+    "IOT_SMART_DEVICES",
+    "TELECOM",
+    "GYM_FITNESS"
+   ]
+  },
+  {
+   "code": 2800,
+   "key": "SERVICE_ENGAGEMENTS",
+   "name": "Hizmet Projeleri",
+   "audience": "INSTITUTION",
+   "required_licenses_any": [
+    "CONSULTING",
+    "LEGAL_SERVICES",
+    "ACCOUNTING_AUDIT",
+    "HR_STAFFING",
+    "IT_SERVICES",
+    "ADVERTISING_AGENCY",
+    "CONSTRUCTION_CONTRACTOR",
+    "ARCHITECTURE_ENGINEERING",
+    "SECURITY_SERVICES",
+    "CLEANING_MAINTENANCE",
+    "REPAIR_AUTO_SERVICE"
+   ]
+  },
+  {
+   "code": 3000,
+   "key": "PLATFORM_OPERATIONS",
+   "name": "Platform Operasyonları",
+   "audience": "PLATFORM",
+   "required_licenses_any": [
+    "OPERATIONS_UI_MANAGEMENT"
+   ]
+  },
+  {
+   "code": 3100,
+   "key": "PLATFORM_FINANCE",
+   "name": "Platform Finans",
+   "audience": "PLATFORM",
+   "required_licenses_any": [
+    "FINANCE_BANK_AGREEMENTS"
+   ]
+  },
+  {
+   "code": 3200,
+   "key": "PLATFORM_VERIFICATION",
+   "name": "Kimlik Doğrulama",
+   "audience": "PLATFORM",
+   "required_licenses_any": [
+    "VERIFICATION_INTERVIEWS"
+   ]
+  },
+  {
+   "code": 3300,
+   "key": "PLATFORM_ARBITRATION",
+   "name": "Platform Hakemlik",
+   "audience": "PLATFORM",
+   "required_licenses_any": [
+    "OPERATIONS_UI_MANAGEMENT"
+   ]
+  },
+  {
+   "code": 3400,
+   "key": "PLATFORM_AUDIT",
+   "name": "Denetim ve İzleme",
+   "audience": "PLATFORM",
+   "required_licenses_any": [
+    "OPERATIONS_UI_MANAGEMENT"
+   ]
+  },
+  {
+   "code": 5000,
+   "key": "USER_ACCOUNT",
+   "name": "Hesap ve Kimlik",
+   "audience": "USER",
+   "required_licenses_any": []
+  },
+  {
+   "code": 5100,
+   "key": "USER_WALLET",
+   "name": "Cüzdan",
+   "audience": "USER",
+   "required_licenses_any": []
+  },
+  {
+   "code": 5200,
+   "key": "USER_MARKETPLACE",
+   "name": "Pazaryeri",
+   "audience": "USER",
+   "required_licenses_any": []
+  },
+  {
+   "code": 5300,
+   "key": "USER_SOCIAL",
+   "name": "Bildirim ve Geri Bildirim",
+   "audience": "USER",
+   "required_licenses_any": []
+  },
+  {
+   "code": 5400,
+   "key": "USER_INSTITUTION",
+   "name": "Kurum İlişkileri",
+   "audience": "USER",
+   "required_licenses_any": []
+  }
+ ],
+ "permissions": [
+  {
+   "code": 101,
+   "key": "INSTITUTION_PROFILE_VIEW",
+   "name": "Kurum profilini görüntüle",
+   "module": "INSTITUTION_ADMIN",
+   "is_sensitive": false,
+   "is_default_for_employee": true,
+   "four_eyes": false,
+   "primary_screen": "/inst/dashboard"
+  },
+  {
+   "code": 102,
+   "key": "INSTITUTION_PROFILE_MANAGE",
+   "name": "Kurum profilini düzenle",
+   "module": "INSTITUTION_ADMIN",
+   "is_sensitive": false,
+   "is_default_for_employee": false,
+   "four_eyes": false,
+   "primary_screen": "/inst/profile/edit"
+  },
+  {
+   "code": 103,
+   "key": "INSTITUTION_DOCUMENTS_MANAGE",
+   "name": "Kurum belgelerini yönet",
+   "module": "INSTITUTION_ADMIN",
+   "is_sensitive": true,
+   "is_default_for_employee": false,
+   "four_eyes": false,
+   "primary_screen": "/inst/documents"
+  },
+  {
+   "code": 104,
+   "key": "WORKER_PERMISSIONS_MANAGE",
+   "name": "Çalışan yetkilerini yönet",
+   "module": "INSTITUTION_ADMIN",
+   "is_sensitive": true,
+   "is_default_for_employee": false,
+   "four_eyes": false,
+   "primary_screen": "/inst/permissions"
+  },
+  {
+   "code": 105,
+   "key": "INSTITUTION_SETTINGS_MANAGE",
+   "name": "Kurum ayarlarını yönet",
+   "module": "INSTITUTION_ADMIN",
+   "is_sensitive": false,
+   "is_default_for_employee": false,
+   "four_eyes": false,
+   "primary_screen": "/inst/settings"
+  },
+  {
+   "code": 106,
+   "key": "INSTITUTION_ANALYTICS_VIEW",
+   "name": "Kurum analitiğini görüntüle",
+   "module": "INSTITUTION_ADMIN",
+   "is_sensitive": false,
+   "is_default_for_employee": false,
+   "four_eyes": false,
+   "primary_screen": "/inst/analytics"
+  },
+  {
+   "code": 107,
+   "key": "INSTITUTION_ANALYTICS_EXPORT",
+   "name": "Analitiği dışa aktar",
+   "module": "INSTITUTION_ADMIN",
+   "is_sensitive": true,
+   "is_default_for_employee": false,
+   "four_eyes": false,
+   "primary_screen": "/inst/analytics/export"
+  },
+  {
+   "code": 201,
+   "key": "BRANCH_VIEW",
+   "name": "Şubeleri görüntüle",
+   "module": "BRANCH_MANAGEMENT",
+   "is_sensitive": false,
+   "is_default_for_employee": true,
+   "four_eyes": false,
+   "primary_screen": "/inst/branches"
+  },
+  {
+   "code": 202,
+   "key": "BRANCH_MANAGE",
+   "name": "Şube bilgilerini düzenle",
+   "module": "BRANCH_MANAGEMENT",
+   "is_sensitive": false,
+   "is_default_for_employee": false,
+   "four_eyes": false,
+   "primary_screen": "/inst/branches/edit"
+  },
+  {
+   "code": 203,
+   "key": "BRANCH_APPLICATION_SUBMIT",
+   "name": "Yeni şube başvurusu yap",
+   "module": "BRANCH_MANAGEMENT",
+   "is_sensitive": false,
+   "is_default_for_employee": false,
+   "four_eyes": false,
+   "primary_screen": "/inst/branches/new"
+  },
+  {
+   "code": 204,
+   "key": "BRANCH_CLOSURE_REQUEST",
+   "name": "Şube kapatma talebi başlat",
+   "module": "BRANCH_MANAGEMENT",
+   "is_sensitive": true,
+   "is_default_for_employee": false,
+   "four_eyes": false,
+   "primary_screen": "/inst/branches/closure"
+  },
+  {
+   "code": 301,
+   "key": "EMPLOYEE_SELF_SERVICE",
+   "name": "Kendi pozisyon ve izin bilgilerini görüntüle",
+   "module": "WORKFORCE_HR",
+   "is_sensitive": false,
+   "is_default_for_employee": true,
+   "four_eyes": false,
+   "primary_screen": "/inst/me/positions"
+  },
+  {
+   "code": 302,
+   "key": "WORKER_VIEW",
+   "name": "Çalışanları görüntüle",
+   "module": "WORKFORCE_HR",
+   "is_sensitive": false,
+   "is_default_for_employee": false,
+   "four_eyes": false,
+   "primary_screen": "/inst/workers"
+  },
+  {
+   "code": 303,
+   "key": "WORKER_MANAGE",
+   "name": "Çalışan pozisyonlarını yönet",
+   "module": "WORKFORCE_HR",
+   "is_sensitive": false,
+   "is_default_for_employee": false,
+   "four_eyes": false,
+   "primary_screen": "/inst/workers/edit"
+  },
+  {
+   "code": 304,
+   "key": "EMPLOYMENT_APPLICATIONS_REVIEW",
+   "name": "İş başvurularını değerlendir",
+   "module": "WORKFORCE_HR",
+   "is_sensitive": false,
+   "is_default_for_employee": false,
+   "four_eyes": false,
+   "primary_screen": "/inst/hiring/applications"
+  },
+  {
+   "code": 305,
+   "key": "WORKER_TERMINATE",
+   "name": "Çalışan işten çıkar",
+   "module": "WORKFORCE_HR",
+   "is_sensitive": true,
+   "is_default_for_employee": false,
+   "four_eyes": false,
+   "primary_screen": "/inst/workers/terminate"
+  },
+  {
+   "code": 306,
+   "key": "SALARY_VIEW",
+   "name": "Maaş bilgilerini görüntüle",
+   "module": "WORKFORCE_HR",
+   "is_sensitive": true,
+   "is_default_for_employee": false,
+   "four_eyes": false,
+   "primary_screen": "/inst/workers/salary"
+  },
+  {
+   "code": 307,
+   "key": "SALARY_MANAGE",
+   "name": "Maaş ve komisyon belirle",
+   "module": "WORKFORCE_HR",
+   "is_sensitive": true,
+   "is_default_for_employee": false,
+   "four_eyes": false,
+   "primary_screen": "/inst/workers/salary"
+  },
+  {
+   "code": 308,
+   "key": "EXIT_SETTLEMENT_VIEW",
+   "name": "Ayrılış hesaplaşmasını görüntüle",
+   "module": "WORKFORCE_HR",
+   "is_sensitive": true,
+   "is_default_for_employee": false,
+   "four_eyes": false,
+   "primary_screen": "/inst/exits/settlements"
+  },
+  {
+   "code": 309,
+   "key": "EXIT_SETTLEMENT_MANAGE",
+   "name": "Ayrılış hesaplaşmasını yönet",
+   "module": "WORKFORCE_HR",
+   "is_sensitive": true,
+   "is_default_for_employee": false,
+   "four_eyes": false,
+   "primary_screen": "/inst/exits/settlements/manage"
+  },
+  {
+   "code": 401,
+   "key": "PAYROLL_VIEW",
+   "name": "Bordroları görüntüle",
+   "module": "PAYROLL",
+   "is_sensitive": true,
+   "is_default_for_employee": false,
+   "four_eyes": false,
+   "primary_screen": "/inst/payroll/runs"
+  },
+  {
+   "code": 402,
+   "key": "PAYROLL_PREPARE",
+   "name": "Bordro hazırla",
+   "module": "PAYROLL",
+   "is_sensitive": true,
+   "is_default_for_employee": false,
+   "four_eyes": false,
+   "primary_screen": "/inst/payroll/prepare"
+  },
+  {
+   "code": 403,
+   "key": "PAYROLL_APPROVE",
+   "name": "Bordro onayla",
+   "module": "PAYROLL",
+   "is_sensitive": true,
+   "is_default_for_employee": false,
+   "four_eyes": true,
+   "primary_screen": "/inst/payroll/approve"
+  },
+  {
+   "code": 501,
+   "key": "LEDGER_VIEW",
+   "name": "Defteri görüntüle",
+   "module": "FINANCE_ACCOUNTING",
+   "is_sensitive": true,
+   "is_default_for_employee": false,
+   "four_eyes": false,
+   "primary_screen": "/inst/finance/ledger"
+  },
+  {
+   "code": 502,
+   "key": "JOURNAL_MANAGE",
+   "name": "Manuel yevmiye kaydı gir",
+   "module": "FINANCE_ACCOUNTING",
+   "is_sensitive": true,
+   "is_default_for_employee": false,
+   "four_eyes": false,
+   "primary_screen": "/inst/finance/journal/new"
+  },
+  {
+   "code": 503,
+   "key": "CHART_OF_ACCOUNTS_VIEW",
+   "name": "Hesap planını görüntüle",
+   "module": "FINANCE_ACCOUNTING",
+   "is_sensitive": true,
+   "is_default_for_employee": false,
+   "four_eyes": false,
+   "primary_screen": "/inst/finance/chart"
+  },
+  {
+   "code": 504,
+   "key": "CHART_OF_ACCOUNTS_MANAGE",
+   "name": "Hesap planını yönet",
+   "module": "FINANCE_ACCOUNTING",
+   "is_sensitive": true,
+   "is_default_for_employee": false,
+   "four_eyes": false,
+   "primary_screen": "/inst/finance/chart/edit"
+  },
+  {
+   "code": 505,
+   "key": "FINANCIAL_REPORTS_VIEW",
+   "name": "Mali raporları görüntüle",
+   "module": "FINANCE_ACCOUNTING",
+   "is_sensitive": true,
+   "is_default_for_employee": false,
+   "four_eyes": false,
+   "primary_screen": "/inst/finance/reports"
+  },
+  {
+   "code": 506,
+   "key": "FINANCIAL_REPORTS_EXPORT",
+   "name": "Mali raporları dışa aktar",
+   "module": "FINANCE_ACCOUNTING",
+   "is_sensitive": true,
+   "is_default_for_employee": false,
+   "four_eyes": false,
+   "primary_screen": "/inst/finance/reports/export"
+  },
+  {
+   "code": 601,
+   "key": "INSTITUTION_WALLET_VIEW",
+   "name": "Kurum cüzdanını görüntüle",
+   "module": "WALLET_TREASURY",
+   "is_sensitive": true,
+   "is_default_for_employee": false,
+   "four_eyes": false,
+   "primary_screen": "/inst/wallet"
+  },
+  {
+   "code": 602,
+   "key": "INSTITUTION_TRANSFER_INITIATE",
+   "name": "Kurum cüzdanından transfer başlat",
+   "module": "WALLET_TREASURY",
+   "is_sensitive": true,
+   "is_default_for_employee": false,
+   "four_eyes": false,
+   "primary_screen": "/inst/wallet/transfer"
+  },
+  {
+   "code": 603,
+   "key": "INSTITUTION_TRANSFER_APPROVE",
+   "name": "Kurum transferini onayla",
+   "module": "WALLET_TREASURY",
+   "is_sensitive": true,
+   "is_default_for_employee": false,
+   "four_eyes": true,
+   "primary_screen": "/inst/wallet/transfer/approve"
+  },
+  {
+   "code": 604,
+   "key": "BANK_ACCOUNTS_VIEW",
+   "name": "Banka hesaplarını görüntüle",
+   "module": "WALLET_TREASURY",
+   "is_sensitive": true,
+   "is_default_for_employee": false,
+   "four_eyes": false,
+   "primary_screen": "/inst/bank-accounts"
+  },
+  {
+   "code": 605,
+   "key": "BANK_ACCOUNTS_MANAGE",
+   "name": "Banka hesaplarını yönet",
+   "module": "WALLET_TREASURY",
+   "is_sensitive": true,
+   "is_default_for_employee": false,
+   "four_eyes": false,
+   "primary_screen": "/inst/bank-accounts/edit"
+  },
+  {
+   "code": 606,
+   "key": "DEPOSIT_REQUEST_CREATE",
+   "name": "Para yatırma talebi oluştur",
+   "module": "WALLET_TREASURY",
+   "is_sensitive": true,
+   "is_default_for_employee": false,
+   "four_eyes": false,
+   "primary_screen": "/inst/wallet/deposit-request"
+  },
+  {
+   "code": 607,
+   "key": "CURRENCY_CONVERSION_EXECUTE",
+   "name": "Kur dönüşümü yap",
+   "module": "WALLET_TREASURY",
+   "is_sensitive": true,
+   "is_default_for_employee": false,
+   "four_eyes": false,
+   "primary_screen": "/inst/wallet/convert"
+  },
+  {
+   "code": 608,
+   "key": "FINANCIAL_REQUEST_SUBMIT",
+   "name": "Finansal talep gönder",
+   "module": "WALLET_TREASURY",
+   "is_sensitive": true,
+   "is_default_for_employee": false,
+   "four_eyes": false,
+   "primary_screen": "/inst/finance/requests"
+  },
+  {
+   "code": 701,
+   "key": "TAX_VIEW",
+   "name": "Vergi hesap ve dönemlerini görüntüle",
+   "module": "TAX",
+   "is_sensitive": true,
+   "is_default_for_employee": false,
+   "four_eyes": false,
+   "primary_screen": "/inst/tax/accounts"
+  },
+  {
+   "code": 702,
+   "key": "TAX_FILING_MANAGE",
+   "name": "Vergi beyanını yönet",
+   "module": "TAX",
+   "is_sensitive": true,
+   "is_default_for_employee": false,
+   "four_eyes": false,
+   "primary_screen": "/inst/tax/filing"
+  },
+  {
+   "code": 703,
+   "key": "TAX_REMITTANCE_MANAGE",
+   "name": "Vergi ödemesi yap",
+   "module": "TAX",
+   "is_sensitive": true,
+   "is_default_for_employee": false,
+   "four_eyes": true,
+   "primary_screen": "/inst/tax/remittances"
+  },
+  {
+   "code": 801,
+   "key": "POS_SESSION_OPEN",
+   "name": "Kasa oturumu aç",
+   "module": "SALES_POS",
+   "is_sensitive": false,
+   "is_default_for_employee": false,
+   "four_eyes": false,
+   "primary_screen": "/inst/pos/open"
+  },
+  {
+   "code": 802,
+   "key": "POS_SESSION_CLOSE",
+   "name": "Kasa oturumu kapat",
+   "module": "SALES_POS",
+   "is_sensitive": false,
+   "is_default_for_employee": false,
+   "four_eyes": false,
+   "primary_screen": "/inst/pos/close"
+  },
+  {
+   "code": 803,
+   "key": "POS_SALE_CREATE",
+   "name": "Kasadan satış yap",
+   "module": "SALES_POS",
+   "is_sensitive": false,
+   "is_default_for_employee": false,
+   "four_eyes": false,
+   "primary_screen": "/inst/pos/sale"
+  },
+  {
+   "code": 804,
+   "key": "POS_REFUND_EXECUTE",
+   "name": "Kasadan iade yap",
+   "module": "SALES_POS",
+   "is_sensitive": true,
+   "is_default_for_employee": false,
+   "four_eyes": false,
+   "primary_screen": "/inst/pos/refund"
+  },
+  {
+   "code": 805,
+   "key": "POS_CASH_MOVEMENT_MANAGE",
+   "name": "Kasa nakit hareketi gir",
+   "module": "SALES_POS",
+   "is_sensitive": true,
+   "is_default_for_employee": false,
+   "four_eyes": false,
+   "primary_screen": "/inst/pos/cash"
+  },
+  {
+   "code": 806,
+   "key": "POS_SESSIONS_REVIEW",
+   "name": "Tüm kasa oturumlarını incele",
+   "module": "SALES_POS",
+   "is_sensitive": true,
+   "is_default_for_employee": false,
+   "four_eyes": false,
+   "primary_screen": "/inst/pos/review"
+  },
+  {
+   "code": 807,
+   "key": "CUSTOMER_QR_VERIFY",
+   "name": "Müşteri QR doğrula",
+   "module": "SALES_POS",
+   "is_sensitive": false,
+   "is_default_for_employee": false,
+   "four_eyes": false,
+   "primary_screen": "/inst/pos/verify-qr"
+  },
+  {
+   "code": 808,
+   "key": "VOUCHER_SELL",
+   "name": "Kupon sat",
+   "module": "SALES_POS",
+   "is_sensitive": true,
+   "is_default_for_employee": false,
+   "four_eyes": false,
+   "primary_screen": "/inst/pos/voucher-sale"
+  },
+  {
+   "code": 901,
+   "key": "LISTING_VIEW",
+   "name": "İlanları görüntüle",
+   "module": "LISTINGS_CATALOG",
+   "is_sensitive": false,
+   "is_default_for_employee": false,
+   "four_eyes": false,
+   "primary_screen": "/inst/listings"
+  },
+  {
+   "code": 902,
+   "key": "LISTING_CREATE",
+   "name": "İlan oluştur",
+   "module": "LISTINGS_CATALOG",
+   "is_sensitive": false,
+   "is_default_for_employee": false,
+   "four_eyes": false,
+   "primary_screen": "/inst/listings/new"
+  },
+  {
+   "code": 903,
+   "key": "LISTING_EDIT",
+   "name": "İlan düzenle",
+   "module": "LISTINGS_CATALOG",
+   "is_sensitive": false,
+   "is_default_for_employee": false,
+   "four_eyes": false,
+   "primary_screen": "/inst/listings/edit"
+  },
+  {
+   "code": 904,
+   "key": "LISTING_PUBLISH",
+   "name": "İlanı incelemeye gönder",
+   "module": "LISTINGS_CATALOG",
+   "is_sensitive": false,
+   "is_default_for_employee": false,
+   "four_eyes": false,
+   "primary_screen": "/inst/listings/status"
+  },
+  {
+   "code": 905,
+   "key": "LISTING_DEACTIVATE",
+   "name": "İlanı pasife al",
+   "module": "LISTINGS_CATALOG",
+   "is_sensitive": false,
+   "is_default_for_employee": false,
+   "four_eyes": false,
+   "primary_screen": "/inst/listings/status"
+  },
+  {
+   "code": 906,
+   "key": "PRICE_MANAGE",
+   "name": "Fiyat yönet",
+   "module": "LISTINGS_CATALOG",
+   "is_sensitive": false,
+   "is_default_for_employee": false,
+   "four_eyes": false,
+   "primary_screen": "/inst/listings/pricing"
+  },
+  {
+   "code": 907,
+   "key": "LISTING_MEDIA_MANAGE",
+   "name": "İlan görsel ve belgelerini yönet",
+   "module": "LISTINGS_CATALOG",
+   "is_sensitive": false,
+   "is_default_for_employee": false,
+   "four_eyes": false,
+   "primary_screen": "/inst/listings/media"
+  },
+  {
+   "code": 1001,
+   "key": "STOCK_VIEW",
+   "name": "Stok görüntüle",
+   "module": "INVENTORY",
+   "is_sensitive": false,
+   "is_default_for_employee": false,
+   "four_eyes": false,
+   "primary_screen": "/inst/inventory"
+  },
+  {
+   "code": 1002,
+   "key": "STOCK_RECEIVE",
+   "name": "Mal kabul",
+   "module": "INVENTORY",
+   "is_sensitive": false,
+   "is_default_for_employee": false,
+   "four_eyes": false,
+   "primary_screen": "/inst/inventory/receive"
+  },
+  {
+   "code": 1003,
+   "key": "STOCK_ADJUST",
+   "name": "Stok düzeltme",
+   "module": "INVENTORY",
+   "is_sensitive": true,
+   "is_default_for_employee": false,
+   "four_eyes": false,
+   "primary_screen": "/inst/inventory/adjust"
+  },
+  {
+   "code": 1004,
+   "key": "STOCK_TRANSFER",
+   "name": "Şubeler arası stok transferi",
+   "module": "INVENTORY",
+   "is_sensitive": false,
+   "is_default_for_employee": false,
+   "four_eyes": false,
+   "primary_screen": "/inst/inventory/transfer"
+  },
+  {
+   "code": 1005,
+   "key": "LOT_EXPIRY_MANAGE",
+   "name": "Parti ve son kullanma yönet",
+   "module": "INVENTORY",
+   "is_sensitive": false,
+   "is_default_for_employee": false,
+   "four_eyes": false,
+   "primary_screen": "/inst/inventory/lots"
+  },
+  {
+   "code": 1101,
+   "key": "ORDER_VIEW",
+   "name": "Siparişleri görüntüle",
+   "module": "ORDERS",
+   "is_sensitive": false,
+   "is_default_for_employee": false,
+   "four_eyes": false,
+   "primary_screen": "/inst/orders"
+  },
+  {
+   "code": 1102,
+   "key": "ORDER_PROCESS",
+   "name": "Sipariş hazırla ve durum güncelle",
+   "module": "ORDERS",
+   "is_sensitive": false,
+   "is_default_for_employee": false,
+   "four_eyes": false,
+   "primary_screen": "/inst/orders/process"
+  },
+  {
+   "code": 1103,
+   "key": "ORDER_CANCEL",
+   "name": "Sipariş iptal et",
+   "module": "ORDERS",
+   "is_sensitive": true,
+   "is_default_for_employee": false,
+   "four_eyes": false,
+   "primary_screen": "/inst/orders/cancel"
+  },
+  {
+   "code": 1104,
+   "key": "ORDER_ASSIGN",
+   "name": "Siparişi çalışana ata",
+   "module": "ORDERS",
+   "is_sensitive": false,
+   "is_default_for_employee": false,
+   "four_eyes": false,
+   "primary_screen": "/inst/orders/assign"
+  },
+  {
+   "code": 1105,
+   "key": "ORDER_EXPORT",
+   "name": "Siparişleri dışa aktar",
+   "module": "ORDERS",
+   "is_sensitive": true,
+   "is_default_for_employee": false,
+   "four_eyes": false,
+   "primary_screen": "/inst/orders/export"
+  },
+  {
+   "code": 1201,
+   "key": "BOOKING_VIEW",
+   "name": "Rezervasyonları görüntüle",
+   "module": "BOOKINGS",
+   "is_sensitive": false,
+   "is_default_for_employee": false,
+   "four_eyes": false,
+   "primary_screen": "/inst/bookings"
+  },
+  {
+   "code": 1202,
+   "key": "BOOKING_MANAGE",
+   "name": "Rezervasyon yönet",
+   "module": "BOOKINGS",
+   "is_sensitive": false,
+   "is_default_for_employee": false,
+   "four_eyes": false,
+   "primary_screen": "/inst/bookings/detail"
+  },
+  {
+   "code": 1203,
+   "key": "SLOT_MANAGE",
+   "name": "Müsaitlik slotlarını yönet",
+   "module": "BOOKINGS",
+   "is_sensitive": false,
+   "is_default_for_employee": false,
+   "four_eyes": false,
+   "primary_screen": "/inst/bookings/slots"
+  },
+  {
+   "code": 1204,
+   "key": "BOOKING_CHECKIN",
+   "name": "Giriş ve çıkış işlemi",
+   "module": "BOOKINGS",
+   "is_sensitive": false,
+   "is_default_for_employee": false,
+   "four_eyes": false,
+   "primary_screen": "/inst/bookings/checkin"
+  },
+  {
+   "code": 1205,
+   "key": "BOOKING_CANCEL_REFUND",
+   "name": "Rezervasyon iptal ve iade",
+   "module": "BOOKINGS",
+   "is_sensitive": true,
+   "is_default_for_employee": false,
+   "four_eyes": false,
+   "primary_screen": "/inst/bookings/cancel"
+  },
+  {
+   "code": 1301,
+   "key": "SHIPMENT_VIEW",
+   "name": "Sevkiyatları görüntüle",
+   "module": "LOGISTICS_OPS",
+   "is_sensitive": false,
+   "is_default_for_employee": false,
+   "four_eyes": false,
+   "primary_screen": "/inst/shipments"
+  },
+  {
+   "code": 1302,
+   "key": "SHIPMENT_MANAGE",
+   "name": "Sevkiyat yönet",
+   "module": "LOGISTICS_OPS",
+   "is_sensitive": false,
+   "is_default_for_employee": false,
+   "four_eyes": false,
+   "primary_screen": "/inst/shipments/detail"
+  },
+  {
+   "code": 1303,
+   "key": "SHIPMENT_STATUS_UPDATE",
+   "name": "Sevkiyat durumunu güncelle",
+   "module": "LOGISTICS_OPS",
+   "is_sensitive": false,
+   "is_default_for_employee": false,
+   "four_eyes": false,
+   "primary_screen": "/inst/shipments/status"
+  },
+  {
+   "code": 1304,
+   "key": "CARRIER_ASSIGN",
+   "name": "Taşıyıcı ve kurye ata",
+   "module": "LOGISTICS_OPS",
+   "is_sensitive": false,
+   "is_default_for_employee": false,
+   "four_eyes": false,
+   "primary_screen": "/inst/shipments/assign"
+  },
+  {
+   "code": 1305,
+   "key": "CUSTOMS_DOCS_MANAGE",
+   "name": "Gümrük belgelerini yönet",
+   "module": "LOGISTICS_OPS",
+   "is_sensitive": true,
+   "is_default_for_employee": false,
+   "four_eyes": false,
+   "primary_screen": "/inst/shipments/customs"
+  },
+  {
+   "code": 1401,
+   "key": "RAW_MATERIAL_VIEW",
+   "name": "Hammaddeleri görüntüle",
+   "module": "PRODUCTION_SUPPLY",
+   "is_sensitive": false,
+   "is_default_for_employee": false,
+   "four_eyes": false,
+   "primary_screen": "/inst/production/materials"
+  },
+  {
+   "code": 1402,
+   "key": "RAW_MATERIAL_MANAGE",
+   "name": "Hammadde yönet",
+   "module": "PRODUCTION_SUPPLY",
+   "is_sensitive": false,
+   "is_default_for_employee": false,
+   "four_eyes": false,
+   "primary_screen": "/inst/production/materials/edit"
+  },
+  {
+   "code": 1403,
+   "key": "RECIPE_MANAGE",
+   "name": "Reçete yönet",
+   "module": "PRODUCTION_SUPPLY",
+   "is_sensitive": false,
+   "is_default_for_employee": false,
+   "four_eyes": false,
+   "primary_screen": "/inst/production/recipes"
+  },
+  {
+   "code": 1404,
+   "key": "PRODUCTION_SCHEDULE_MANAGE",
+   "name": "Üretim planı yönet",
+   "module": "PRODUCTION_SUPPLY",
+   "is_sensitive": false,
+   "is_default_for_employee": false,
+   "four_eyes": false,
+   "primary_screen": "/inst/production/schedules"
+  },
+  {
+   "code": 1405,
+   "key": "PRODUCTION_RUN_EXECUTE",
+   "name": "Üretim partisi yürüt",
+   "module": "PRODUCTION_SUPPLY",
+   "is_sensitive": false,
+   "is_default_for_employee": false,
+   "four_eyes": false,
+   "primary_screen": "/inst/production/runs"
+  },
+  {
+   "code": 1406,
+   "key": "WASTE_RECORD",
+   "name": "Fire kaydı gir",
+   "module": "PRODUCTION_SUPPLY",
+   "is_sensitive": false,
+   "is_default_for_employee": false,
+   "four_eyes": false,
+   "primary_screen": "/inst/production/waste"
+  },
+  {
+   "code": 1501,
+   "key": "B2B_AGREEMENT_VIEW",
+   "name": "B2B anlaşmalarını görüntüle",
+   "module": "B2B_CONSORTIUM",
+   "is_sensitive": false,
+   "is_default_for_employee": false,
+   "four_eyes": false,
+   "primary_screen": "/inst/b2b/agreements"
+  },
+  {
+   "code": 1502,
+   "key": "B2B_AGREEMENT_MANAGE",
+   "name": "B2B anlaşması yönet",
+   "module": "B2B_CONSORTIUM",
+   "is_sensitive": true,
+   "is_default_for_employee": false,
+   "four_eyes": false,
+   "primary_screen": "/inst/b2b/agreements/edit"
+  },
+  {
+   "code": 1503,
+   "key": "DISTRIBUTOR_MANAGE",
+   "name": "Distribütör ilişkisi yönet",
+   "module": "B2B_CONSORTIUM",
+   "is_sensitive": false,
+   "is_default_for_employee": false,
+   "four_eyes": false,
+   "primary_screen": "/inst/b2b/distributors"
+  },
+  {
+   "code": 1504,
+   "key": "CONSORTIUM_VIEW",
+   "name": "Konsorsiyumu görüntüle",
+   "module": "B2B_CONSORTIUM",
+   "is_sensitive": false,
+   "is_default_for_employee": false,
+   "four_eyes": false,
+   "primary_screen": "/inst/consortium"
+  },
+  {
+   "code": 1505,
+   "key": "CONSORTIUM_MANAGE",
+   "name": "Konsorsiyum üyeliğini yönet",
+   "module": "B2B_CONSORTIUM",
+   "is_sensitive": true,
+   "is_default_for_employee": false,
+   "four_eyes": false,
+   "primary_screen": "/inst/consortium/members"
+  },
+  {
+   "code": 1506,
+   "key": "RESOURCE_POOL_MANAGE",
+   "name": "Kaynak havuzu yönet",
+   "module": "B2B_CONSORTIUM",
+   "is_sensitive": false,
+   "is_default_for_employee": false,
+   "four_eyes": false,
+   "primary_screen": "/inst/consortium/pools"
+  },
+  {
+   "code": 1507,
+   "key": "RESOURCE_USAGE_REQUEST",
+   "name": "Havuz kaynağı kullanım talebi",
+   "module": "B2B_CONSORTIUM",
+   "is_sensitive": false,
+   "is_default_for_employee": false,
+   "four_eyes": false,
+   "primary_screen": "/inst/consortium/usage"
+  },
+  {
+   "code": 1601,
+   "key": "DISPUTE_VIEW",
+   "name": "İtiraz ve iade taleplerini görüntüle",
+   "module": "CUSTOMER_SERVICE",
+   "is_sensitive": false,
+   "is_default_for_employee": false,
+   "four_eyes": false,
+   "primary_screen": "/inst/support/disputes"
+  },
+  {
+   "code": 1602,
+   "key": "DISPUTE_RESPOND",
+   "name": "İtirazlara yanıt ver",
+   "module": "CUSTOMER_SERVICE",
+   "is_sensitive": false,
+   "is_default_for_employee": false,
+   "four_eyes": false,
+   "primary_screen": "/inst/support/disputes/respond"
+  },
+  {
+   "code": 1603,
+   "key": "REFUND_APPROVE",
+   "name": "İade onayla",
+   "module": "CUSTOMER_SERVICE",
+   "is_sensitive": true,
+   "is_default_for_employee": false,
+   "four_eyes": true,
+   "primary_screen": "/inst/support/refunds"
+  },
+  {
+   "code": 1604,
+   "key": "COMPLAINT_VIEW",
+   "name": "Şikayetleri görüntüle",
+   "module": "CUSTOMER_SERVICE",
+   "is_sensitive": false,
+   "is_default_for_employee": false,
+   "four_eyes": false,
+   "primary_screen": "/inst/support/complaints"
+  },
+  {
+   "code": 1605,
+   "key": "COMPLAINT_RESPOND",
+   "name": "Şikayete yanıt ver",
+   "module": "CUSTOMER_SERVICE",
+   "is_sensitive": false,
+   "is_default_for_employee": false,
+   "four_eyes": false,
+   "primary_screen": "/inst/support/complaints/respond"
+  },
+  {
+   "code": 1606,
+   "key": "RATING_VIEW",
+   "name": "Değerlendirmeleri görüntüle",
+   "module": "CUSTOMER_SERVICE",
+   "is_sensitive": false,
+   "is_default_for_employee": false,
+   "four_eyes": false,
+   "primary_screen": "/inst/support/ratings"
+  },
+  {
+   "code": 1607,
+   "key": "RATING_REPLY",
+   "name": "Değerlendirmeye yanıt ver",
+   "module": "CUSTOMER_SERVICE",
+   "is_sensitive": false,
+   "is_default_for_employee": false,
+   "four_eyes": false,
+   "primary_screen": "/inst/support/ratings"
+  },
+  {
+   "code": 1701,
+   "key": "PROMOTION_VIEW",
+   "name": "Kampanyaları görüntüle",
+   "module": "PROMOTIONS",
+   "is_sensitive": false,
+   "is_default_for_employee": false,
+   "four_eyes": false,
+   "primary_screen": "/inst/promotions"
+  },
+  {
+   "code": 1702,
+   "key": "PROMOTION_MANAGE",
+   "name": "Kampanya yönet",
+   "module": "PROMOTIONS",
+   "is_sensitive": false,
+   "is_default_for_employee": false,
+   "four_eyes": false,
+   "primary_screen": "/inst/promotions/edit"
+  },
+  {
+   "code": 1703,
+   "key": "NOTIFICATION_CAMPAIGN_SEND",
+   "name": "Müşterilere bildirim gönder",
+   "module": "PROMOTIONS",
+   "is_sensitive": false,
+   "is_default_for_employee": false,
+   "four_eyes": false,
+   "primary_screen": "/inst/notifications/send"
+  },
+  {
+   "code": 1704,
+   "key": "PRIVILEGE_VIEW",
+   "name": "Kurum imtiyazlarını görüntüle",
+   "module": "PROMOTIONS",
+   "is_sensitive": false,
+   "is_default_for_employee": false,
+   "four_eyes": false,
+   "primary_screen": "/inst/privileges"
+  },
+  {
+   "code": 1801,
+   "key": "SHAREHOLDER_VIEW",
+   "name": "Ortakları görüntüle",
+   "module": "GOVERNANCE",
+   "is_sensitive": true,
+   "is_default_for_employee": false,
+   "four_eyes": false,
+   "primary_screen": "/inst/governance/shareholders"
+  },
+  {
+   "code": 1802,
+   "key": "PARTNER_APPLICATION_REVIEW",
+   "name": "Ortaklık başvurularını değerlendir",
+   "module": "GOVERNANCE",
+   "is_sensitive": true,
+   "is_default_for_employee": false,
+   "four_eyes": false,
+   "primary_screen": "/inst/governance/applications"
+  },
+  {
+   "code": 1803,
+   "key": "PARTNER_EXIT_MANAGE",
+   "name": "Ortak çıkış sürecini yönet",
+   "module": "GOVERNANCE",
+   "is_sensitive": true,
+   "is_default_for_employee": false,
+   "four_eyes": false,
+   "primary_screen": "/inst/governance/exits"
+  },
+  {
+   "code": 1804,
+   "key": "CAPITAL_CONTRIBUTION_MANAGE",
+   "name": "Sermaye katkısını yönet",
+   "module": "GOVERNANCE",
+   "is_sensitive": true,
+   "is_default_for_employee": false,
+   "four_eyes": false,
+   "primary_screen": "/inst/governance/contributions"
+  },
+  {
+   "code": 1805,
+   "key": "PROFIT_DISTRIBUTION_VIEW",
+   "name": "Kâr dağıtımını görüntüle",
+   "module": "GOVERNANCE",
+   "is_sensitive": true,
+   "is_default_for_employee": false,
+   "four_eyes": false,
+   "primary_screen": "/inst/governance/profit"
+  },
+  {
+   "code": 1806,
+   "key": "PROFIT_DISTRIBUTION_PROPOSE",
+   "name": "Kâr dağıtımı öner",
+   "module": "GOVERNANCE",
+   "is_sensitive": true,
+   "is_default_for_employee": false,
+   "four_eyes": false,
+   "primary_screen": "/inst/governance/profit/propose"
+  },
+  {
+   "code": 1807,
+   "key": "CLOSURE_REQUEST",
+   "name": "Kurum kapatma talebi başlat",
+   "module": "GOVERNANCE",
+   "is_sensitive": true,
+   "is_default_for_employee": false,
+   "four_eyes": false,
+   "primary_screen": "/inst/governance/closure"
+  },
+  {
+   "code": 1808,
+   "key": "BOARD_APPROVALS_VIEW",
+   "name": "Onay kuyruğunu görüntüle",
+   "module": "GOVERNANCE",
+   "is_sensitive": false,
+   "is_default_for_employee": false,
+   "four_eyes": false,
+   "primary_screen": "/inst/governance/approvals"
+  },
+  {
+   "code": 1901,
+   "key": "PERMIT_VIEW",
+   "name": "İzin ve ruhsatları görüntüle",
+   "module": "COMPLIANCE_LEGAL",
+   "is_sensitive": false,
+   "is_default_for_employee": false,
+   "four_eyes": false,
+   "primary_screen": "/inst/compliance/permits"
+  },
+  {
+   "code": 1902,
+   "key": "PERMIT_MANAGE",
+   "name": "İzin ve ruhsat yönet",
+   "module": "COMPLIANCE_LEGAL",
+   "is_sensitive": true,
+   "is_default_for_employee": false,
+   "four_eyes": false,
+   "primary_screen": "/inst/compliance/permits/edit"
+  },
+  {
+   "code": 1903,
+   "key": "COMPLIANCE_VIEW",
+   "name": "Uyum kontrollerini görüntüle",
+   "module": "COMPLIANCE_LEGAL",
+   "is_sensitive": false,
+   "is_default_for_employee": false,
+   "four_eyes": false,
+   "primary_screen": "/inst/compliance/checks"
+  },
+  {
+   "code": 1904,
+   "key": "CONTRACT_VIEW",
+   "name": "Sözleşmeleri görüntüle",
+   "module": "COMPLIANCE_LEGAL",
+   "is_sensitive": false,
+   "is_default_for_employee": false,
+   "four_eyes": false,
+   "primary_screen": "/inst/contracts"
+  },
+  {
+   "code": 1905,
+   "key": "CONTRACT_SIGN",
+   "name": "Kurum adına sözleşme imzala",
+   "module": "COMPLIANCE_LEGAL",
+   "is_sensitive": true,
+   "is_default_for_employee": false,
+   "four_eyes": false,
+   "primary_screen": "/inst/contracts/sign"
+  },
+  {
+   "code": 1906,
+   "key": "LICENSE_VIEW",
+   "name": "Lisansları görüntüle",
+   "module": "COMPLIANCE_LEGAL",
+   "is_sensitive": false,
+   "is_default_for_employee": false,
+   "four_eyes": false,
+   "primary_screen": "/inst/licenses"
+  },
+  {
+   "code": 1907,
+   "key": "SLA_VIEW",
+   "name": "SLA metriklerini görüntüle",
+   "module": "COMPLIANCE_LEGAL",
+   "is_sensitive": false,
+   "is_default_for_employee": false,
+   "four_eyes": false,
+   "primary_screen": "/inst/sla"
+  },
+  {
+   "code": 2001,
+   "key": "ASSET_VIEW",
+   "name": "Maddi varlıkları görüntüle",
+   "module": "ASSETS",
+   "is_sensitive": true,
+   "is_default_for_employee": false,
+   "four_eyes": false,
+   "primary_screen": "/inst/assets"
+  },
+  {
+   "code": 2002,
+   "key": "ASSET_MANAGE",
+   "name": "Maddi varlık yönet",
+   "module": "ASSETS",
+   "is_sensitive": true,
+   "is_default_for_employee": false,
+   "four_eyes": false,
+   "primary_screen": "/inst/assets/edit"
+  },
+  {
+   "code": 2003,
+   "key": "VALUATION_MANAGE",
+   "name": "Değerleme kaydı gir",
+   "module": "ASSETS",
+   "is_sensitive": true,
+   "is_default_for_employee": false,
+   "four_eyes": false,
+   "primary_screen": "/inst/assets/valuations"
+  },
+  {
+   "code": 2004,
+   "key": "ASSET_DOCUMENT_MANAGE",
+   "name": "Varlık belgelerini yönet",
+   "module": "ASSETS",
+   "is_sensitive": true,
+   "is_default_for_employee": false,
+   "four_eyes": false,
+   "primary_screen": "/inst/assets/documents"
+  },
+  {
+   "code": 2101,
+   "key": "INSURANCE_PRODUCT_MANAGE",
+   "name": "Sigorta ürününü yönet",
+   "module": "INSURANCE_OPS",
+   "is_sensitive": false,
+   "is_default_for_employee": false,
+   "four_eyes": false,
+   "primary_screen": "/inst/insurance/products"
+  },
+  {
+   "code": 2102,
+   "key": "POLICY_VIEW",
+   "name": "Poliçeleri görüntüle",
+   "module": "INSURANCE_OPS",
+   "is_sensitive": true,
+   "is_default_for_employee": false,
+   "four_eyes": false,
+   "primary_screen": "/inst/insurance/policies"
+  },
+  {
+   "code": 2103,
+   "key": "POLICY_ISSUE",
+   "name": "Poliçe düzenle",
+   "module": "INSURANCE_OPS",
+   "is_sensitive": false,
+   "is_default_for_employee": false,
+   "four_eyes": false,
+   "primary_screen": "/inst/insurance/policies/issue"
+  },
+  {
+   "code": 2104,
+   "key": "PREMIUM_VIEW",
+   "name": "Prim tahsilatlarını görüntüle",
+   "module": "INSURANCE_OPS",
+   "is_sensitive": true,
+   "is_default_for_employee": false,
+   "four_eyes": false,
+   "primary_screen": "/inst/insurance/premiums"
+  },
+  {
+   "code": 2105,
+   "key": "CLAIM_VIEW",
+   "name": "Hasarları görüntüle",
+   "module": "INSURANCE_OPS",
+   "is_sensitive": true,
+   "is_default_for_employee": false,
+   "four_eyes": false,
+   "primary_screen": "/inst/insurance/claims"
+  },
+  {
+   "code": 2106,
+   "key": "CLAIM_ADJUDICATE",
+   "name": "Hasar karara bağla",
+   "module": "INSURANCE_OPS",
+   "is_sensitive": true,
+   "is_default_for_employee": false,
+   "four_eyes": false,
+   "primary_screen": "/inst/insurance/claims/adjudicate"
+  },
+  {
+   "code": 2107,
+   "key": "CLAIM_PAYOUT_ISSUE",
+   "name": "Tazminat ödemesi hazırla",
+   "module": "INSURANCE_OPS",
+   "is_sensitive": true,
+   "is_default_for_employee": false,
+   "four_eyes": false,
+   "primary_screen": "/inst/insurance/payouts"
+  },
+  {
+   "code": 2108,
+   "key": "CLAIM_PAYOUT_APPROVE",
+   "name": "Tazminat ödemesi onayla",
+   "module": "INSURANCE_OPS",
+   "is_sensitive": true,
+   "is_default_for_employee": false,
+   "four_eyes": true,
+   "primary_screen": "/inst/insurance/payouts/approve"
+  },
+  {
+   "code": 2201,
+   "key": "PROGRAM_MANAGE",
+   "name": "Eğitim programı yönet",
+   "module": "EDUCATION_OPS",
+   "is_sensitive": false,
+   "is_default_for_employee": false,
+   "four_eyes": false,
+   "primary_screen": "/inst/education/programs"
+  },
+  {
+   "code": 2202,
+   "key": "ENROLLMENT_VIEW",
+   "name": "Kayıtları görüntüle",
+   "module": "EDUCATION_OPS",
+   "is_sensitive": true,
+   "is_default_for_employee": false,
+   "four_eyes": false,
+   "primary_screen": "/inst/education/enrollments"
+  },
+  {
+   "code": 2203,
+   "key": "ENROLLMENT_MANAGE",
+   "name": "Kayıt yönet",
+   "module": "EDUCATION_OPS",
+   "is_sensitive": false,
+   "is_default_for_employee": false,
+   "four_eyes": false,
+   "primary_screen": "/inst/education/enrollments/manage"
+  },
+  {
+   "code": 2204,
+   "key": "CERTIFICATE_ISSUE",
+   "name": "Sertifika ve diploma ver",
+   "module": "EDUCATION_OPS",
+   "is_sensitive": false,
+   "is_default_for_employee": false,
+   "four_eyes": false,
+   "primary_screen": "/inst/education/certificates"
+  },
+  {
+   "code": 2205,
+   "key": "INSTRUCTOR_ASSIGN",
+   "name": "Eğitmen ata",
+   "module": "EDUCATION_OPS",
+   "is_sensitive": false,
+   "is_default_for_employee": false,
+   "four_eyes": false,
+   "primary_screen": "/inst/education/instructors"
+  },
+  {
+   "code": 2301,
+   "key": "CONTENT_VIEW",
+   "name": "İçerikleri görüntüle",
+   "module": "MEDIA_CONTENT",
+   "is_sensitive": false,
+   "is_default_for_employee": false,
+   "four_eyes": false,
+   "primary_screen": "/inst/content"
+  },
+  {
+   "code": 2302,
+   "key": "CONTENT_MANAGE",
+   "name": "İçerik yükle ve yönet",
+   "module": "MEDIA_CONTENT",
+   "is_sensitive": false,
+   "is_default_for_employee": false,
+   "four_eyes": false,
+   "primary_screen": "/inst/content/edit"
+  },
+  {
+   "code": 2303,
+   "key": "CONTENT_RIGHTS_MANAGE",
+   "name": "Hak ve bölge kısıtlarını yönet",
+   "module": "MEDIA_CONTENT",
+   "is_sensitive": true,
+   "is_default_for_employee": false,
+   "four_eyes": false,
+   "primary_screen": "/inst/content/rights"
+  },
+  {
+   "code": 2304,
+   "key": "CONTENT_ACCESS_MANAGE",
+   "name": "İzleme hakkı ver ve iptal et",
+   "module": "MEDIA_CONTENT",
+   "is_sensitive": true,
+   "is_default_for_employee": false,
+   "four_eyes": false,
+   "primary_screen": "/inst/content/access"
+  },
+  {
+   "code": 2401,
+   "key": "ODDS_MANAGE",
+   "name": "Oran yönet",
+   "module": "BETTING_OPS",
+   "is_sensitive": true,
+   "is_default_for_employee": false,
+   "four_eyes": false,
+   "primary_screen": "/inst/betting/markets"
+  },
+  {
+   "code": 2402,
+   "key": "ODDS_LOCK",
+   "name": "Oran kilitle ve aç",
+   "module": "BETTING_OPS",
+   "is_sensitive": true,
+   "is_default_for_employee": false,
+   "four_eyes": false,
+   "primary_screen": "/inst/betting/odds/lock"
+  },
+  {
+   "code": 2403,
+   "key": "WAGER_VIEW",
+   "name": "Bahisleri görüntüle",
+   "module": "BETTING_OPS",
+   "is_sensitive": true,
+   "is_default_for_employee": false,
+   "four_eyes": false,
+   "primary_screen": "/inst/betting/wagers"
+  },
+  {
+   "code": 2404,
+   "key": "WAGER_SETTLE",
+   "name": "Bahis sonuçlandır",
+   "module": "BETTING_OPS",
+   "is_sensitive": true,
+   "is_default_for_employee": false,
+   "four_eyes": true,
+   "primary_screen": "/inst/betting/settle"
+  },
+  {
+   "code": 2501,
+   "key": "MEDICAL_LISTING_MANAGE",
+   "name": "Tıbbi ürün ve hizmet ilanı yönet",
+   "module": "HEALTH_OPS",
+   "is_sensitive": false,
+   "is_default_for_employee": false,
+   "four_eyes": false,
+   "primary_screen": "/inst/health/listings"
+  },
+  {
+   "code": 2502,
+   "key": "PRESCRIPTION_VERIFY",
+   "name": "Reçete doğrula",
+   "module": "HEALTH_OPS",
+   "is_sensitive": true,
+   "is_default_for_employee": false,
+   "four_eyes": false,
+   "primary_screen": "/inst/health/prescriptions"
+  },
+  {
+   "code": 2503,
+   "key": "PATIENT_APPOINTMENT_VIEW",
+   "name": "Hasta randevularını görüntüle",
+   "module": "HEALTH_OPS",
+   "is_sensitive": true,
+   "is_default_for_employee": false,
+   "four_eyes": false,
+   "primary_screen": "/inst/health/appointments"
+  },
+  {
+   "code": 2601,
+   "key": "FINANCIAL_INSTRUMENT_MANAGE",
+   "name": "Finansal ürün yönet",
+   "module": "FINANCIAL_OPS",
+   "is_sensitive": true,
+   "is_default_for_employee": false,
+   "four_eyes": false,
+   "primary_screen": "/inst/fin-ops/instruments"
+  },
+  {
+   "code": 2602,
+   "key": "WITHDRAWAL_REQUEST_VIEW",
+   "name": "Nakit çıkış taleplerini görüntüle",
+   "module": "FINANCIAL_OPS",
+   "is_sensitive": true,
+   "is_default_for_employee": false,
+   "four_eyes": false,
+   "primary_screen": "/inst/fin-ops/withdrawals"
+  },
+  {
+   "code": 2603,
+   "key": "WITHDRAWAL_CODE_VERIFY",
+   "name": "Nakit çıkış doğrulama kodunu gir",
+   "module": "FINANCIAL_OPS",
+   "is_sensitive": true,
+   "is_default_for_employee": false,
+   "four_eyes": false,
+   "primary_screen": "/inst/fin-ops/withdrawals/verify"
+  },
+  {
+   "code": 2604,
+   "key": "WITHDRAWAL_PAYOUT",
+   "name": "Nakit ödemeyi yap",
+   "module": "FINANCIAL_OPS",
+   "is_sensitive": true,
+   "is_default_for_employee": false,
+   "four_eyes": false,
+   "primary_screen": "/inst/fin-ops/withdrawals/pay"
+  },
+  {
+   "code": 2605,
+   "key": "CASH_SLIP_MANAGE",
+   "name": "Nakit çıkış fişi yönet",
+   "module": "FINANCIAL_OPS",
+   "is_sensitive": true,
+   "is_default_for_employee": false,
+   "four_eyes": false,
+   "primary_screen": "/inst/fin-ops/slips"
+  },
+  {
+   "code": 2701,
+   "key": "SUBSCRIPTION_VIEW",
+   "name": "Abonelikleri görüntüle",
+   "module": "SAAS_HOSTING_OPS",
+   "is_sensitive": true,
+   "is_default_for_employee": false,
+   "four_eyes": false,
+   "primary_screen": "/inst/subscriptions"
+  },
+  {
+   "code": 2702,
+   "key": "SUBSCRIPTION_MANAGE",
+   "name": "Abonelik yönet",
+   "module": "SAAS_HOSTING_OPS",
+   "is_sensitive": false,
+   "is_default_for_employee": false,
+   "four_eyes": false,
+   "primary_screen": "/inst/subscriptions/manage"
+  },
+  {
+   "code": 2703,
+   "key": "SEAT_MANAGE",
+   "name": "Koltuk ataması yönet",
+   "module": "SAAS_HOSTING_OPS",
+   "is_sensitive": false,
+   "is_default_for_employee": false,
+   "four_eyes": false,
+   "primary_screen": "/inst/subscriptions/seats"
+  },
+  {
+   "code": 2704,
+   "key": "RESOURCE_ALLOCATION_MANAGE",
+   "name": "Kaynak tahsisi yönet",
+   "module": "SAAS_HOSTING_OPS",
+   "is_sensitive": false,
+   "is_default_for_employee": false,
+   "four_eyes": false,
+   "primary_screen": "/inst/subscriptions/resources"
+  },
+  {
+   "code": 2705,
+   "key": "IOT_DEVICE_VIEW",
+   "name": "IoT cihaz ve telemetrisini görüntüle",
+   "module": "SAAS_HOSTING_OPS",
+   "is_sensitive": false,
+   "is_default_for_employee": false,
+   "four_eyes": false,
+   "primary_screen": "/inst/iot/devices"
+  },
+  {
+   "code": 2801,
+   "key": "ENGAGEMENT_VIEW",
+   "name": "Hizmet projelerini görüntüle",
+   "module": "SERVICE_ENGAGEMENTS",
+   "is_sensitive": false,
+   "is_default_for_employee": false,
+   "four_eyes": false,
+   "primary_screen": "/inst/engagements"
+  },
+  {
+   "code": 2802,
+   "key": "ENGAGEMENT_MANAGE",
+   "name": "Hizmet projesi yönet",
+   "module": "SERVICE_ENGAGEMENTS",
+   "is_sensitive": false,
+   "is_default_for_employee": false,
+   "four_eyes": false,
+   "primary_screen": "/inst/engagements/manage"
+  },
+  {
+   "code": 2803,
+   "key": "MILESTONE_DELIVER",
+   "name": "Aşama teslimi bildir",
+   "module": "SERVICE_ENGAGEMENTS",
+   "is_sensitive": false,
+   "is_default_for_employee": false,
+   "four_eyes": false,
+   "primary_screen": "/inst/engagements/milestones"
+  },
+  {
+   "code": 3001,
+   "key": "FEATURE_FLAG_MANAGE",
+   "name": "Özellik bayraklarını yönet",
+   "module": "PLATFORM_OPERATIONS",
+   "is_sensitive": true,
+   "is_default_for_employee": false,
+   "four_eyes": false,
+   "primary_screen": "/ops/feature-flags"
+  },
+  {
+   "code": 3002,
+   "key": "SYSTEM_NOTIFICATION_SEND",
+   "name": "Sistem bildirimi gönder",
+   "module": "PLATFORM_OPERATIONS",
+   "is_sensitive": false,
+   "is_default_for_employee": false,
+   "four_eyes": false,
+   "primary_screen": "/ops/notifications"
+  },
+  {
+   "code": 3003,
+   "key": "COMMISSION_CONFIG_MANAGE",
+   "name": "Komisyon ayarlarını yönet",
+   "module": "PLATFORM_OPERATIONS",
+   "is_sensitive": true,
+   "is_default_for_employee": false,
+   "four_eyes": false,
+   "primary_screen": "/ops/commissions"
+  },
+  {
+   "code": 3004,
+   "key": "TAX_RULES_MANAGE",
+   "name": "Vergi kurallarını yönet",
+   "module": "PLATFORM_OPERATIONS",
+   "is_sensitive": true,
+   "is_default_for_employee": false,
+   "four_eyes": false,
+   "primary_screen": "/ops/tax-rules"
+  },
+  {
+   "code": 3005,
+   "key": "JURISDICTION_RULES_MANAGE",
+   "name": "Hakemlik ve fesih kurallarını yönet",
+   "module": "PLATFORM_OPERATIONS",
+   "is_sensitive": true,
+   "is_default_for_employee": false,
+   "four_eyes": false,
+   "primary_screen": "/ops/jurisdiction"
+  },
+  {
+   "code": 3006,
+   "key": "CATEGORY_COUNTRY_RULES_MANAGE",
+   "name": "Kategori-ülke kurallarını yönet",
+   "module": "PLATFORM_OPERATIONS",
+   "is_sensitive": true,
+   "is_default_for_employee": false,
+   "four_eyes": false,
+   "primary_screen": "/ops/category-rules"
+  },
+  {
+   "code": 3007,
+   "key": "LICENSE_ASSIGN",
+   "name": "Lisans ver, devret ve iptal et",
+   "module": "PLATFORM_OPERATIONS",
+   "is_sensitive": true,
+   "is_default_for_employee": false,
+   "four_eyes": true,
+   "primary_screen": "/ops/licenses"
+  },
+  {
+   "code": 3008,
+   "key": "FORMATION_APPLICATION_REVIEW",
+   "name": "Şirket kurma başvurusunu değerlendir",
+   "module": "PLATFORM_OPERATIONS",
+   "is_sensitive": true,
+   "is_default_for_employee": false,
+   "four_eyes": false,
+   "primary_screen": "/ops/formation-applications"
+  },
+  {
+   "code": 3009,
+   "key": "BRANCH_APPLICATION_REVIEW",
+   "name": "Şube başvurusunu değerlendir",
+   "module": "PLATFORM_OPERATIONS",
+   "is_sensitive": true,
+   "is_default_for_employee": false,
+   "four_eyes": false,
+   "primary_screen": "/ops/branch-applications"
+  },
+  {
+   "code": 3010,
+   "key": "INSTITUTION_SUSPEND",
+   "name": "Kurumu dondur ve ihraç et",
+   "module": "PLATFORM_OPERATIONS",
+   "is_sensitive": true,
+   "is_default_for_employee": false,
+   "four_eyes": true,
+   "primary_screen": "/ops/institutions/suspend"
+  },
+  {
+   "code": 3011,
+   "key": "USER_DOCUMENT_REVIEW",
+   "name": "Kullanıcı belgelerini incele",
+   "module": "PLATFORM_OPERATIONS",
+   "is_sensitive": true,
+   "is_default_for_employee": false,
+   "four_eyes": false,
+   "primary_screen": "/ops/user-documents"
+  },
+  {
+   "code": 3012,
+   "key": "GDPR_REQUEST_PROCESS",
+   "name": "KVKK ve GDPR taleplerini işle",
+   "module": "PLATFORM_OPERATIONS",
+   "is_sensitive": true,
+   "is_default_for_employee": false,
+   "four_eyes": false,
+   "primary_screen": "/ops/gdpr"
+  },
+  {
+   "code": 3013,
+   "key": "PERMISSION_CATALOG_MANAGE",
+   "name": "Yetki kataloğunu yönet",
+   "module": "PLATFORM_OPERATIONS",
+   "is_sensitive": true,
+   "is_default_for_employee": false,
+   "four_eyes": false,
+   "primary_screen": "/ops/permission-catalog"
+  },
+  {
+   "code": 3014,
+   "key": "USER_SUPPORT_VIEW",
+   "name": "Kullanıcı destek kayıtlarını görüntüle",
+   "module": "PLATFORM_OPERATIONS",
+   "is_sensitive": true,
+   "is_default_for_employee": false,
+   "four_eyes": false,
+   "primary_screen": "/ops/user-support"
+  },
+  {
+   "code": 3015,
+   "key": "COMPLAINT_ESCALATION_HANDLE",
+   "name": "Yükseltilen şikayetleri işle",
+   "module": "PLATFORM_OPERATIONS",
+   "is_sensitive": true,
+   "is_default_for_employee": false,
+   "four_eyes": false,
+   "primary_screen": "/ops/complaints"
+  },
+  {
+   "code": 3016,
+   "key": "PRIVILEGE_TIER_MANAGE",
+   "name": "İmtiyaz eşiklerini yönet",
+   "module": "PLATFORM_OPERATIONS",
+   "is_sensitive": false,
+   "is_default_for_employee": false,
+   "four_eyes": false,
+   "primary_screen": "/ops/privilege-tiers"
+  },
+  {
+   "code": 3017,
+   "key": "OPERATING_RULES_MANAGE",
+   "name": "Kurum işletme kurallarını yönet",
+   "module": "PLATFORM_OPERATIONS",
+   "is_sensitive": false,
+   "is_default_for_employee": false,
+   "four_eyes": false,
+   "primary_screen": "/ops/operating-rules"
+  },
+  {
+   "code": 3018,
+   "key": "INSTITUTION_PERMIT_REVIEW",
+   "name": "Kurum izin belgelerini incele",
+   "module": "PLATFORM_OPERATIONS",
+   "is_sensitive": true,
+   "is_default_for_employee": false,
+   "four_eyes": false,
+   "primary_screen": "/ops/permit-review"
+  },
+  {
+   "code": 3101,
+   "key": "PARTNER_BANK_MANAGE",
+   "name": "Anlaşmalı bankaları yönet",
+   "module": "PLATFORM_FINANCE",
+   "is_sensitive": true,
+   "is_default_for_employee": false,
+   "four_eyes": false,
+   "primary_screen": "/fin/partner-banks"
+  },
+  {
+   "code": 3102,
+   "key": "RESERVE_ACCOUNT_MANAGE",
+   "name": "Rezerv ve işletme hesaplarını yönet",
+   "module": "PLATFORM_FINANCE",
+   "is_sensitive": true,
+   "is_default_for_employee": false,
+   "four_eyes": false,
+   "primary_screen": "/fin/reserve-accounts"
+  },
+  {
+   "code": 3103,
+   "key": "BANK_MOVEMENT_ENTER",
+   "name": "Banka hareketi gir",
+   "module": "PLATFORM_FINANCE",
+   "is_sensitive": true,
+   "is_default_for_employee": false,
+   "four_eyes": false,
+   "primary_screen": "/fin/bank-movements"
+  },
+  {
+   "code": 3104,
+   "key": "DEPOSIT_VERIFY",
+   "name": "Para yatırma talebini doğrula",
+   "module": "PLATFORM_FINANCE",
+   "is_sensitive": true,
+   "is_default_for_employee": false,
+   "four_eyes": false,
+   "primary_screen": "/fin/deposits/verify"
+  },
+  {
+   "code": 3105,
+   "key": "DEPOSIT_APPROVE",
+   "name": "Para yatırma talebini onayla",
+   "module": "PLATFORM_FINANCE",
+   "is_sensitive": true,
+   "is_default_for_employee": false,
+   "four_eyes": true,
+   "primary_screen": "/fin/deposits/approve"
+  },
+  {
+   "code": 3106,
+   "key": "RESERVE_RECONCILE",
+   "name": "Rezerv mutabakatı yap",
+   "module": "PLATFORM_FINANCE",
+   "is_sensitive": true,
+   "is_default_for_employee": false,
+   "four_eyes": false,
+   "primary_screen": "/fin/reconciliation"
+  },
+  {
+   "code": 3107,
+   "key": "RESERVE_RECONCILE_APPROVE",
+   "name": "Rezerv mutabakatını onayla",
+   "module": "PLATFORM_FINANCE",
+   "is_sensitive": true,
+   "is_default_for_employee": false,
+   "four_eyes": true,
+   "primary_screen": "/fin/reconciliation/approve"
+  },
+  {
+   "code": 3108,
+   "key": "VOUCHER_BATCH_CREATE",
+   "name": "Kupon partisi oluştur",
+   "module": "PLATFORM_FINANCE",
+   "is_sensitive": true,
+   "is_default_for_employee": false,
+   "four_eyes": false,
+   "primary_screen": "/fin/vouchers/create"
+  },
+  {
+   "code": 3109,
+   "key": "VOUCHER_BATCH_APPROVE",
+   "name": "Kupon partisini onayla",
+   "module": "PLATFORM_FINANCE",
+   "is_sensitive": true,
+   "is_default_for_employee": false,
+   "four_eyes": true,
+   "primary_screen": "/fin/vouchers/approve"
+  },
+  {
+   "code": 3110,
+   "key": "EXCHANGE_RATE_SOURCE_MANAGE",
+   "name": "Kur kaynaklarını yönet",
+   "module": "PLATFORM_FINANCE",
+   "is_sensitive": true,
+   "is_default_for_employee": false,
+   "four_eyes": false,
+   "primary_screen": "/fin/exchange-sources"
+  },
+  {
+   "code": 3111,
+   "key": "SYSTEM_WALLET_VIEW",
+   "name": "Sistem komisyon cüzdanlarını görüntüle",
+   "module": "PLATFORM_FINANCE",
+   "is_sensitive": true,
+   "is_default_for_employee": false,
+   "four_eyes": false,
+   "primary_screen": "/fin/system-wallets"
+  },
+  {
+   "code": 3201,
+   "key": "VERIFICATION_SESSION_SCHEDULE",
+   "name": "Doğrulama görüşmesi planla",
+   "module": "PLATFORM_VERIFICATION",
+   "is_sensitive": false,
+   "is_default_for_employee": false,
+   "four_eyes": false,
+   "primary_screen": "/verify/schedule"
+  },
+  {
+   "code": 3202,
+   "key": "VERIFICATION_SESSION_CONDUCT",
+   "name": "Doğrulama görüşmesi yürüt",
+   "module": "PLATFORM_VERIFICATION",
+   "is_sensitive": true,
+   "is_default_for_employee": false,
+   "four_eyes": false,
+   "primary_screen": "/verify/session"
+  },
+  {
+   "code": 3203,
+   "key": "VERIFICATION_RECORDING_VIEW",
+   "name": "Görüşme kayıtlarını görüntüle",
+   "module": "PLATFORM_VERIFICATION",
+   "is_sensitive": true,
+   "is_default_for_employee": false,
+   "four_eyes": false,
+   "primary_screen": "/verify/recordings"
+  },
+  {
+   "code": 3204,
+   "key": "VERIFICATION_LEVEL_GRANT",
+   "name": "Doğrulama seviyesi ver",
+   "module": "PLATFORM_VERIFICATION",
+   "is_sensitive": true,
+   "is_default_for_employee": false,
+   "four_eyes": false,
+   "primary_screen": "/verify/levels"
+  },
+  {
+   "code": 3301,
+   "key": "DISPUTE_PLATFORM_HANDLE",
+   "name": "Platform ekibi uyuşmazlıklarını yürüt",
+   "module": "PLATFORM_ARBITRATION",
+   "is_sensitive": true,
+   "is_default_for_employee": false,
+   "four_eyes": false,
+   "primary_screen": "/arb/disputes"
+  },
+  {
+   "code": 3302,
+   "key": "ARBITRATOR_APPOINT",
+   "name": "Hakem ata",
+   "module": "PLATFORM_ARBITRATION",
+   "is_sensitive": true,
+   "is_default_for_employee": false,
+   "four_eyes": false,
+   "primary_screen": "/arb/arbitrators"
+  },
+  {
+   "code": 3303,
+   "key": "AWARD_ISSUE",
+   "name": "Hakem kararı kaydet",
+   "module": "PLATFORM_ARBITRATION",
+   "is_sensitive": true,
+   "is_default_for_employee": false,
+   "four_eyes": false,
+   "primary_screen": "/arb/awards"
+  },
+  {
+   "code": 3401,
+   "key": "AUDIT_LOG_VIEW",
+   "name": "Denetim kayıtlarını görüntüle",
+   "module": "PLATFORM_AUDIT",
+   "is_sensitive": true,
+   "is_default_for_employee": false,
+   "four_eyes": false,
+   "primary_screen": "/audit/logs"
+  },
+  {
+   "code": 3402,
+   "key": "SYNC_MONITOR_VIEW",
+   "name": "Senkronizasyon durumunu izle",
+   "module": "PLATFORM_AUDIT",
+   "is_sensitive": false,
+   "is_default_for_employee": false,
+   "four_eyes": false,
+   "primary_screen": "/audit/sync"
+  },
+  {
+   "code": 3403,
+   "key": "DEAD_LETTER_MANAGE",
+   "name": "Hatalı mesaj kuyruğunu yönet",
+   "module": "PLATFORM_AUDIT",
+   "is_sensitive": true,
+   "is_default_for_employee": false,
+   "four_eyes": false,
+   "primary_screen": "/audit/dead-letters"
+  },
+  {
+   "code": 3404,
+   "key": "IOT_STAGING_VIEW",
+   "name": "IoT ham veri akışını izle",
+   "module": "PLATFORM_AUDIT",
+   "is_sensitive": false,
+   "is_default_for_employee": false,
+   "four_eyes": false,
+   "primary_screen": "/audit/iot"
+  },
+  {
+   "code": 3405,
+   "key": "SLA_METRICS_MANAGE",
+   "name": "SLA metrik kaydı gir",
+   "module": "PLATFORM_AUDIT",
+   "is_sensitive": false,
+   "is_default_for_employee": false,
+   "four_eyes": false,
+   "primary_screen": "/audit/sla"
+  }
+ ],
+ "screens": [
+  {
+   "code": 101,
+   "route": "/inst/dashboard",
+   "name": "Kurum Panosu",
+   "module": "INSTITUTION_ADMIN",
+   "audience": "INSTITUTION",
+   "requires_all": [
+    "INSTITUTION_PROFILE_VIEW"
+   ]
+  },
+  {
+   "code": 102,
+   "route": "/inst/profile",
+   "name": "Kurum Profili",
+   "module": "INSTITUTION_ADMIN",
+   "audience": "INSTITUTION",
+   "requires_all": [
+    "INSTITUTION_PROFILE_VIEW"
+   ]
+  },
+  {
+   "code": 103,
+   "route": "/inst/profile/edit",
+   "name": "Profili Düzenle",
+   "module": "INSTITUTION_ADMIN",
+   "audience": "INSTITUTION",
+   "requires_all": [
+    "INSTITUTION_PROFILE_MANAGE"
+   ]
+  },
+  {
+   "code": 104,
+   "route": "/inst/documents",
+   "name": "Kurum Belgeleri",
+   "module": "INSTITUTION_ADMIN",
+   "audience": "INSTITUTION",
+   "requires_all": [
+    "INSTITUTION_DOCUMENTS_MANAGE"
+   ]
+  },
+  {
+   "code": 105,
+   "route": "/inst/permissions",
+   "name": "Çalışan Yetkileri",
+   "module": "INSTITUTION_ADMIN",
+   "audience": "INSTITUTION",
+   "requires_all": [
+    "WORKER_PERMISSIONS_MANAGE"
+   ]
+  },
+  {
+   "code": 106,
+   "route": "/inst/settings",
+   "name": "Kurum Ayarları",
+   "module": "INSTITUTION_ADMIN",
+   "audience": "INSTITUTION",
+   "requires_all": [
+    "INSTITUTION_SETTINGS_MANAGE"
+   ]
+  },
+  {
+   "code": 107,
+   "route": "/inst/analytics",
+   "name": "Analitik",
+   "module": "INSTITUTION_ADMIN",
+   "audience": "INSTITUTION",
+   "requires_all": [
+    "INSTITUTION_ANALYTICS_VIEW"
+   ]
+  },
+  {
+   "code": 108,
+   "route": "/inst/analytics/export",
+   "name": "Analitik Dışa Aktarım",
+   "module": "INSTITUTION_ADMIN",
+   "audience": "INSTITUTION",
+   "requires_all": [
+    "INSTITUTION_ANALYTICS_EXPORT"
+   ]
+  },
+  {
+   "code": 201,
+   "route": "/inst/branches",
+   "name": "Şubeler",
+   "module": "BRANCH_MANAGEMENT",
+   "audience": "INSTITUTION",
+   "requires_all": [
+    "BRANCH_VIEW"
+   ]
+  },
+  {
+   "code": 202,
+   "route": "/inst/branches/detail",
+   "name": "Şube Detayı",
+   "module": "BRANCH_MANAGEMENT",
+   "audience": "INSTITUTION",
+   "requires_all": [
+    "BRANCH_VIEW"
+   ]
+  },
+  {
+   "code": 203,
+   "route": "/inst/branches/edit",
+   "name": "Şube Düzenle",
+   "module": "BRANCH_MANAGEMENT",
+   "audience": "INSTITUTION",
+   "requires_all": [
+    "BRANCH_MANAGE"
+   ]
+  },
+  {
+   "code": 204,
+   "route": "/inst/branches/new",
+   "name": "Yeni Şube Başvurusu",
+   "module": "BRANCH_MANAGEMENT",
+   "audience": "INSTITUTION",
+   "requires_all": [
+    "BRANCH_APPLICATION_SUBMIT"
+   ]
+  },
+  {
+   "code": 205,
+   "route": "/inst/branches/closure",
+   "name": "Şube Kapatma",
+   "module": "BRANCH_MANAGEMENT",
+   "audience": "INSTITUTION",
+   "requires_all": [
+    "BRANCH_CLOSURE_REQUEST"
+   ]
+  },
+  {
+   "code": 301,
+   "route": "/inst/me/positions",
+   "name": "Pozisyonlarım",
+   "module": "WORKFORCE_HR",
+   "audience": "INSTITUTION",
+   "requires_all": [
+    "EMPLOYEE_SELF_SERVICE"
+   ]
+  },
+  {
+   "code": 302,
+   "route": "/inst/workers",
+   "name": "Çalışanlar",
+   "module": "WORKFORCE_HR",
+   "audience": "INSTITUTION",
+   "requires_all": [
+    "WORKER_VIEW"
+   ]
+  },
+  {
+   "code": 303,
+   "route": "/inst/workers/detail",
+   "name": "Çalışan Detayı",
+   "module": "WORKFORCE_HR",
+   "audience": "INSTITUTION",
+   "requires_all": [
+    "WORKER_VIEW"
+   ]
+  },
+  {
+   "code": 304,
+   "route": "/inst/workers/edit",
+   "name": "Çalışan Pozisyonu Düzenle",
+   "module": "WORKFORCE_HR",
+   "audience": "INSTITUTION",
+   "requires_all": [
+    "WORKER_MANAGE"
+   ]
+  },
+  {
+   "code": 305,
+   "route": "/inst/hiring/applications",
+   "name": "İş Başvuruları",
+   "module": "WORKFORCE_HR",
+   "audience": "INSTITUTION",
+   "requires_all": [
+    "EMPLOYMENT_APPLICATIONS_REVIEW"
+   ]
+  },
+  {
+   "code": 306,
+   "route": "/inst/workers/terminate",
+   "name": "İşten Çıkarma",
+   "module": "WORKFORCE_HR",
+   "audience": "INSTITUTION",
+   "requires_all": [
+    "WORKER_TERMINATE"
+   ]
+  },
+  {
+   "code": 307,
+   "route": "/inst/workers/salary",
+   "name": "Maaş ve Komisyon",
+   "module": "WORKFORCE_HR",
+   "audience": "INSTITUTION",
+   "requires_all": [
+    "SALARY_VIEW",
+    "SALARY_MANAGE"
+   ]
+  },
+  {
+   "code": 308,
+   "route": "/inst/exits/settlements",
+   "name": "Ayrılış Hesaplaşmaları",
+   "module": "WORKFORCE_HR",
+   "audience": "INSTITUTION",
+   "requires_all": [
+    "EXIT_SETTLEMENT_VIEW"
+   ]
+  },
+  {
+   "code": 309,
+   "route": "/inst/exits/settlements/manage",
+   "name": "Hesaplaşma Düzenle",
+   "module": "WORKFORCE_HR",
+   "audience": "INSTITUTION",
+   "requires_all": [
+    "EXIT_SETTLEMENT_MANAGE"
+   ]
+  },
+  {
+   "code": 401,
+   "route": "/inst/me/payslips",
+   "name": "Maaş Bordrolarım",
+   "module": "PAYROLL",
+   "audience": "INSTITUTION",
+   "requires_all": [
+    "EMPLOYEE_SELF_SERVICE"
+   ]
+  },
+  {
+   "code": 402,
+   "route": "/inst/payroll/runs",
+   "name": "Bordro Dönemleri",
+   "module": "PAYROLL",
+   "audience": "INSTITUTION",
+   "requires_all": [
+    "PAYROLL_VIEW"
+   ]
+  },
+  {
+   "code": 403,
+   "route": "/inst/payroll/prepare",
+   "name": "Bordro Hazırla",
+   "module": "PAYROLL",
+   "audience": "INSTITUTION",
+   "requires_all": [
+    "PAYROLL_PREPARE"
+   ]
+  },
+  {
+   "code": 404,
+   "route": "/inst/payroll/approve",
+   "name": "Bordro Onayı",
+   "module": "PAYROLL",
+   "audience": "INSTITUTION",
+   "requires_all": [
+    "PAYROLL_APPROVE"
+   ]
+  },
+  {
+   "code": 501,
+   "route": "/inst/finance/ledger",
+   "name": "Defter",
+   "module": "FINANCE_ACCOUNTING",
+   "audience": "INSTITUTION",
+   "requires_all": [
+    "LEDGER_VIEW"
+   ]
+  },
+  {
+   "code": 502,
+   "route": "/inst/finance/journal/new",
+   "name": "Yevmiye Kaydı",
+   "module": "FINANCE_ACCOUNTING",
+   "audience": "INSTITUTION",
+   "requires_all": [
+    "JOURNAL_MANAGE"
+   ]
+  },
+  {
+   "code": 503,
+   "route": "/inst/finance/chart",
+   "name": "Hesap Planı",
+   "module": "FINANCE_ACCOUNTING",
+   "audience": "INSTITUTION",
+   "requires_all": [
+    "CHART_OF_ACCOUNTS_VIEW"
+   ]
+  },
+  {
+   "code": 504,
+   "route": "/inst/finance/chart/edit",
+   "name": "Hesap Planı Düzenle",
+   "module": "FINANCE_ACCOUNTING",
+   "audience": "INSTITUTION",
+   "requires_all": [
+    "CHART_OF_ACCOUNTS_MANAGE"
+   ]
+  },
+  {
+   "code": 505,
+   "route": "/inst/finance/reports",
+   "name": "Mali Raporlar",
+   "module": "FINANCE_ACCOUNTING",
+   "audience": "INSTITUTION",
+   "requires_all": [
+    "FINANCIAL_REPORTS_VIEW"
+   ]
+  },
+  {
+   "code": 506,
+   "route": "/inst/finance/reports/export",
+   "name": "Rapor Dışa Aktarım",
+   "module": "FINANCE_ACCOUNTING",
+   "audience": "INSTITUTION",
+   "requires_all": [
+    "FINANCIAL_REPORTS_EXPORT"
+   ]
+  },
+  {
+   "code": 601,
+   "route": "/inst/wallet",
+   "name": "Kurum Cüzdanı",
+   "module": "WALLET_TREASURY",
+   "audience": "INSTITUTION",
+   "requires_all": [
+    "INSTITUTION_WALLET_VIEW"
+   ]
+  },
+  {
+   "code": 602,
+   "route": "/inst/wallet/transfer",
+   "name": "Transfer",
+   "module": "WALLET_TREASURY",
+   "audience": "INSTITUTION",
+   "requires_all": [
+    "INSTITUTION_TRANSFER_INITIATE"
+   ]
+  },
+  {
+   "code": 603,
+   "route": "/inst/wallet/transfer/approve",
+   "name": "Transfer Onayı",
+   "module": "WALLET_TREASURY",
+   "audience": "INSTITUTION",
+   "requires_all": [
+    "INSTITUTION_TRANSFER_APPROVE"
+   ]
+  },
+  {
+   "code": 604,
+   "route": "/inst/bank-accounts",
+   "name": "Banka Hesapları",
+   "module": "WALLET_TREASURY",
+   "audience": "INSTITUTION",
+   "requires_all": [
+    "BANK_ACCOUNTS_VIEW"
+   ]
+  },
+  {
+   "code": 605,
+   "route": "/inst/bank-accounts/edit",
+   "name": "Banka Hesabı Düzenle",
+   "module": "WALLET_TREASURY",
+   "audience": "INSTITUTION",
+   "requires_all": [
+    "BANK_ACCOUNTS_MANAGE"
+   ]
+  },
+  {
+   "code": 606,
+   "route": "/inst/wallet/deposit-request",
+   "name": "Para Yatırma Talebi",
+   "module": "WALLET_TREASURY",
+   "audience": "INSTITUTION",
+   "requires_all": [
+    "DEPOSIT_REQUEST_CREATE"
+   ]
+  },
+  {
+   "code": 607,
+   "route": "/inst/wallet/convert",
+   "name": "Kur Dönüşümü",
+   "module": "WALLET_TREASURY",
+   "audience": "INSTITUTION",
+   "requires_all": [
+    "CURRENCY_CONVERSION_EXECUTE"
+   ]
+  },
+  {
+   "code": 608,
+   "route": "/inst/finance/requests",
+   "name": "Finansal Talepler",
+   "module": "WALLET_TREASURY",
+   "audience": "INSTITUTION",
+   "requires_all": [
+    "FINANCIAL_REQUEST_SUBMIT"
+   ]
+  },
+  {
+   "code": 701,
+   "route": "/inst/tax/accounts",
+   "name": "Vergi Hesapları",
+   "module": "TAX",
+   "audience": "INSTITUTION",
+   "requires_all": [
+    "TAX_VIEW"
+   ]
+  },
+  {
+   "code": 702,
+   "route": "/inst/tax/periods",
+   "name": "Vergi Dönemleri",
+   "module": "TAX",
+   "audience": "INSTITUTION",
+   "requires_all": [
+    "TAX_VIEW"
+   ]
+  },
+  {
+   "code": 703,
+   "route": "/inst/tax/filing",
+   "name": "Beyanname",
+   "module": "TAX",
+   "audience": "INSTITUTION",
+   "requires_all": [
+    "TAX_FILING_MANAGE"
+   ]
+  },
+  {
+   "code": 704,
+   "route": "/inst/tax/remittances",
+   "name": "Vergi Ödemeleri",
+   "module": "TAX",
+   "audience": "INSTITUTION",
+   "requires_all": [
+    "TAX_REMITTANCE_MANAGE"
+   ]
+  },
+  {
+   "code": 801,
+   "route": "/inst/pos/open",
+   "name": "Kasa Aç",
+   "module": "SALES_POS",
+   "audience": "INSTITUTION",
+   "requires_all": [
+    "POS_SESSION_OPEN"
+   ]
+  },
+  {
+   "code": 802,
+   "route": "/inst/pos/sale",
+   "name": "Satış Ekranı",
+   "module": "SALES_POS",
+   "audience": "INSTITUTION",
+   "requires_all": [
+    "POS_SALE_CREATE"
+   ]
+  },
+  {
+   "code": 803,
+   "route": "/inst/pos/refund",
+   "name": "İade",
+   "module": "SALES_POS",
+   "audience": "INSTITUTION",
+   "requires_all": [
+    "POS_REFUND_EXECUTE"
+   ]
+  },
+  {
+   "code": 804,
+   "route": "/inst/pos/cash",
+   "name": "Kasa Nakit Hareketleri",
+   "module": "SALES_POS",
+   "audience": "INSTITUTION",
+   "requires_all": [
+    "POS_CASH_MOVEMENT_MANAGE"
+   ]
+  },
+  {
+   "code": 805,
+   "route": "/inst/pos/close",
+   "name": "Kasa Kapat",
+   "module": "SALES_POS",
+   "audience": "INSTITUTION",
+   "requires_all": [
+    "POS_SESSION_CLOSE"
+   ]
+  },
+  {
+   "code": 806,
+   "route": "/inst/pos/review",
+   "name": "Kasa Oturumları",
+   "module": "SALES_POS",
+   "audience": "INSTITUTION",
+   "requires_all": [
+    "POS_SESSIONS_REVIEW"
+   ]
+  },
+  {
+   "code": 807,
+   "route": "/inst/pos/verify-qr",
+   "name": "QR Doğrula",
+   "module": "SALES_POS",
+   "audience": "INSTITUTION",
+   "requires_all": [
+    "CUSTOMER_QR_VERIFY"
+   ]
+  },
+  {
+   "code": 808,
+   "route": "/inst/pos/voucher-sale",
+   "name": "Kupon Satışı",
+   "module": "SALES_POS",
+   "audience": "INSTITUTION",
+   "requires_all": [
+    "VOUCHER_SELL"
+   ]
+  },
+  {
+   "code": 901,
+   "route": "/inst/listings",
+   "name": "İlanlar",
+   "module": "LISTINGS_CATALOG",
+   "audience": "INSTITUTION",
+   "requires_all": [
+    "LISTING_VIEW"
+   ]
+  },
+  {
+   "code": 902,
+   "route": "/inst/listings/new",
+   "name": "Yeni İlan",
+   "module": "LISTINGS_CATALOG",
+   "audience": "INSTITUTION",
+   "requires_all": [
+    "LISTING_CREATE"
+   ]
+  },
+  {
+   "code": 903,
+   "route": "/inst/listings/edit",
+   "name": "İlan Düzenle",
+   "module": "LISTINGS_CATALOG",
+   "audience": "INSTITUTION",
+   "requires_all": [
+    "LISTING_EDIT"
+   ]
+  },
+  {
+   "code": 904,
+   "route": "/inst/listings/status",
+   "name": "İlan Durumu",
+   "module": "LISTINGS_CATALOG",
+   "audience": "INSTITUTION",
+   "requires_all": [
+    "LISTING_PUBLISH",
+    "LISTING_DEACTIVATE"
+   ]
+  },
+  {
+   "code": 905,
+   "route": "/inst/listings/pricing",
+   "name": "Fiyatlandırma",
+   "module": "LISTINGS_CATALOG",
+   "audience": "INSTITUTION",
+   "requires_all": [
+    "PRICE_MANAGE"
+   ]
+  },
+  {
+   "code": 906,
+   "route": "/inst/listings/media",
+   "name": "İlan Medyası",
+   "module": "LISTINGS_CATALOG",
+   "audience": "INSTITUTION",
+   "requires_all": [
+    "LISTING_MEDIA_MANAGE"
+   ]
+  },
+  {
+   "code": 1001,
+   "route": "/inst/inventory",
+   "name": "Stok Durumu",
+   "module": "INVENTORY",
+   "audience": "INSTITUTION",
+   "requires_all": [
+    "STOCK_VIEW"
+   ]
+  },
+  {
+   "code": 1002,
+   "route": "/inst/inventory/movements",
+   "name": "Stok Hareketleri",
+   "module": "INVENTORY",
+   "audience": "INSTITUTION",
+   "requires_all": [
+    "STOCK_VIEW"
+   ]
+  },
+  {
+   "code": 1003,
+   "route": "/inst/inventory/receive",
+   "name": "Mal Kabul",
+   "module": "INVENTORY",
+   "audience": "INSTITUTION",
+   "requires_all": [
+    "STOCK_RECEIVE"
+   ]
+  },
+  {
+   "code": 1004,
+   "route": "/inst/inventory/adjust",
+   "name": "Stok Düzeltme",
+   "module": "INVENTORY",
+   "audience": "INSTITUTION",
+   "requires_all": [
+    "STOCK_ADJUST"
+   ]
+  },
+  {
+   "code": 1005,
+   "route": "/inst/inventory/transfer",
+   "name": "Şube Transferi",
+   "module": "INVENTORY",
+   "audience": "INSTITUTION",
+   "requires_all": [
+    "STOCK_TRANSFER"
+   ]
+  },
+  {
+   "code": 1006,
+   "route": "/inst/inventory/lots",
+   "name": "Parti ve SKT",
+   "module": "INVENTORY",
+   "audience": "INSTITUTION",
+   "requires_all": [
+    "LOT_EXPIRY_MANAGE"
+   ]
+  },
+  {
+   "code": 1101,
+   "route": "/inst/orders",
+   "name": "Siparişler",
+   "module": "ORDERS",
+   "audience": "INSTITUTION",
+   "requires_all": [
+    "ORDER_VIEW"
+   ]
+  },
+  {
+   "code": 1102,
+   "route": "/inst/orders/detail",
+   "name": "Sipariş Detayı",
+   "module": "ORDERS",
+   "audience": "INSTITUTION",
+   "requires_all": [
+    "ORDER_VIEW"
+   ]
+  },
+  {
+   "code": 1103,
+   "route": "/inst/orders/process",
+   "name": "Sipariş Hazırlama",
+   "module": "ORDERS",
+   "audience": "INSTITUTION",
+   "requires_all": [
+    "ORDER_PROCESS"
+   ]
+  },
+  {
+   "code": 1104,
+   "route": "/inst/orders/cancel",
+   "name": "Sipariş İptali",
+   "module": "ORDERS",
+   "audience": "INSTITUTION",
+   "requires_all": [
+    "ORDER_CANCEL"
+   ]
+  },
+  {
+   "code": 1105,
+   "route": "/inst/orders/assign",
+   "name": "Sipariş Atama",
+   "module": "ORDERS",
+   "audience": "INSTITUTION",
+   "requires_all": [
+    "ORDER_ASSIGN"
+   ]
+  },
+  {
+   "code": 1106,
+   "route": "/inst/orders/export",
+   "name": "Sipariş Dışa Aktarım",
+   "module": "ORDERS",
+   "audience": "INSTITUTION",
+   "requires_all": [
+    "ORDER_EXPORT"
+   ]
+  },
+  {
+   "code": 1201,
+   "route": "/inst/bookings",
+   "name": "Rezervasyonlar",
+   "module": "BOOKINGS",
+   "audience": "INSTITUTION",
+   "requires_all": [
+    "BOOKING_VIEW"
+   ]
+  },
+  {
+   "code": 1202,
+   "route": "/inst/bookings/detail",
+   "name": "Rezervasyon Detayı",
+   "module": "BOOKINGS",
+   "audience": "INSTITUTION",
+   "requires_all": [
+    "BOOKING_MANAGE"
+   ]
+  },
+  {
+   "code": 1203,
+   "route": "/inst/bookings/slots",
+   "name": "Müsaitlik Takvimi",
+   "module": "BOOKINGS",
+   "audience": "INSTITUTION",
+   "requires_all": [
+    "SLOT_MANAGE"
+   ]
+  },
+  {
+   "code": 1204,
+   "route": "/inst/bookings/checkin",
+   "name": "Giriş ve Çıkış",
+   "module": "BOOKINGS",
+   "audience": "INSTITUTION",
+   "requires_all": [
+    "BOOKING_CHECKIN"
+   ]
+  },
+  {
+   "code": 1205,
+   "route": "/inst/bookings/cancel",
+   "name": "İptal ve İade",
+   "module": "BOOKINGS",
+   "audience": "INSTITUTION",
+   "requires_all": [
+    "BOOKING_CANCEL_REFUND"
+   ]
+  },
+  {
+   "code": 1301,
+   "route": "/inst/shipments",
+   "name": "Sevkiyatlar",
+   "module": "LOGISTICS_OPS",
+   "audience": "INSTITUTION",
+   "requires_all": [
+    "SHIPMENT_VIEW"
+   ]
+  },
+  {
+   "code": 1302,
+   "route": "/inst/shipments/detail",
+   "name": "Sevkiyat Detayı",
+   "module": "LOGISTICS_OPS",
+   "audience": "INSTITUTION",
+   "requires_all": [
+    "SHIPMENT_MANAGE"
+   ]
+  },
+  {
+   "code": 1303,
+   "route": "/inst/shipments/status",
+   "name": "Durum Güncelle",
+   "module": "LOGISTICS_OPS",
+   "audience": "INSTITUTION",
+   "requires_all": [
+    "SHIPMENT_STATUS_UPDATE"
+   ]
+  },
+  {
+   "code": 1304,
+   "route": "/inst/shipments/assign",
+   "name": "Kurye Atama",
+   "module": "LOGISTICS_OPS",
+   "audience": "INSTITUTION",
+   "requires_all": [
+    "CARRIER_ASSIGN"
+   ]
+  },
+  {
+   "code": 1305,
+   "route": "/inst/shipments/customs",
+   "name": "Gümrük Belgeleri",
+   "module": "LOGISTICS_OPS",
+   "audience": "INSTITUTION",
+   "requires_all": [
+    "CUSTOMS_DOCS_MANAGE"
+   ]
+  },
+  {
+   "code": 1401,
+   "route": "/inst/production/materials",
+   "name": "Hammaddeler",
+   "module": "PRODUCTION_SUPPLY",
+   "audience": "INSTITUTION",
+   "requires_all": [
+    "RAW_MATERIAL_VIEW"
+   ]
+  },
+  {
+   "code": 1402,
+   "route": "/inst/production/materials/edit",
+   "name": "Hammadde Düzenle",
+   "module": "PRODUCTION_SUPPLY",
+   "audience": "INSTITUTION",
+   "requires_all": [
+    "RAW_MATERIAL_MANAGE"
+   ]
+  },
+  {
+   "code": 1403,
+   "route": "/inst/production/recipes",
+   "name": "Reçeteler",
+   "module": "PRODUCTION_SUPPLY",
+   "audience": "INSTITUTION",
+   "requires_all": [
+    "RECIPE_MANAGE"
+   ]
+  },
+  {
+   "code": 1404,
+   "route": "/inst/production/schedules",
+   "name": "Üretim Planı",
+   "module": "PRODUCTION_SUPPLY",
+   "audience": "INSTITUTION",
+   "requires_all": [
+    "PRODUCTION_SCHEDULE_MANAGE"
+   ]
+  },
+  {
+   "code": 1405,
+   "route": "/inst/production/runs",
+   "name": "Üretim Partileri",
+   "module": "PRODUCTION_SUPPLY",
+   "audience": "INSTITUTION",
+   "requires_all": [
+    "PRODUCTION_RUN_EXECUTE"
+   ]
+  },
+  {
+   "code": 1406,
+   "route": "/inst/production/waste",
+   "name": "Fire Kaydı",
+   "module": "PRODUCTION_SUPPLY",
+   "audience": "INSTITUTION",
+   "requires_all": [
+    "WASTE_RECORD"
+   ]
+  },
+  {
+   "code": 1501,
+   "route": "/inst/b2b/agreements",
+   "name": "B2B Anlaşmaları",
+   "module": "B2B_CONSORTIUM",
+   "audience": "INSTITUTION",
+   "requires_all": [
+    "B2B_AGREEMENT_VIEW"
+   ]
+  },
+  {
+   "code": 1502,
+   "route": "/inst/b2b/agreements/edit",
+   "name": "Anlaşma Düzenle",
+   "module": "B2B_CONSORTIUM",
+   "audience": "INSTITUTION",
+   "requires_all": [
+    "B2B_AGREEMENT_MANAGE"
+   ]
+  },
+  {
+   "code": 1503,
+   "route": "/inst/b2b/distributors",
+   "name": "Distribütörler",
+   "module": "B2B_CONSORTIUM",
+   "audience": "INSTITUTION",
+   "requires_all": [
+    "DISTRIBUTOR_MANAGE"
+   ]
+  },
+  {
+   "code": 1504,
+   "route": "/inst/consortium",
+   "name": "Konsorsiyum",
+   "module": "B2B_CONSORTIUM",
+   "audience": "INSTITUTION",
+   "requires_all": [
+    "CONSORTIUM_VIEW"
+   ]
+  },
+  {
+   "code": 1505,
+   "route": "/inst/consortium/members",
+   "name": "Konsorsiyum Üyeliği",
+   "module": "B2B_CONSORTIUM",
+   "audience": "INSTITUTION",
+   "requires_all": [
+    "CONSORTIUM_MANAGE"
+   ]
+  },
+  {
+   "code": 1506,
+   "route": "/inst/consortium/pools",
+   "name": "Kaynak Havuzları",
+   "module": "B2B_CONSORTIUM",
+   "audience": "INSTITUTION",
+   "requires_all": [
+    "RESOURCE_POOL_MANAGE"
+   ]
+  },
+  {
+   "code": 1507,
+   "route": "/inst/consortium/usage",
+   "name": "Kaynak Kullanımı",
+   "module": "B2B_CONSORTIUM",
+   "audience": "INSTITUTION",
+   "requires_all": [
+    "RESOURCE_USAGE_REQUEST"
+   ]
+  },
+  {
+   "code": 1601,
+   "route": "/inst/support/disputes",
+   "name": "İtiraz ve İadeler",
+   "module": "CUSTOMER_SERVICE",
+   "audience": "INSTITUTION",
+   "requires_all": [
+    "DISPUTE_VIEW"
+   ]
+  },
+  {
+   "code": 1602,
+   "route": "/inst/support/disputes/respond",
+   "name": "İtiraza Yanıt",
+   "module": "CUSTOMER_SERVICE",
+   "audience": "INSTITUTION",
+   "requires_all": [
+    "DISPUTE_RESPOND"
+   ]
+  },
+  {
+   "code": 1603,
+   "route": "/inst/support/refunds",
+   "name": "İade Onayı",
+   "module": "CUSTOMER_SERVICE",
+   "audience": "INSTITUTION",
+   "requires_all": [
+    "REFUND_APPROVE"
+   ]
+  },
+  {
+   "code": 1604,
+   "route": "/inst/support/complaints",
+   "name": "Şikayetler",
+   "module": "CUSTOMER_SERVICE",
+   "audience": "INSTITUTION",
+   "requires_all": [
+    "COMPLAINT_VIEW"
+   ]
+  },
+  {
+   "code": 1605,
+   "route": "/inst/support/complaints/respond",
+   "name": "Şikayete Yanıt",
+   "module": "CUSTOMER_SERVICE",
+   "audience": "INSTITUTION",
+   "requires_all": [
+    "COMPLAINT_RESPOND"
+   ]
+  },
+  {
+   "code": 1606,
+   "route": "/inst/support/ratings",
+   "name": "Değerlendirmeler",
+   "module": "CUSTOMER_SERVICE",
+   "audience": "INSTITUTION",
+   "requires_all": [
+    "RATING_VIEW",
+    "RATING_REPLY"
+   ]
+  },
+  {
+   "code": 1701,
+   "route": "/inst/promotions",
+   "name": "Kampanyalar",
+   "module": "PROMOTIONS",
+   "audience": "INSTITUTION",
+   "requires_all": [
+    "PROMOTION_VIEW"
+   ]
+  },
+  {
+   "code": 1702,
+   "route": "/inst/promotions/edit",
+   "name": "Kampanya Düzenle",
+   "module": "PROMOTIONS",
+   "audience": "INSTITUTION",
+   "requires_all": [
+    "PROMOTION_MANAGE"
+   ]
+  },
+  {
+   "code": 1703,
+   "route": "/inst/notifications/send",
+   "name": "Bildirim Gönder",
+   "module": "PROMOTIONS",
+   "audience": "INSTITUTION",
+   "requires_all": [
+    "NOTIFICATION_CAMPAIGN_SEND"
+   ]
+  },
+  {
+   "code": 1704,
+   "route": "/inst/privileges",
+   "name": "İmtiyazlar",
+   "module": "PROMOTIONS",
+   "audience": "INSTITUTION",
+   "requires_all": [
+    "PRIVILEGE_VIEW"
+   ]
+  },
+  {
+   "code": 1801,
+   "route": "/inst/governance/shareholders",
+   "name": "Ortaklar",
+   "module": "GOVERNANCE",
+   "audience": "INSTITUTION",
+   "requires_all": [
+    "SHAREHOLDER_VIEW"
+   ]
+  },
+  {
+   "code": 1802,
+   "route": "/inst/governance/applications",
+   "name": "Ortaklık Başvuruları",
+   "module": "GOVERNANCE",
+   "audience": "INSTITUTION",
+   "requires_all": [
+    "PARTNER_APPLICATION_REVIEW"
+   ]
+  },
+  {
+   "code": 1803,
+   "route": "/inst/governance/exits",
+   "name": "Ortak Çıkışları",
+   "module": "GOVERNANCE",
+   "audience": "INSTITUTION",
+   "requires_all": [
+    "PARTNER_EXIT_MANAGE"
+   ]
+  },
+  {
+   "code": 1804,
+   "route": "/inst/governance/contributions",
+   "name": "Sermaye Katkıları",
+   "module": "GOVERNANCE",
+   "audience": "INSTITUTION",
+   "requires_all": [
+    "CAPITAL_CONTRIBUTION_MANAGE"
+   ]
+  },
+  {
+   "code": 1805,
+   "route": "/inst/governance/profit",
+   "name": "Kâr Dağıtımları",
+   "module": "GOVERNANCE",
+   "audience": "INSTITUTION",
+   "requires_all": [
+    "PROFIT_DISTRIBUTION_VIEW"
+   ]
+  },
+  {
+   "code": 1806,
+   "route": "/inst/governance/profit/propose",
+   "name": "Kâr Dağıtımı Öner",
+   "module": "GOVERNANCE",
+   "audience": "INSTITUTION",
+   "requires_all": [
+    "PROFIT_DISTRIBUTION_PROPOSE"
+   ]
+  },
+  {
+   "code": 1807,
+   "route": "/inst/governance/closure",
+   "name": "Kurum Kapatma",
+   "module": "GOVERNANCE",
+   "audience": "INSTITUTION",
+   "requires_all": [
+    "CLOSURE_REQUEST"
+   ]
+  },
+  {
+   "code": 1808,
+   "route": "/inst/governance/approvals",
+   "name": "Onay Kuyruğu",
+   "module": "GOVERNANCE",
+   "audience": "INSTITUTION",
+   "requires_all": [
+    "BOARD_APPROVALS_VIEW"
+   ]
+  },
+  {
+   "code": 1901,
+   "route": "/inst/compliance/permits",
+   "name": "İzinler ve Ruhsatlar",
+   "module": "COMPLIANCE_LEGAL",
+   "audience": "INSTITUTION",
+   "requires_all": [
+    "PERMIT_VIEW"
+   ]
+  },
+  {
+   "code": 1902,
+   "route": "/inst/compliance/permits/edit",
+   "name": "İzin Yükle ve Düzenle",
+   "module": "COMPLIANCE_LEGAL",
+   "audience": "INSTITUTION",
+   "requires_all": [
+    "PERMIT_MANAGE"
+   ]
+  },
+  {
+   "code": 1903,
+   "route": "/inst/compliance/checks",
+   "name": "Uyum Kontrolleri",
+   "module": "COMPLIANCE_LEGAL",
+   "audience": "INSTITUTION",
+   "requires_all": [
+    "COMPLIANCE_VIEW"
+   ]
+  },
+  {
+   "code": 1904,
+   "route": "/inst/contracts",
+   "name": "Sözleşmeler",
+   "module": "COMPLIANCE_LEGAL",
+   "audience": "INSTITUTION",
+   "requires_all": [
+    "CONTRACT_VIEW"
+   ]
+  },
+  {
+   "code": 1905,
+   "route": "/inst/contracts/sign",
+   "name": "Sözleşme İmzala",
+   "module": "COMPLIANCE_LEGAL",
+   "audience": "INSTITUTION",
+   "requires_all": [
+    "CONTRACT_SIGN"
+   ]
+  },
+  {
+   "code": 1906,
+   "route": "/inst/licenses",
+   "name": "Lisanslar",
+   "module": "COMPLIANCE_LEGAL",
+   "audience": "INSTITUTION",
+   "requires_all": [
+    "LICENSE_VIEW"
+   ]
+  },
+  {
+   "code": 1907,
+   "route": "/inst/sla",
+   "name": "SLA Performansı",
+   "module": "COMPLIANCE_LEGAL",
+   "audience": "INSTITUTION",
+   "requires_all": [
+    "SLA_VIEW"
+   ]
+  },
+  {
+   "code": 2001,
+   "route": "/inst/assets",
+   "name": "Varlıklar",
+   "module": "ASSETS",
+   "audience": "INSTITUTION",
+   "requires_all": [
+    "ASSET_VIEW"
+   ]
+  },
+  {
+   "code": 2002,
+   "route": "/inst/assets/edit",
+   "name": "Varlık Düzenle",
+   "module": "ASSETS",
+   "audience": "INSTITUTION",
+   "requires_all": [
+    "ASSET_MANAGE"
+   ]
+  },
+  {
+   "code": 2003,
+   "route": "/inst/assets/valuations",
+   "name": "Değerlemeler",
+   "module": "ASSETS",
+   "audience": "INSTITUTION",
+   "requires_all": [
+    "VALUATION_MANAGE"
+   ]
+  },
+  {
+   "code": 2004,
+   "route": "/inst/assets/documents",
+   "name": "Varlık Belgeleri",
+   "module": "ASSETS",
+   "audience": "INSTITUTION",
+   "requires_all": [
+    "ASSET_DOCUMENT_MANAGE"
+   ]
+  },
+  {
+   "code": 2101,
+   "route": "/inst/insurance/products",
+   "name": "Sigorta Ürünleri",
+   "module": "INSURANCE_OPS",
+   "audience": "INSTITUTION",
+   "requires_all": [
+    "INSURANCE_PRODUCT_MANAGE"
+   ]
+  },
+  {
+   "code": 2102,
+   "route": "/inst/insurance/policies",
+   "name": "Poliçeler",
+   "module": "INSURANCE_OPS",
+   "audience": "INSTITUTION",
+   "requires_all": [
+    "POLICY_VIEW"
+   ]
+  },
+  {
+   "code": 2103,
+   "route": "/inst/insurance/policies/issue",
+   "name": "Poliçe Düzenle",
+   "module": "INSURANCE_OPS",
+   "audience": "INSTITUTION",
+   "requires_all": [
+    "POLICY_ISSUE"
+   ]
+  },
+  {
+   "code": 2104,
+   "route": "/inst/insurance/premiums",
+   "name": "Prim Tahsilatları",
+   "module": "INSURANCE_OPS",
+   "audience": "INSTITUTION",
+   "requires_all": [
+    "PREMIUM_VIEW"
+   ]
+  },
+  {
+   "code": 2105,
+   "route": "/inst/insurance/claims",
+   "name": "Hasar Dosyaları",
+   "module": "INSURANCE_OPS",
+   "audience": "INSTITUTION",
+   "requires_all": [
+    "CLAIM_VIEW"
+   ]
+  },
+  {
+   "code": 2106,
+   "route": "/inst/insurance/claims/adjudicate",
+   "name": "Hasar Kararı",
+   "module": "INSURANCE_OPS",
+   "audience": "INSTITUTION",
+   "requires_all": [
+    "CLAIM_ADJUDICATE"
+   ]
+  },
+  {
+   "code": 2107,
+   "route": "/inst/insurance/payouts",
+   "name": "Tazminat Ödemeleri",
+   "module": "INSURANCE_OPS",
+   "audience": "INSTITUTION",
+   "requires_all": [
+    "CLAIM_PAYOUT_ISSUE"
+   ]
+  },
+  {
+   "code": 2108,
+   "route": "/inst/insurance/payouts/approve",
+   "name": "Tazminat Onayı",
+   "module": "INSURANCE_OPS",
+   "audience": "INSTITUTION",
+   "requires_all": [
+    "CLAIM_PAYOUT_APPROVE"
+   ]
+  },
+  {
+   "code": 2201,
+   "route": "/inst/education/programs",
+   "name": "Eğitim Programları",
+   "module": "EDUCATION_OPS",
+   "audience": "INSTITUTION",
+   "requires_all": [
+    "PROGRAM_MANAGE"
+   ]
+  },
+  {
+   "code": 2202,
+   "route": "/inst/education/enrollments",
+   "name": "Kayıtlar",
+   "module": "EDUCATION_OPS",
+   "audience": "INSTITUTION",
+   "requires_all": [
+    "ENROLLMENT_VIEW"
+   ]
+  },
+  {
+   "code": 2203,
+   "route": "/inst/education/enrollments/manage",
+   "name": "Kayıt İşlemleri",
+   "module": "EDUCATION_OPS",
+   "audience": "INSTITUTION",
+   "requires_all": [
+    "ENROLLMENT_MANAGE"
+   ]
+  },
+  {
+   "code": 2204,
+   "route": "/inst/education/certificates",
+   "name": "Sertifikalar",
+   "module": "EDUCATION_OPS",
+   "audience": "INSTITUTION",
+   "requires_all": [
+    "CERTIFICATE_ISSUE"
+   ]
+  },
+  {
+   "code": 2205,
+   "route": "/inst/education/instructors",
+   "name": "Eğitmenler",
+   "module": "EDUCATION_OPS",
+   "audience": "INSTITUTION",
+   "requires_all": [
+    "INSTRUCTOR_ASSIGN"
+   ]
+  },
+  {
+   "code": 2301,
+   "route": "/inst/content",
+   "name": "İçerikler",
+   "module": "MEDIA_CONTENT",
+   "audience": "INSTITUTION",
+   "requires_all": [
+    "CONTENT_VIEW"
+   ]
+  },
+  {
+   "code": 2302,
+   "route": "/inst/content/edit",
+   "name": "İçerik Düzenle",
+   "module": "MEDIA_CONTENT",
+   "audience": "INSTITUTION",
+   "requires_all": [
+    "CONTENT_MANAGE"
+   ]
+  },
+  {
+   "code": 2303,
+   "route": "/inst/content/rights",
+   "name": "Hak ve Bölgeler",
+   "module": "MEDIA_CONTENT",
+   "audience": "INSTITUTION",
+   "requires_all": [
+    "CONTENT_RIGHTS_MANAGE"
+   ]
+  },
+  {
+   "code": 2304,
+   "route": "/inst/content/access",
+   "name": "Erişim Hakları",
+   "module": "MEDIA_CONTENT",
+   "audience": "INSTITUTION",
+   "requires_all": [
+    "CONTENT_ACCESS_MANAGE"
+   ]
+  },
+  {
+   "code": 2401,
+   "route": "/inst/betting/markets",
+   "name": "Bahis Marketleri",
+   "module": "BETTING_OPS",
+   "audience": "INSTITUTION",
+   "requires_all": [
+    "ODDS_MANAGE"
+   ]
+  },
+  {
+   "code": 2402,
+   "route": "/inst/betting/odds/lock",
+   "name": "Oran Kilidi",
+   "module": "BETTING_OPS",
+   "audience": "INSTITUTION",
+   "requires_all": [
+    "ODDS_LOCK"
+   ]
+  },
+  {
+   "code": 2403,
+   "route": "/inst/betting/wagers",
+   "name": "Bahis Kayıtları",
+   "module": "BETTING_OPS",
+   "audience": "INSTITUTION",
+   "requires_all": [
+    "WAGER_VIEW"
+   ]
+  },
+  {
+   "code": 2404,
+   "route": "/inst/betting/settle",
+   "name": "Sonuçlandırma",
+   "module": "BETTING_OPS",
+   "audience": "INSTITUTION",
+   "requires_all": [
+    "WAGER_SETTLE"
+   ]
+  },
+  {
+   "code": 2501,
+   "route": "/inst/health/listings",
+   "name": "Tıbbi İlanlar",
+   "module": "HEALTH_OPS",
+   "audience": "INSTITUTION",
+   "requires_all": [
+    "MEDICAL_LISTING_MANAGE"
+   ]
+  },
+  {
+   "code": 2502,
+   "route": "/inst/health/prescriptions",
+   "name": "Reçete Doğrulama",
+   "module": "HEALTH_OPS",
+   "audience": "INSTITUTION",
+   "requires_all": [
+    "PRESCRIPTION_VERIFY"
+   ]
+  },
+  {
+   "code": 2503,
+   "route": "/inst/health/appointments",
+   "name": "Hasta Randevuları",
+   "module": "HEALTH_OPS",
+   "audience": "INSTITUTION",
+   "requires_all": [
+    "PATIENT_APPOINTMENT_VIEW"
+   ]
+  },
+  {
+   "code": 2601,
+   "route": "/inst/fin-ops/instruments",
+   "name": "Finansal Ürünler",
+   "module": "FINANCIAL_OPS",
+   "audience": "INSTITUTION",
+   "requires_all": [
+    "FINANCIAL_INSTRUMENT_MANAGE"
+   ]
+  },
+  {
+   "code": 2602,
+   "route": "/inst/fin-ops/withdrawals",
+   "name": "Nakit Çıkış Talepleri",
+   "module": "FINANCIAL_OPS",
+   "audience": "INSTITUTION",
+   "requires_all": [
+    "WITHDRAWAL_REQUEST_VIEW"
+   ]
+  },
+  {
+   "code": 2603,
+   "route": "/inst/fin-ops/withdrawals/verify",
+   "name": "Kod Doğrulama",
+   "module": "FINANCIAL_OPS",
+   "audience": "INSTITUTION",
+   "requires_all": [
+    "WITHDRAWAL_CODE_VERIFY"
+   ]
+  },
+  {
+   "code": 2604,
+   "route": "/inst/fin-ops/withdrawals/pay",
+   "name": "Nakit Ödeme",
+   "module": "FINANCIAL_OPS",
+   "audience": "INSTITUTION",
+   "requires_all": [
+    "WITHDRAWAL_PAYOUT"
+   ]
+  },
+  {
+   "code": 2605,
+   "route": "/inst/fin-ops/slips",
+   "name": "Çıkış Fişleri",
+   "module": "FINANCIAL_OPS",
+   "audience": "INSTITUTION",
+   "requires_all": [
+    "CASH_SLIP_MANAGE"
+   ]
+  },
+  {
+   "code": 2701,
+   "route": "/inst/subscriptions",
+   "name": "Abonelikler",
+   "module": "SAAS_HOSTING_OPS",
+   "audience": "INSTITUTION",
+   "requires_all": [
+    "SUBSCRIPTION_VIEW"
+   ]
+  },
+  {
+   "code": 2702,
+   "route": "/inst/subscriptions/manage",
+   "name": "Abonelik İşlemleri",
+   "module": "SAAS_HOSTING_OPS",
+   "audience": "INSTITUTION",
+   "requires_all": [
+    "SUBSCRIPTION_MANAGE"
+   ]
+  },
+  {
+   "code": 2703,
+   "route": "/inst/subscriptions/seats",
+   "name": "Koltuklar",
+   "module": "SAAS_HOSTING_OPS",
+   "audience": "INSTITUTION",
+   "requires_all": [
+    "SEAT_MANAGE"
+   ]
+  },
+  {
+   "code": 2704,
+   "route": "/inst/subscriptions/resources",
+   "name": "Kaynak Tahsisi",
+   "module": "SAAS_HOSTING_OPS",
+   "audience": "INSTITUTION",
+   "requires_all": [
+    "RESOURCE_ALLOCATION_MANAGE"
+   ]
+  },
+  {
+   "code": 2705,
+   "route": "/inst/iot/devices",
+   "name": "IoT Cihazları",
+   "module": "SAAS_HOSTING_OPS",
+   "audience": "INSTITUTION",
+   "requires_all": [
+    "IOT_DEVICE_VIEW"
+   ]
+  },
+  {
+   "code": 2801,
+   "route": "/inst/engagements",
+   "name": "Hizmet Projeleri",
+   "module": "SERVICE_ENGAGEMENTS",
+   "audience": "INSTITUTION",
+   "requires_all": [
+    "ENGAGEMENT_VIEW"
+   ]
+  },
+  {
+   "code": 2802,
+   "route": "/inst/engagements/manage",
+   "name": "Proje Yönetimi",
+   "module": "SERVICE_ENGAGEMENTS",
+   "audience": "INSTITUTION",
+   "requires_all": [
+    "ENGAGEMENT_MANAGE"
+   ]
+  },
+  {
+   "code": 2803,
+   "route": "/inst/engagements/milestones",
+   "name": "Aşama Teslimleri",
+   "module": "SERVICE_ENGAGEMENTS",
+   "audience": "INSTITUTION",
+   "requires_all": [
+    "MILESTONE_DELIVER"
+   ]
+  },
+  {
+   "code": 3001,
+   "route": "/ops/feature-flags",
+   "name": "Özellik Bayrakları",
+   "module": "PLATFORM_OPERATIONS",
+   "audience": "PLATFORM",
+   "requires_all": [
+    "FEATURE_FLAG_MANAGE"
+   ]
+  },
+  {
+   "code": 3002,
+   "route": "/ops/notifications",
+   "name": "Sistem Bildirimleri",
+   "module": "PLATFORM_OPERATIONS",
+   "audience": "PLATFORM",
+   "requires_all": [
+    "SYSTEM_NOTIFICATION_SEND"
+   ]
+  },
+  {
+   "code": 3003,
+   "route": "/ops/commissions",
+   "name": "Komisyon Ayarları",
+   "module": "PLATFORM_OPERATIONS",
+   "audience": "PLATFORM",
+   "requires_all": [
+    "COMMISSION_CONFIG_MANAGE"
+   ]
+  },
+  {
+   "code": 3004,
+   "route": "/ops/tax-rules",
+   "name": "Vergi Kuralları",
+   "module": "PLATFORM_OPERATIONS",
+   "audience": "PLATFORM",
+   "requires_all": [
+    "TAX_RULES_MANAGE"
+   ]
+  },
+  {
+   "code": 3005,
+   "route": "/ops/jurisdiction",
+   "name": "Hakemlik ve Fesih Kuralları",
+   "module": "PLATFORM_OPERATIONS",
+   "audience": "PLATFORM",
+   "requires_all": [
+    "JURISDICTION_RULES_MANAGE"
+   ]
+  },
+  {
+   "code": 3006,
+   "route": "/ops/category-rules",
+   "name": "Kategori-Ülke Kuralları",
+   "module": "PLATFORM_OPERATIONS",
+   "audience": "PLATFORM",
+   "requires_all": [
+    "CATEGORY_COUNTRY_RULES_MANAGE"
+   ]
+  },
+  {
+   "code": 3007,
+   "route": "/ops/licenses",
+   "name": "Lisans Yönetimi",
+   "module": "PLATFORM_OPERATIONS",
+   "audience": "PLATFORM",
+   "requires_all": [
+    "LICENSE_ASSIGN"
+   ]
+  },
+  {
+   "code": 3008,
+   "route": "/ops/formation-applications",
+   "name": "Şirket Kurma Başvuruları",
+   "module": "PLATFORM_OPERATIONS",
+   "audience": "PLATFORM",
+   "requires_all": [
+    "FORMATION_APPLICATION_REVIEW"
+   ]
+  },
+  {
+   "code": 3009,
+   "route": "/ops/branch-applications",
+   "name": "Şube Başvuruları",
+   "module": "PLATFORM_OPERATIONS",
+   "audience": "PLATFORM",
+   "requires_all": [
+    "BRANCH_APPLICATION_REVIEW"
+   ]
+  },
+  {
+   "code": 3010,
+   "route": "/ops/institutions/suspend",
+   "name": "Kurum Dondurma",
+   "module": "PLATFORM_OPERATIONS",
+   "audience": "PLATFORM",
+   "requires_all": [
+    "INSTITUTION_SUSPEND"
+   ]
+  },
+  {
+   "code": 3011,
+   "route": "/ops/user-documents",
+   "name": "Kullanıcı Belge İncelemesi",
+   "module": "PLATFORM_OPERATIONS",
+   "audience": "PLATFORM",
+   "requires_all": [
+    "USER_DOCUMENT_REVIEW"
+   ]
+  },
+  {
+   "code": 3012,
+   "route": "/ops/gdpr",
+   "name": "KVKK ve GDPR Talepleri",
+   "module": "PLATFORM_OPERATIONS",
+   "audience": "PLATFORM",
+   "requires_all": [
+    "GDPR_REQUEST_PROCESS"
+   ]
+  },
+  {
+   "code": 3013,
+   "route": "/ops/permission-catalog",
+   "name": "Yetki Kataloğu",
+   "module": "PLATFORM_OPERATIONS",
+   "audience": "PLATFORM",
+   "requires_all": [
+    "PERMISSION_CATALOG_MANAGE"
+   ]
+  },
+  {
+   "code": 3014,
+   "route": "/ops/user-support",
+   "name": "Kullanıcı Destek",
+   "module": "PLATFORM_OPERATIONS",
+   "audience": "PLATFORM",
+   "requires_all": [
+    "USER_SUPPORT_VIEW"
+   ]
+  },
+  {
+   "code": 3015,
+   "route": "/ops/complaints",
+   "name": "Yükseltilen Şikayetler",
+   "module": "PLATFORM_OPERATIONS",
+   "audience": "PLATFORM",
+   "requires_all": [
+    "COMPLAINT_ESCALATION_HANDLE"
+   ]
+  },
+  {
+   "code": 3016,
+   "route": "/ops/privilege-tiers",
+   "name": "İmtiyaz Eşikleri",
+   "module": "PLATFORM_OPERATIONS",
+   "audience": "PLATFORM",
+   "requires_all": [
+    "PRIVILEGE_TIER_MANAGE"
+   ]
+  },
+  {
+   "code": 3017,
+   "route": "/ops/operating-rules",
+   "name": "İşletme Kuralları",
+   "module": "PLATFORM_OPERATIONS",
+   "audience": "PLATFORM",
+   "requires_all": [
+    "OPERATING_RULES_MANAGE"
+   ]
+  },
+  {
+   "code": 3018,
+   "route": "/ops/permit-review",
+   "name": "Kurum İzin İncelemesi",
+   "module": "PLATFORM_OPERATIONS",
+   "audience": "PLATFORM",
+   "requires_all": [
+    "INSTITUTION_PERMIT_REVIEW"
+   ]
+  },
+  {
+   "code": 3101,
+   "route": "/fin/partner-banks",
+   "name": "Anlaşmalı Bankalar",
+   "module": "PLATFORM_FINANCE",
+   "audience": "PLATFORM",
+   "requires_all": [
+    "PARTNER_BANK_MANAGE"
+   ]
+  },
+  {
+   "code": 3102,
+   "route": "/fin/reserve-accounts",
+   "name": "Rezerv Hesapları",
+   "module": "PLATFORM_FINANCE",
+   "audience": "PLATFORM",
+   "requires_all": [
+    "RESERVE_ACCOUNT_MANAGE"
+   ]
+  },
+  {
+   "code": 3103,
+   "route": "/fin/bank-movements",
+   "name": "Banka Hareketleri",
+   "module": "PLATFORM_FINANCE",
+   "audience": "PLATFORM",
+   "requires_all": [
+    "BANK_MOVEMENT_ENTER"
+   ]
+  },
+  {
+   "code": 3104,
+   "route": "/fin/deposits/verify",
+   "name": "Yatırım Doğrulama",
+   "module": "PLATFORM_FINANCE",
+   "audience": "PLATFORM",
+   "requires_all": [
+    "DEPOSIT_VERIFY"
+   ]
+  },
+  {
+   "code": 3105,
+   "route": "/fin/deposits/approve",
+   "name": "Yatırım Onayı",
+   "module": "PLATFORM_FINANCE",
+   "audience": "PLATFORM",
+   "requires_all": [
+    "DEPOSIT_APPROVE"
+   ]
+  },
+  {
+   "code": 3106,
+   "route": "/fin/reconciliation",
+   "name": "Rezerv Mutabakatı",
+   "module": "PLATFORM_FINANCE",
+   "audience": "PLATFORM",
+   "requires_all": [
+    "RESERVE_RECONCILE"
+   ]
+  },
+  {
+   "code": 3107,
+   "route": "/fin/reconciliation/approve",
+   "name": "Mutabakat Onayı",
+   "module": "PLATFORM_FINANCE",
+   "audience": "PLATFORM",
+   "requires_all": [
+    "RESERVE_RECONCILE_APPROVE"
+   ]
+  },
+  {
+   "code": 3108,
+   "route": "/fin/vouchers/create",
+   "name": "Kupon Partisi Oluştur",
+   "module": "PLATFORM_FINANCE",
+   "audience": "PLATFORM",
+   "requires_all": [
+    "VOUCHER_BATCH_CREATE"
+   ]
+  },
+  {
+   "code": 3109,
+   "route": "/fin/vouchers/approve",
+   "name": "Kupon Partisi Onayı",
+   "module": "PLATFORM_FINANCE",
+   "audience": "PLATFORM",
+   "requires_all": [
+    "VOUCHER_BATCH_APPROVE"
+   ]
+  },
+  {
+   "code": 3110,
+   "route": "/fin/exchange-sources",
+   "name": "Kur Kaynakları",
+   "module": "PLATFORM_FINANCE",
+   "audience": "PLATFORM",
+   "requires_all": [
+    "EXCHANGE_RATE_SOURCE_MANAGE"
+   ]
+  },
+  {
+   "code": 3111,
+   "route": "/fin/system-wallets",
+   "name": "Sistem Cüzdanları",
+   "module": "PLATFORM_FINANCE",
+   "audience": "PLATFORM",
+   "requires_all": [
+    "SYSTEM_WALLET_VIEW"
+   ]
+  },
+  {
+   "code": 3201,
+   "route": "/verify/schedule",
+   "name": "Görüşme Planlama",
+   "module": "PLATFORM_VERIFICATION",
+   "audience": "PLATFORM",
+   "requires_all": [
+    "VERIFICATION_SESSION_SCHEDULE"
+   ]
+  },
+  {
+   "code": 3202,
+   "route": "/verify/session",
+   "name": "Görüşme Ekranı",
+   "module": "PLATFORM_VERIFICATION",
+   "audience": "PLATFORM",
+   "requires_all": [
+    "VERIFICATION_SESSION_CONDUCT"
+   ]
+  },
+  {
+   "code": 3203,
+   "route": "/verify/recordings",
+   "name": "Görüşme Kayıtları",
+   "module": "PLATFORM_VERIFICATION",
+   "audience": "PLATFORM",
+   "requires_all": [
+    "VERIFICATION_RECORDING_VIEW"
+   ]
+  },
+  {
+   "code": 3204,
+   "route": "/verify/levels",
+   "name": "Seviye Verme",
+   "module": "PLATFORM_VERIFICATION",
+   "audience": "PLATFORM",
+   "requires_all": [
+    "VERIFICATION_LEVEL_GRANT"
+   ]
+  },
+  {
+   "code": 3301,
+   "route": "/arb/disputes",
+   "name": "Platform Uyuşmazlıkları",
+   "module": "PLATFORM_ARBITRATION",
+   "audience": "PLATFORM",
+   "requires_all": [
+    "DISPUTE_PLATFORM_HANDLE"
+   ]
+  },
+  {
+   "code": 3302,
+   "route": "/arb/arbitrators",
+   "name": "Hakem Atama",
+   "module": "PLATFORM_ARBITRATION",
+   "audience": "PLATFORM",
+   "requires_all": [
+    "ARBITRATOR_APPOINT"
+   ]
+  },
+  {
+   "code": 3303,
+   "route": "/arb/awards",
+   "name": "Hakem Kararları",
+   "module": "PLATFORM_ARBITRATION",
+   "audience": "PLATFORM",
+   "requires_all": [
+    "AWARD_ISSUE"
+   ]
+  },
+  {
+   "code": 3401,
+   "route": "/audit/logs",
+   "name": "Denetim Kayıtları",
+   "module": "PLATFORM_AUDIT",
+   "audience": "PLATFORM",
+   "requires_all": [
+    "AUDIT_LOG_VIEW"
+   ]
+  },
+  {
+   "code": 3402,
+   "route": "/audit/sync",
+   "name": "Senkronizasyon İzleme",
+   "module": "PLATFORM_AUDIT",
+   "audience": "PLATFORM",
+   "requires_all": [
+    "SYNC_MONITOR_VIEW"
+   ]
+  },
+  {
+   "code": 3403,
+   "route": "/audit/dead-letters",
+   "name": "Hatalı Mesajlar",
+   "module": "PLATFORM_AUDIT",
+   "audience": "PLATFORM",
+   "requires_all": [
+    "DEAD_LETTER_MANAGE"
+   ]
+  },
+  {
+   "code": 3404,
+   "route": "/audit/iot",
+   "name": "IoT Ham Veri",
+   "module": "PLATFORM_AUDIT",
+   "audience": "PLATFORM",
+   "requires_all": [
+    "IOT_STAGING_VIEW"
+   ]
+  },
+  {
+   "code": 3405,
+   "route": "/audit/sla",
+   "name": "SLA Kayıtları",
+   "module": "PLATFORM_AUDIT",
+   "audience": "PLATFORM",
+   "requires_all": [
+    "SLA_METRICS_MANAGE"
+   ]
+  },
+  {
+   "code": 5001,
+   "route": "/app/welcome",
+   "name": "Karşılama",
+   "module": "USER_ACCOUNT",
+   "audience": "USER",
+   "requires_all": []
+  },
+  {
+   "code": 5002,
+   "route": "/app/register",
+   "name": "Kayıt",
+   "module": "USER_ACCOUNT",
+   "audience": "USER",
+   "requires_all": []
+  },
+  {
+   "code": 5003,
+   "route": "/app/login",
+   "name": "Giriş",
+   "module": "USER_ACCOUNT",
+   "audience": "USER",
+   "requires_all": []
+  },
+  {
+   "code": 5004,
+   "route": "/app/pin",
+   "name": "PIN Girişi",
+   "module": "USER_ACCOUNT",
+   "audience": "USER",
+   "requires_all": []
+  },
+  {
+   "code": 5005,
+   "route": "/app/profile",
+   "name": "Profil",
+   "module": "USER_ACCOUNT",
+   "audience": "USER",
+   "requires_all": []
+  },
+  {
+   "code": 5006,
+   "route": "/app/profile/edit",
+   "name": "Profil Düzenle",
+   "module": "USER_ACCOUNT",
+   "audience": "USER",
+   "requires_all": []
+  },
+  {
+   "code": 5007,
+   "route": "/app/verification",
+   "name": "Doğrulama Seviyeleri",
+   "module": "USER_ACCOUNT",
+   "audience": "USER",
+   "requires_all": []
+  },
+  {
+   "code": 5008,
+   "route": "/app/verification/documents",
+   "name": "Belgelerim",
+   "module": "USER_ACCOUNT",
+   "audience": "USER",
+   "requires_all": []
+  },
+  {
+   "code": 5009,
+   "route": "/app/verification/interview",
+   "name": "Görüşme Randevusu",
+   "module": "USER_ACCOUNT",
+   "audience": "USER",
+   "requires_all": []
+  },
+  {
+   "code": 5010,
+   "route": "/app/security/sessions",
+   "name": "Oturumlarım",
+   "module": "USER_ACCOUNT",
+   "audience": "USER",
+   "requires_all": []
+  },
+  {
+   "code": 5011,
+   "route": "/app/privacy/gdpr",
+   "name": "Veri Gizliliği Talepleri",
+   "module": "USER_ACCOUNT",
+   "audience": "USER",
+   "requires_all": []
+  },
+  {
+   "code": 5012,
+   "route": "/app/settings",
+   "name": "Ayarlar",
+   "module": "USER_ACCOUNT",
+   "audience": "USER",
+   "requires_all": []
+  },
+  {
+   "code": 5101,
+   "route": "/app/wallet",
+   "name": "Cüzdanlarım",
+   "module": "USER_WALLET",
+   "audience": "USER",
+   "requires_all": []
+  },
+  {
+   "code": 5102,
+   "route": "/app/wallet/detail",
+   "name": "Cüzdan Detayı",
+   "module": "USER_WALLET",
+   "audience": "USER",
+   "requires_all": []
+  },
+  {
+   "code": 5103,
+   "route": "/app/wallet/send",
+   "name": "Para Gönder",
+   "module": "USER_WALLET",
+   "audience": "USER",
+   "requires_all": []
+  },
+  {
+   "code": 5104,
+   "route": "/app/wallet/receive-qr",
+   "name": "QR ile Para Al",
+   "module": "USER_WALLET",
+   "audience": "USER",
+   "requires_all": []
+  },
+  {
+   "code": 5105,
+   "route": "/app/wallet/convert",
+   "name": "Kur Dönüşümü",
+   "module": "USER_WALLET",
+   "audience": "USER",
+   "requires_all": []
+  },
+  {
+   "code": 5106,
+   "route": "/app/wallet/voucher",
+   "name": "Kupon Yükle",
+   "module": "USER_WALLET",
+   "audience": "USER",
+   "requires_all": []
+  },
+  {
+   "code": 5107,
+   "route": "/app/wallet/withdraw",
+   "name": "Nakit Çek",
+   "module": "USER_WALLET",
+   "audience": "USER",
+   "requires_all": []
+  },
+  {
+   "code": 5108,
+   "route": "/app/wallet/withdraw/status",
+   "name": "Çekim Durumu",
+   "module": "USER_WALLET",
+   "audience": "USER",
+   "requires_all": []
+  },
+  {
+   "code": 5109,
+   "route": "/app/transactions",
+   "name": "İşlem Geçmişi",
+   "module": "USER_WALLET",
+   "audience": "USER",
+   "requires_all": []
+  },
+  {
+   "code": 5110,
+   "route": "/app/transactions/detail",
+   "name": "İşlem Detayı",
+   "module": "USER_WALLET",
+   "audience": "USER",
+   "requires_all": []
+  },
+  {
+   "code": 5201,
+   "route": "/app/market",
+   "name": "Keşfet",
+   "module": "USER_MARKETPLACE",
+   "audience": "USER",
+   "requires_all": []
+  },
+  {
+   "code": 5202,
+   "route": "/app/market/category",
+   "name": "Kategori",
+   "module": "USER_MARKETPLACE",
+   "audience": "USER",
+   "requires_all": []
+  },
+  {
+   "code": 5203,
+   "route": "/app/market/search",
+   "name": "Arama",
+   "module": "USER_MARKETPLACE",
+   "audience": "USER",
+   "requires_all": []
+  },
+  {
+   "code": 5204,
+   "route": "/app/market/listing",
+   "name": "İlan Detayı",
+   "module": "USER_MARKETPLACE",
+   "audience": "USER",
+   "requires_all": []
+  },
+  {
+   "code": 5205,
+   "route": "/app/market/institution",
+   "name": "Kurum Sayfası",
+   "module": "USER_MARKETPLACE",
+   "audience": "USER",
+   "requires_all": []
+  },
+  {
+   "code": 5206,
+   "route": "/app/cart",
+   "name": "Sepet",
+   "module": "USER_MARKETPLACE",
+   "audience": "USER",
+   "requires_all": []
+  },
+  {
+   "code": 5207,
+   "route": "/app/checkout",
+   "name": "Ödeme",
+   "module": "USER_MARKETPLACE",
+   "audience": "USER",
+   "requires_all": []
+  },
+  {
+   "code": 5208,
+   "route": "/app/orders",
+   "name": "Siparişlerim",
+   "module": "USER_MARKETPLACE",
+   "audience": "USER",
+   "requires_all": []
+  },
+  {
+   "code": 5209,
+   "route": "/app/orders/detail",
+   "name": "Sipariş Detayı",
+   "module": "USER_MARKETPLACE",
+   "audience": "USER",
+   "requires_all": []
+  },
+  {
+   "code": 5210,
+   "route": "/app/orders/tracking",
+   "name": "Kargo Takibi",
+   "module": "USER_MARKETPLACE",
+   "audience": "USER",
+   "requires_all": []
+  },
+  {
+   "code": 5211,
+   "route": "/app/bookings",
+   "name": "Rezervasyonlarım",
+   "module": "USER_MARKETPLACE",
+   "audience": "USER",
+   "requires_all": []
+  },
+  {
+   "code": 5212,
+   "route": "/app/tickets",
+   "name": "Biletlerim",
+   "module": "USER_MARKETPLACE",
+   "audience": "USER",
+   "requires_all": []
+  },
+  {
+   "code": 5213,
+   "route": "/app/subscriptions",
+   "name": "Aboneliklerim",
+   "module": "USER_MARKETPLACE",
+   "audience": "USER",
+   "requires_all": []
+  },
+  {
+   "code": 5214,
+   "route": "/app/library",
+   "name": "İçerik Kütüphanem",
+   "module": "USER_MARKETPLACE",
+   "audience": "USER",
+   "requires_all": []
+  },
+  {
+   "code": 5215,
+   "route": "/app/enrollments",
+   "name": "Eğitimlerim",
+   "module": "USER_MARKETPLACE",
+   "audience": "USER",
+   "requires_all": []
+  },
+  {
+   "code": 5216,
+   "route": "/app/insurance/policies",
+   "name": "Poliçelerim",
+   "module": "USER_MARKETPLACE",
+   "audience": "USER",
+   "requires_all": []
+  },
+  {
+   "code": 5217,
+   "route": "/app/insurance/claims",
+   "name": "Hasar Başvurularım",
+   "module": "USER_MARKETPLACE",
+   "audience": "USER",
+   "requires_all": []
+  },
+  {
+   "code": 5218,
+   "route": "/app/bets",
+   "name": "Bahislerim",
+   "module": "USER_MARKETPLACE",
+   "audience": "USER",
+   "requires_all": []
+  },
+  {
+   "code": 5219,
+   "route": "/app/auctions",
+   "name": "Açık Artırmalarım",
+   "module": "USER_MARKETPLACE",
+   "audience": "USER",
+   "requires_all": []
+  },
+  {
+   "code": 5220,
+   "route": "/app/sell",
+   "name": "Bireysel Satış",
+   "module": "USER_MARKETPLACE",
+   "audience": "USER",
+   "requires_all": []
+  },
+  {
+   "code": 5301,
+   "route": "/app/notifications",
+   "name": "Bildirimler",
+   "module": "USER_SOCIAL",
+   "audience": "USER",
+   "requires_all": []
+  },
+  {
+   "code": 5302,
+   "route": "/app/ratings/give",
+   "name": "Değerlendirme Yap",
+   "module": "USER_SOCIAL",
+   "audience": "USER",
+   "requires_all": []
+  },
+  {
+   "code": 5303,
+   "route": "/app/ratings/received",
+   "name": "Aldığım Değerlendirmeler",
+   "module": "USER_SOCIAL",
+   "audience": "USER",
+   "requires_all": []
+  },
+  {
+   "code": 5304,
+   "route": "/app/complaints",
+   "name": "Şikayetlerim",
+   "module": "USER_SOCIAL",
+   "audience": "USER",
+   "requires_all": []
+  },
+  {
+   "code": 5305,
+   "route": "/app/complaints/new",
+   "name": "Şikayet Oluştur",
+   "module": "USER_SOCIAL",
+   "audience": "USER",
+   "requires_all": []
+  },
+  {
+   "code": 5306,
+   "route": "/app/disputes",
+   "name": "İtiraz ve İadelerim",
+   "module": "USER_SOCIAL",
+   "audience": "USER",
+   "requires_all": []
+  },
+  {
+   "code": 5307,
+   "route": "/app/disputes/new",
+   "name": "İtiraz Başlat",
+   "module": "USER_SOCIAL",
+   "audience": "USER",
+   "requires_all": []
+  },
+  {
+   "code": 5308,
+   "route": "/app/promotions",
+   "name": "Kampanyalar",
+   "module": "USER_SOCIAL",
+   "audience": "USER",
+   "requires_all": []
+  },
+  {
+   "code": 5401,
+   "route": "/app/institutions",
+   "name": "Kurumlarım",
+   "module": "USER_INSTITUTION",
+   "audience": "USER",
+   "requires_all": []
+  },
+  {
+   "code": 5402,
+   "route": "/app/institutions/new",
+   "name": "Şirket Kurma Başvurusu",
+   "module": "USER_INSTITUTION",
+   "audience": "USER",
+   "requires_all": []
+  },
+  {
+   "code": 5403,
+   "route": "/app/jobs",
+   "name": "İş İlanları ve Başvurular",
+   "module": "USER_INSTITUTION",
+   "audience": "USER",
+   "requires_all": []
+  },
+  {
+   "code": 5404,
+   "route": "/app/partnerships",
+   "name": "Ortaklık Başvuruları",
+   "module": "USER_INSTITUTION",
+   "audience": "USER",
+   "requires_all": []
+  },
+  {
+   "code": 5405,
+   "route": "/app/voting",
+   "name": "Oylamalarım",
+   "module": "USER_INSTITUTION",
+   "audience": "USER",
+   "requires_all": []
+  },
+  {
+   "code": 5406,
+   "route": "/app/workspace/switch",
+   "name": "Kurum Çalışma Alanına Geç",
+   "module": "USER_INSTITUTION",
+   "audience": "USER",
+   "requires_all": []
+  }
+ ],
+ "role_presets": [
+  {
+   "key": "MANAGING_PARTNER",
+   "name": "Yönetici Ortak",
+   "audience": "INSTITUTION",
+   "default_position_type": 3,
+   "permissions": [
+    "ASSET_DOCUMENT_MANAGE",
+    "ASSET_MANAGE",
+    "ASSET_VIEW",
+    "B2B_AGREEMENT_MANAGE",
+    "B2B_AGREEMENT_VIEW",
+    "BANK_ACCOUNTS_MANAGE",
+    "BANK_ACCOUNTS_VIEW",
+    "BOARD_APPROVALS_VIEW",
+    "BOOKING_CANCEL_REFUND",
+    "BOOKING_CHECKIN",
+    "BOOKING_MANAGE",
+    "BOOKING_VIEW",
+    "BRANCH_APPLICATION_SUBMIT",
+    "BRANCH_CLOSURE_REQUEST",
+    "BRANCH_MANAGE",
+    "BRANCH_VIEW",
+    "CAPITAL_CONTRIBUTION_MANAGE",
+    "CARRIER_ASSIGN",
+    "CASH_SLIP_MANAGE",
+    "CERTIFICATE_ISSUE",
+    "CHART_OF_ACCOUNTS_MANAGE",
+    "CHART_OF_ACCOUNTS_VIEW",
+    "CLAIM_ADJUDICATE",
+    "CLAIM_PAYOUT_APPROVE",
+    "CLAIM_PAYOUT_ISSUE",
+    "CLAIM_VIEW",
+    "CLOSURE_REQUEST",
+    "COMPLAINT_RESPOND",
+    "COMPLAINT_VIEW",
+    "COMPLIANCE_VIEW",
+    "CONSORTIUM_MANAGE",
+    "CONSORTIUM_VIEW",
+    "CONTENT_ACCESS_MANAGE",
+    "CONTENT_MANAGE",
+    "CONTENT_RIGHTS_MANAGE",
+    "CONTENT_VIEW",
+    "CONTRACT_SIGN",
+    "CONTRACT_VIEW",
+    "CURRENCY_CONVERSION_EXECUTE",
+    "CUSTOMER_QR_VERIFY",
+    "CUSTOMS_DOCS_MANAGE",
+    "DEPOSIT_REQUEST_CREATE",
+    "DISPUTE_RESPOND",
+    "DISPUTE_VIEW",
+    "DISTRIBUTOR_MANAGE",
+    "EMPLOYEE_SELF_SERVICE",
+    "EMPLOYMENT_APPLICATIONS_REVIEW",
+    "ENGAGEMENT_MANAGE",
+    "ENGAGEMENT_VIEW",
+    "ENROLLMENT_MANAGE",
+    "ENROLLMENT_VIEW",
+    "EXIT_SETTLEMENT_MANAGE",
+    "EXIT_SETTLEMENT_VIEW",
+    "FINANCIAL_INSTRUMENT_MANAGE",
+    "FINANCIAL_REPORTS_EXPORT",
+    "FINANCIAL_REPORTS_VIEW",
+    "FINANCIAL_REQUEST_SUBMIT",
+    "INSTITUTION_ANALYTICS_EXPORT",
+    "INSTITUTION_ANALYTICS_VIEW",
+    "INSTITUTION_DOCUMENTS_MANAGE",
+    "INSTITUTION_PROFILE_MANAGE",
+    "INSTITUTION_PROFILE_VIEW",
+    "INSTITUTION_SETTINGS_MANAGE",
+    "INSTITUTION_TRANSFER_APPROVE",
+    "INSTITUTION_TRANSFER_INITIATE",
+    "INSTITUTION_WALLET_VIEW",
+    "INSTRUCTOR_ASSIGN",
+    "INSURANCE_PRODUCT_MANAGE",
+    "IOT_DEVICE_VIEW",
+    "JOURNAL_MANAGE",
+    "LEDGER_VIEW",
+    "LICENSE_VIEW",
+    "LISTING_CREATE",
+    "LISTING_DEACTIVATE",
+    "LISTING_EDIT",
+    "LISTING_MEDIA_MANAGE",
+    "LISTING_PUBLISH",
+    "LISTING_VIEW",
+    "LOT_EXPIRY_MANAGE",
+    "MEDICAL_LISTING_MANAGE",
+    "MILESTONE_DELIVER",
+    "NOTIFICATION_CAMPAIGN_SEND",
+    "ODDS_LOCK",
+    "ODDS_MANAGE",
+    "ORDER_ASSIGN",
+    "ORDER_CANCEL",
+    "ORDER_EXPORT",
+    "ORDER_PROCESS",
+    "ORDER_VIEW",
+    "PARTNER_APPLICATION_REVIEW",
+    "PARTNER_EXIT_MANAGE",
+    "PATIENT_APPOINTMENT_VIEW",
+    "PAYROLL_APPROVE",
+    "PAYROLL_PREPARE",
+    "PAYROLL_VIEW",
+    "PERMIT_MANAGE",
+    "PERMIT_VIEW",
+    "POLICY_ISSUE",
+    "POLICY_VIEW",
+    "POS_CASH_MOVEMENT_MANAGE",
+    "POS_REFUND_EXECUTE",
+    "POS_SALE_CREATE",
+    "POS_SESSIONS_REVIEW",
+    "POS_SESSION_CLOSE",
+    "POS_SESSION_OPEN",
+    "PREMIUM_VIEW",
+    "PRESCRIPTION_VERIFY",
+    "PRICE_MANAGE",
+    "PRIVILEGE_VIEW",
+    "PRODUCTION_RUN_EXECUTE",
+    "PRODUCTION_SCHEDULE_MANAGE",
+    "PROFIT_DISTRIBUTION_PROPOSE",
+    "PROFIT_DISTRIBUTION_VIEW",
+    "PROGRAM_MANAGE",
+    "PROMOTION_MANAGE",
+    "PROMOTION_VIEW",
+    "RATING_REPLY",
+    "RATING_VIEW",
+    "RAW_MATERIAL_MANAGE",
+    "RAW_MATERIAL_VIEW",
+    "RECIPE_MANAGE",
+    "REFUND_APPROVE",
+    "RESOURCE_ALLOCATION_MANAGE",
+    "RESOURCE_POOL_MANAGE",
+    "RESOURCE_USAGE_REQUEST",
+    "SALARY_MANAGE",
+    "SALARY_VIEW",
+    "SEAT_MANAGE",
+    "SHAREHOLDER_VIEW",
+    "SHIPMENT_MANAGE",
+    "SHIPMENT_STATUS_UPDATE",
+    "SHIPMENT_VIEW",
+    "SLA_VIEW",
+    "SLOT_MANAGE",
+    "STOCK_ADJUST",
+    "STOCK_RECEIVE",
+    "STOCK_TRANSFER",
+    "STOCK_VIEW",
+    "SUBSCRIPTION_MANAGE",
+    "SUBSCRIPTION_VIEW",
+    "TAX_FILING_MANAGE",
+    "TAX_REMITTANCE_MANAGE",
+    "TAX_VIEW",
+    "VALUATION_MANAGE",
+    "VOUCHER_SELL",
+    "WAGER_SETTLE",
+    "WAGER_VIEW",
+    "WASTE_RECORD",
+    "WITHDRAWAL_CODE_VERIFY",
+    "WITHDRAWAL_PAYOUT",
+    "WITHDRAWAL_REQUEST_VIEW",
+    "WORKER_MANAGE",
+    "WORKER_PERMISSIONS_MANAGE",
+    "WORKER_TERMINATE",
+    "WORKER_VIEW"
+   ]
+  },
+  {
+   "key": "EQUITY_PARTNER",
+   "name": "Ortak",
+   "audience": "INSTITUTION",
+   "default_position_type": 2,
+   "permissions": [
+    "BOARD_APPROVALS_VIEW",
+    "BRANCH_VIEW",
+    "CONTRACT_VIEW",
+    "FINANCIAL_REPORTS_VIEW",
+    "INSTITUTION_PROFILE_VIEW",
+    "LICENSE_VIEW",
+    "PROFIT_DISTRIBUTION_VIEW",
+    "SHAREHOLDER_VIEW"
+   ]
+  },
+  {
+   "key": "BRANCH_MANAGER",
+   "name": "Şube Müdürü",
+   "audience": "INSTITUTION",
+   "default_position_type": 0,
+   "permissions": [
+    "BOOKING_CANCEL_REFUND",
+    "BOOKING_CHECKIN",
+    "BOOKING_MANAGE",
+    "BOOKING_VIEW",
+    "BRANCH_VIEW",
+    "COMPLAINT_RESPOND",
+    "COMPLAINT_VIEW",
+    "CUSTOMER_QR_VERIFY",
+    "DISPUTE_RESPOND",
+    "DISPUTE_VIEW",
+    "EMPLOYEE_SELF_SERVICE",
+    "INSTITUTION_PROFILE_VIEW",
+    "LISTING_EDIT",
+    "LISTING_VIEW",
+    "LOT_EXPIRY_MANAGE",
+    "ORDER_ASSIGN",
+    "ORDER_CANCEL",
+    "ORDER_EXPORT",
+    "ORDER_PROCESS",
+    "ORDER_VIEW",
+    "POS_CASH_MOVEMENT_MANAGE",
+    "POS_REFUND_EXECUTE",
+    "POS_SALE_CREATE",
+    "POS_SESSIONS_REVIEW",
+    "POS_SESSION_CLOSE",
+    "POS_SESSION_OPEN",
+    "PRICE_MANAGE",
+    "RATING_REPLY",
+    "RATING_VIEW",
+    "REFUND_APPROVE",
+    "SHIPMENT_VIEW",
+    "SLOT_MANAGE",
+    "STOCK_ADJUST",
+    "STOCK_RECEIVE",
+    "STOCK_TRANSFER",
+    "STOCK_VIEW",
+    "WORKER_VIEW"
+   ]
+  },
+  {
+   "key": "CASHIER",
+   "name": "Kasiyer",
+   "audience": "INSTITUTION",
+   "default_position_type": 0,
+   "permissions": [
+    "CUSTOMER_QR_VERIFY",
+    "EMPLOYEE_SELF_SERVICE",
+    "INSTITUTION_PROFILE_VIEW",
+    "ORDER_VIEW",
+    "POS_SALE_CREATE",
+    "POS_SESSION_CLOSE",
+    "POS_SESSION_OPEN",
+    "STOCK_VIEW"
+   ]
+  },
+  {
+   "key": "ACCOUNTANT",
+   "name": "Muhasebeci",
+   "audience": "INSTITUTION",
+   "default_position_type": 0,
+   "permissions": [
+    "BANK_ACCOUNTS_VIEW",
+    "CHART_OF_ACCOUNTS_MANAGE",
+    "CHART_OF_ACCOUNTS_VIEW",
+    "EMPLOYEE_SELF_SERVICE",
+    "FINANCIAL_REPORTS_EXPORT",
+    "FINANCIAL_REPORTS_VIEW",
+    "INSTITUTION_PROFILE_VIEW",
+    "INSTITUTION_WALLET_VIEW",
+    "JOURNAL_MANAGE",
+    "LEDGER_VIEW",
+    "PAYROLL_PREPARE",
+    "PAYROLL_VIEW",
+    "TAX_FILING_MANAGE",
+    "TAX_VIEW"
+   ]
+  },
+  {
+   "key": "FINANCE_MANAGER",
+   "name": "Mali İşler Müdürü",
+   "audience": "INSTITUTION",
+   "default_position_type": 0,
+   "permissions": [
+    "EMPLOYEE_SELF_SERVICE",
+    "FINANCIAL_REPORTS_VIEW",
+    "INSTITUTION_PROFILE_VIEW",
+    "INSTITUTION_TRANSFER_APPROVE",
+    "INSTITUTION_WALLET_VIEW",
+    "LEDGER_VIEW",
+    "PAYROLL_APPROVE",
+    "PAYROLL_VIEW",
+    "REFUND_APPROVE",
+    "TAX_REMITTANCE_MANAGE",
+    "TAX_VIEW"
+   ]
+  },
+  {
+   "key": "HR_MANAGER",
+   "name": "İK Müdürü",
+   "audience": "INSTITUTION",
+   "default_position_type": 0,
+   "permissions": [
+    "BRANCH_VIEW",
+    "EMPLOYEE_SELF_SERVICE",
+    "EMPLOYMENT_APPLICATIONS_REVIEW",
+    "EXIT_SETTLEMENT_MANAGE",
+    "EXIT_SETTLEMENT_VIEW",
+    "INSTITUTION_PROFILE_VIEW",
+    "SALARY_MANAGE",
+    "SALARY_VIEW",
+    "WORKER_MANAGE",
+    "WORKER_TERMINATE",
+    "WORKER_VIEW"
+   ]
+  },
+  {
+   "key": "CATALOG_MANAGER",
+   "name": "Katalog ve Satış Sorumlusu",
+   "audience": "INSTITUTION",
+   "default_position_type": 0,
+   "permissions": [
+    "EMPLOYEE_SELF_SERVICE",
+    "INSTITUTION_PROFILE_VIEW",
+    "LISTING_CREATE",
+    "LISTING_DEACTIVATE",
+    "LISTING_EDIT",
+    "LISTING_MEDIA_MANAGE",
+    "LISTING_PUBLISH",
+    "LISTING_VIEW",
+    "NOTIFICATION_CAMPAIGN_SEND",
+    "PRICE_MANAGE",
+    "PRIVILEGE_VIEW",
+    "PROMOTION_MANAGE",
+    "PROMOTION_VIEW",
+    "STOCK_VIEW"
+   ]
+  },
+  {
+   "key": "WAREHOUSE_STAFF",
+   "name": "Depo Görevlisi",
+   "audience": "INSTITUTION",
+   "default_position_type": 0,
+   "permissions": [
+    "EMPLOYEE_SELF_SERVICE",
+    "INSTITUTION_PROFILE_VIEW",
+    "LOT_EXPIRY_MANAGE",
+    "ORDER_PROCESS",
+    "ORDER_VIEW",
+    "STOCK_RECEIVE",
+    "STOCK_TRANSFER",
+    "STOCK_VIEW"
+   ]
+  },
+  {
+   "key": "SUPPORT_AGENT",
+   "name": "Müşteri Temsilcisi",
+   "audience": "INSTITUTION",
+   "default_position_type": 0,
+   "permissions": [
+    "COMPLAINT_RESPOND",
+    "COMPLAINT_VIEW",
+    "DISPUTE_RESPOND",
+    "DISPUTE_VIEW",
+    "EMPLOYEE_SELF_SERVICE",
+    "INSTITUTION_PROFILE_VIEW",
+    "ORDER_VIEW",
+    "RATING_REPLY",
+    "RATING_VIEW"
+   ]
+  },
+  {
+   "key": "COURIER",
+   "name": "Kurye ve Şoför",
+   "audience": "INSTITUTION",
+   "default_position_type": 1,
+   "permissions": [
+    "EMPLOYEE_SELF_SERVICE",
+    "INSTITUTION_PROFILE_VIEW",
+    "SHIPMENT_STATUS_UPDATE",
+    "SHIPMENT_VIEW"
+   ]
+  },
+  {
+   "key": "PRODUCTION_SUPERVISOR",
+   "name": "Üretim Sorumlusu",
+   "audience": "INSTITUTION",
+   "default_position_type": 0,
+   "permissions": [
+    "EMPLOYEE_SELF_SERVICE",
+    "INSTITUTION_PROFILE_VIEW",
+    "PRODUCTION_RUN_EXECUTE",
+    "PRODUCTION_SCHEDULE_MANAGE",
+    "RAW_MATERIAL_MANAGE",
+    "RAW_MATERIAL_VIEW",
+    "RECIPE_MANAGE",
+    "STOCK_RECEIVE",
+    "STOCK_VIEW",
+    "WASTE_RECORD"
+   ]
+  },
+  {
+   "key": "COMPLIANCE_OFFICER",
+   "name": "Uyum Sorumlusu",
+   "audience": "INSTITUTION",
+   "default_position_type": 0,
+   "permissions": [
+    "BRANCH_VIEW",
+    "COMPLIANCE_VIEW",
+    "CONTRACT_SIGN",
+    "CONTRACT_VIEW",
+    "EMPLOYEE_SELF_SERVICE",
+    "INSTITUTION_PROFILE_VIEW",
+    "LICENSE_VIEW",
+    "PERMIT_MANAGE",
+    "PERMIT_VIEW",
+    "SLA_VIEW"
+   ]
+  },
+  {
+   "key": "PLATFORM_OPS_ADMIN",
+   "name": "Platform Operasyon Yöneticisi",
+   "audience": "PLATFORM",
+   "default_position_type": 3,
+   "permissions": [
+    "ARBITRATOR_APPOINT",
+    "AUDIT_LOG_VIEW",
+    "AWARD_ISSUE",
+    "BRANCH_APPLICATION_REVIEW",
+    "CATEGORY_COUNTRY_RULES_MANAGE",
+    "COMMISSION_CONFIG_MANAGE",
+    "COMPLAINT_ESCALATION_HANDLE",
+    "DEAD_LETTER_MANAGE",
+    "DISPUTE_PLATFORM_HANDLE",
+    "FEATURE_FLAG_MANAGE",
+    "FORMATION_APPLICATION_REVIEW",
+    "GDPR_REQUEST_PROCESS",
+    "INSTITUTION_PERMIT_REVIEW",
+    "INSTITUTION_PROFILE_VIEW",
+    "INSTITUTION_SUSPEND",
+    "IOT_STAGING_VIEW",
+    "JURISDICTION_RULES_MANAGE",
+    "LICENSE_ASSIGN",
+    "OPERATING_RULES_MANAGE",
+    "PERMISSION_CATALOG_MANAGE",
+    "PRIVILEGE_TIER_MANAGE",
+    "SLA_METRICS_MANAGE",
+    "SYNC_MONITOR_VIEW",
+    "SYSTEM_NOTIFICATION_SEND",
+    "TAX_RULES_MANAGE",
+    "USER_DOCUMENT_REVIEW",
+    "USER_SUPPORT_VIEW"
+   ]
+  },
+  {
+   "key": "PLATFORM_FINANCE_OFFICER",
+   "name": "Platform Finans Sorumlusu",
+   "audience": "PLATFORM",
+   "default_position_type": 0,
+   "permissions": [
+    "BANK_MOVEMENT_ENTER",
+    "DEPOSIT_VERIFY",
+    "EXCHANGE_RATE_SOURCE_MANAGE",
+    "INSTITUTION_PROFILE_VIEW",
+    "PARTNER_BANK_MANAGE",
+    "RESERVE_ACCOUNT_MANAGE",
+    "RESERVE_RECONCILE",
+    "SYSTEM_WALLET_VIEW",
+    "VOUCHER_BATCH_CREATE"
+   ]
+  },
+  {
+   "key": "PLATFORM_FINANCE_APPROVER",
+   "name": "Platform Finans Onaycısı",
+   "audience": "PLATFORM",
+   "default_position_type": 0,
+   "permissions": [
+    "DEPOSIT_APPROVE",
+    "INSTITUTION_PROFILE_VIEW",
+    "RESERVE_RECONCILE_APPROVE",
+    "SYSTEM_WALLET_VIEW",
+    "VOUCHER_BATCH_APPROVE"
+   ]
+  },
+  {
+   "key": "PLATFORM_VERIFIER",
+   "name": "Platform Doğrulama Görevlisi",
+   "audience": "PLATFORM",
+   "default_position_type": 0,
+   "permissions": [
+    "INSTITUTION_PROFILE_VIEW",
+    "USER_DOCUMENT_REVIEW",
+    "VERIFICATION_LEVEL_GRANT",
+    "VERIFICATION_RECORDING_VIEW",
+    "VERIFICATION_SESSION_CONDUCT",
+    "VERIFICATION_SESSION_SCHEDULE"
+   ]
+  }
+ ]
+}

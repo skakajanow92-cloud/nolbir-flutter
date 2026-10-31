@@ -83,7 +83,29 @@ INSERT INTO sync_routing_rules (table_name, target_systems, notes) VALUES
     ('transaction_disputes_and_refunds', ARRAY[0], 'İtiraz/iade talebi durumu okuma kopyası'),
     ('complaints', ARRAY[0,5], 'Okuma kopyası + yeni şikâyetin AI analizi (yalnızca INSERT kuyruğa bağlı)'),   -- MONGODB,AI_ANALYSIS
     ('notification_campaigns', ARRAY[0], 'Bildirim kampanyası okuma kopyası'),
-    ('notification_deliveries', ARRAY[0], 'Kullanıcı bildirim kutusu okuma kopyası')
+    ('notification_deliveries', ARRAY[0], 'Kullanıcı bildirim kutusu okuma kopyası'),
+    ('ratings', ARRAY[0,1], 'Değerlendirme okuma kopyası + öneri grafiği ilişkisi'),                -- MONGODB,NEO4J
+    ('user_domain_reputations', ARRAY[0,3], 'Kullanıcı itibar okuma kopyası + önbellek geçersiz kılma'),            -- MONGODB,REDIS
+    ('worker_domain_reputations', ARRAY[0,3], 'Çalışan itibar okuma kopyası + önbellek geçersiz kılma'),
+    ('institution_domain_reputations', ARRAY[0,3], 'Kurum itibar okuma kopyası + önbellek geçersiz kılma'),
+    ('institution_partner_application_details', ARRAY[0], 'Ortaklık başvurusu detayı okuma kopyası'),
+    ('institution_employment_applications', ARRAY[0], 'İş başvurusu durumu okuma kopyası; teklif edilen maaş senkronize edilmez'),
+    ('institution_partner_exit_details', ARRAY[0], 'Ortaklıktan çıkış detayı okuma kopyası'),
+    ('fixed_assets', ARRAY[0], 'Maddi varlık okuma kopyası; tapu no ve konum senkronize edilmez'),
+    ('fixed_asset_documents', ARRAY[0], 'Varlık belgeleri bağlantı kaydı okuma kopyası'),
+    ('fixed_asset_valuations', ARRAY[0], 'Değerleme geçmişi okuma kopyası'),
+    ('institution_capital_contributions', ARRAY[0], 'Sermaye katkı defteri okuma kopyası'),
+    ('institution_exit_settlements', ARRAY[0], 'Çıkış hesaplaşması okuma kopyası'),
+    ('disputes', ARRAY[0], 'Uyuşmazlık süreci okuma kopyası'),
+    ('dispute_parties', ARRAY[0], 'Uyuşmazlık tarafları okuma kopyası'),
+    ('dispute_events', ARRAY[0], 'Uyuşmazlık süreç günlüğü okuma kopyası (yalnızca eklenir)'),
+    ('dispute_arbitrators', ARRAY[0], 'Hakem atamaları okuma kopyası'),
+    ('dispute_awards', ARRAY[0], 'Hakem/ekip kararları okuma kopyası'),
+    ('institution_exit_wallet_sweeps', ARRAY[0], 'Çıkışta cüzdan boşaltma durumu okuma kopyası'),
+    ('institution_closure_applications', ARRAY[0], 'Kurum kapatma başvurusu okuma kopyası'),
+    ('institution_closure_distribution_log', ARRAY[0], 'Kapatma dağıtım kayıtları okuma kopyası'),
+    ('institution_branch_closure_details', ARRAY[0], 'Şube kapatma detayı okuma kopyası'),
+    ('financial_requests', ARRAY[0], 'Finansal talep durumu okuma kopyası; talep detayı senkronize edilmez')
 ON CONFLICT (table_name) DO NOTHING;
 
 -- 2. OUTBOX TABLOSU — tüm değişiklikler önce buraya, sonra RabbitMQ'ya
@@ -315,7 +337,7 @@ CREATE TABLE IF NOT EXISTS institutions (
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
     CONSTRAINT uq_txnum_country_code UNIQUE (tax_number,country_code),
-    CHECK (is_active = (compliance_status = 1)) );
+    CHECK (is_active = (compliance_status = 0)) );
 CREATE INDEX IF NOT EXISTS idx_institutions_compliance ON institutions(compliance_status);
 CREATE INDEX IF NOT EXISTS idx_institutions_tax ON institutions(tax_number);
 
@@ -353,8 +375,8 @@ CREATE TABLE IF NOT EXISTS partner_banks (
     bank_name VARCHAR(150) NOT NULL,
     country_code SMALLINT NOT NULL,
     bank_license_number VARCHAR(100) NOT NULL,
-    bank_license_media_id UUID NOT NULL REFERENCES media_assets(id) ON DELETE RESTRICT,
-    agreement_media_id UUID NOT NULL REFERENCES media_assets(id) ON DELETE RESTRICT,
+    bank_license_media_id UUID REFERENCES media_assets(id) ON DELETE RESTRICT,
+    agreement_media_id UUID REFERENCES media_assets(id) ON DELETE RESTRICT,
     partner_bank_status SMALLINT NOT NULL DEFAULT 0,
     valid_from DATE NOT NULL,
     valid_until DATE,
@@ -451,7 +473,7 @@ CREATE TABLE IF NOT EXISTS user_country_documents (
     country_code SMALLINT NOT NULL,                 -- belgenin geçerli olduğu ülke
     document_type SMALLINT NOT NULL DEFAULT 0,      -- pasaport, kimlik, oturma izni vb.
     document_number VARCHAR(100),
-    media_asset_id UUID NOT NULL REFERENCES media_assets(id) ON DELETE RESTRICT,
+    media_asset_id UUID REFERENCES media_assets(id) ON DELETE RESTRICT,
     valid_from DATE,
     valid_until DATE,                               -- oturma izninde dolu, vatandaşlık belgesinde NULL olabilir
     verification_status SMALLINT NOT NULL DEFAULT 0,
@@ -517,7 +539,7 @@ CREATE TABLE IF NOT EXISTS transactions (
 CREATE TABLE IF NOT EXISTS transactions_default PARTITION OF transactions DEFAULT;
 CREATE TABLE IF NOT EXISTS transactions_2026 PARTITION OF transactions 
     FOR VALUES FROM ('2026-01-01') TO ('2027-01-01');
-CREATE TABLE IF NOT EXISTS transactions_2026 PARTITION OF transactions 
+CREATE TABLE IF NOT EXISTS transactions_2027 PARTITION OF transactions 
     FOR VALUES FROM ('2027-01-01') TO ('2028-01-01');
 CREATE INDEX IF NOT EXISTS idx_tx_sender ON transactions(sender_wallet_id, created_at);
 CREATE INDEX IF NOT EXISTS idx_tx_receiver ON transactions(receiver_wallet_id, created_at);
@@ -1318,7 +1340,7 @@ CREATE TABLE IF NOT EXISTS escrow_records_default
     PARTITION OF escrow_records DEFAULT;
 CREATE TABLE IF NOT EXISTS escrow_records_2026 PARTITION OF escrow_records 
     FOR VALUES FROM ('2026-01-01') TO ('2027-01-01');
-CREATE TABLE IF NOT EXISTS escrow_records_2026 PARTITION OF escrow_records 
+CREATE TABLE IF NOT EXISTS escrow_records_2027 PARTITION OF escrow_records 
     FOR VALUES FROM ('2027-01-01') TO ('2028-01-01');
 CREATE INDEX IF NOT EXISTS idx_escrow_payer ON escrow_records(payer_wallet_id);
 CREATE INDEX IF NOT EXISTS idx_escrow_payee ON escrow_records(payee_wallet_id);
@@ -1609,32 +1631,28 @@ CREATE TABLE IF NOT EXISTS ratings (
     evaluator_type SMALLINT NOT NULL, -- Puan veren türü (0: User, 1: Worker, 2: Institution)
     evaluator_user_id INTEGER REFERENCES users(id) ON DELETE RESTRICT,
     evaluator_institution_id INTEGER REFERENCES institutions(id) ON DELETE RESTRICT,
-    evaluator_worker_id INTEGER REFERENCES users(id) ON DELETE RESTRICT,
     target_user_id INTEGER REFERENCES users(id) ON DELETE RESTRICT,
     target_institution_id INTEGER REFERENCES institutions(id) ON DELETE RESTRICT,
-    target_worker_id INTEGER REFERENCES users(id) ON DELETE RESTRICT,
+    target_type SMALLINT NOT NULL,
     score DECIMAL(3, 2) NOT NULL CHECK (score >= 1.00 AND score <= 5.00), -- 1.00 - 5.00 arası standart skor
     trust_score DECIMAL(5, 2) CHECK (trust_score >= 0.00 AND trust_score <= 100.00), -- Finans / Güvenilirlik yüzdesi (opsiyonel)
     review_title VARCHAR(150),
     review_comment TEXT,
     proof_media_ids UUID[], -- Kanıt / Görsel materyaller (media_assets)
-    rating_status SMALLINT DEFAULT 1, -- 0: Pending, 1: Approved/Active, 2: Hidden
-    is_anonymous BOOLEAN DEFAULT false,
+    rating_status SMALLINT DEFAULT 0, -- 0: Pending, 1: Approved/Active, 2: Hidden
+    is_anonymous BOOLEAN NOT NULL DEFAULT false,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
     CONSTRAINT chk_evaluator_ref CHECK (
-        (evaluator_user_id IS NOT NULL AND evaluator_institution_id IS NULL AND evaluator_worker_id IS NULL) OR
-        (evaluator_institution_id IS NOT NULL AND evaluator_user_id IS NULL AND evaluator_worker_id IS NULL) OR
-        (evaluator_worker_id IS NOT NULL AND evaluator_user_id IS NULL AND evaluator_institution_id IS NULL) ),
+        (evaluator_user_id IS NOT NULL AND evaluator_institution_id IS NULL) OR
+        (evaluator_institution_id IS NOT NULL AND evaluator_user_id IS NULL) ),
     CONSTRAINT chk_target_ref CHECK (
-        (target_user_id IS NOT NULL AND target_institution_id IS NULL AND target_worker_id IS NULL) OR
-        (target_institution_id IS NOT NULL AND target_user_id IS NULL AND target_worker_id IS NULL) OR
-        (target_worker_id IS NOT NULL AND target_user_id IS NULL AND target_institution_id IS NULL) ),
+        (target_user_id IS NOT NULL AND target_institution_id IS NULL) OR
+        (target_institution_id IS NOT NULL AND target_user_id IS NULL) ),
     CONSTRAINT fk_ratings_transaction FOREIGN KEY (reference_transaction_id, reference_transaction_created_at)
         REFERENCES transactions (id, created_at) ON DELETE RESTRICT );
 CREATE INDEX IF NOT EXISTS idx_ratings_category ON ratings(category_code);
 CREATE INDEX IF NOT EXISTS idx_ratings_target_user ON ratings(target_user_id) WHERE target_user_id IS NOT NULL;
-CREATE INDEX IF NOT EXISTS idx_ratings_target_worker ON ratings(target_worker_id) WHERE target_worker_id IS NOT NULL;
 CREATE INDEX IF NOT EXISTS idx_ratings_target_inst ON ratings(target_institution_id) WHERE target_institution_id IS NOT NULL;  
     
 -- Ana kullanıcıların kategori bazlı itibar ve risk skorlarını tutar
@@ -1643,23 +1661,23 @@ CREATE TABLE IF NOT EXISTS user_domain_reputations (
     user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE RESTRICT,
     category_code SMALLINT NOT NULL, 
     total_rating_count INTEGER DEFAULT 0 CHECK (total_rating_count >= 0),
-    average_score DECIMAL(3, 2) DEFAULT 5.00 CHECK (average_score BETWEEN 1.00 AND 5.00),
+    average_score DECIMAL(3, 2) DEFAULT 0.00 CHECK (average_score BETWEEN 1.00 AND 5.00),
     credit_trust_score DECIMAL(5, 2) DEFAULT 100.00 CHECK (credit_trust_score BETWEEN 0.00 AND 100.00), 
-    badge_level VARCHAR(50) DEFAULT 'STANDARD', -- 'VIP_CUSTOMER', 'TRUSTED_BUYER' vb.
+    badge_level SMALLINT NOT NULL DEFAULT 0, -- 'VIP_CUSTOMER', 'TRUSTED_BUYER' vb.
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
     CONSTRAINT unq_user_category_reputation UNIQUE (user_id, category_code) );
 
 -- Şirket çalışanlarının kategori bazlı itibar ve performans skorlarını tutar
 CREATE TABLE IF NOT EXISTS worker_domain_reputations (
     id SERIAL PRIMARY KEY,
-    worker_id INTEGER NOT NULL REFERENCES workers(id) ON DELETE RESTRICT,
+    user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE RESTRICT,
     category_code SMALLINT NOT NULL,
     total_rating_count INTEGER DEFAULT 0 CHECK (total_rating_count >= 0),
-    average_score DECIMAL(3, 2) DEFAULT 5.00 CHECK (average_score BETWEEN 1.00 AND 5.00),
+    average_score DECIMAL(3, 2) DEFAULT 0.00 CHECK (average_score BETWEEN 1.00 AND 5.00),
     credit_trust_score DECIMAL(5, 2) DEFAULT 100.00 CHECK (credit_trust_score BETWEEN 0.00 AND 100.00), 
-    badge_level VARCHAR(50) DEFAULT 'STANDARD', 
+    badge_level SMALLINT NOT NULL DEFAULT 0, 
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
-    CONSTRAINT unq_worker_category_reputation UNIQUE (worker_id, category_code) );
+    CONSTRAINT unq_worker_category_reputation UNIQUE (user_id, category_code) );
 
 -- Kurumların ve mahalle esnaflarının kategori/sektör bazlı itibar ve uyum skorlarını tutar
 CREATE TABLE IF NOT EXISTS institution_domain_reputations (
@@ -1726,7 +1744,7 @@ CREATE TABLE IF NOT EXISTS institution_partner_exit_details (
     is_open BOOLEAN NOT NULL DEFAULT TRUE,
     CONSTRAINT chk_pea_exit_type CHECK (exit_type IN (0, 1)),
     CONSTRAINT chk_pea_redistribution_mode CHECK (redistribution_mode IN (0, 1)));
-CREATE UNIQUE INDEX uq_partner_exit_open
+CREATE UNIQUE INDEX IF NOT EXISTS uq_partner_exit_open
     ON institution_partner_exit_details (shareholder_id) WHERE is_open;
 
 -- Maddi varlik bilgilerini tutar
@@ -1755,6 +1773,9 @@ CREATE TABLE IF NOT EXISTS fixed_assets (
     registered_by_user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE RESTRICT,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT fk_fa_branch_inst FOREIGN KEY (branch_id, owner_institution_id)
+         REFERENCES institution_branches (id, institution_id) ON DELETE RESTRICT,
+    CONSTRAINT chk_fa_active_status CHECK (is_active = (fixed_asset_status NOT IN (2,3,4))),
     CONSTRAINT chk_fa_single_owner CHECK (num_nonnulls(owner_institution_id, owner_user_id) = 1),
     CONSTRAINT chk_fa_branch_needs_institution CHECK (branch_id IS NULL OR owner_institution_id IS NOT NULL),
     CONSTRAINT chk_fa_disposal_reason_required CHECK (fixed_asset_status NOT IN (2, 3, 4) OR disposal_reason IS NOT NULL));
@@ -1767,9 +1788,9 @@ CREATE INDEX IF NOT EXISTS idx_fixed_assets_type ON fixed_assets(asset_type);
 CREATE TABLE IF NOT EXISTS fixed_asset_documents (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     fixed_asset_id UUID NOT NULL REFERENCES fixed_assets(id) ON DELETE RESTRICT,
-    media_asset_id UUID NOT NULL REFERENCES media_assets(id) ON DELETE RESTRICT, -- MinIO fiziksel dosyaya media_asset_storage_refs (19) üzerinden bağlanır
+    media_asset_id UUID NOT NULL REFERENCES media_assets(id) ON DELETE RESTRICT, 
     uploaded_by_user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE RESTRICT,
-    document_type SMALLINT NOT NULL,        -- enum_fixed_asset_document_type
+    document_type SMALLINT NOT NULL,       
     document_title VARCHAR(200),
     uploaded_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP );
 CREATE INDEX IF NOT EXISTS idx_fad_asset ON fixed_asset_documents(fixed_asset_id);
@@ -1784,12 +1805,13 @@ CREATE TABLE IF NOT EXISTS fixed_asset_valuations (
     valuation_amount DECIMAL(18, 8) NOT NULL CHECK (valuation_amount > 0),
     currency SMALLINT NOT NULL,
     valuation_date DATE NOT NULL,
-    valuation_method VARCHAR(100),          -- 'BAĞIMSIZ EKSPERTİZ', 'PİYASA DEĞERİ', 'SİGORTA DEĞERİ' vb.
+    valuation_method SMALLINT NOT NULL,          -- 'BAĞIMSIZ EKSPERTİZ', 'PİYASA DEĞERİ', 'SİGORTA DEĞERİ' vb.
     appraiser_name VARCHAR(150),
     appraisal_document_id UUID NOT NULL REFERENCES fixed_asset_documents(id) ON DELETE RESTRICT,
     notes TEXT,
     recorded_by_user_id INTEGER REFERENCES users(id) ON DELETE RESTRICT,
-    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP );
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT uq_fav_fixed_assets UNIQUE (id, fixed_asset_id) );
 CREATE INDEX IF NOT EXISTS idx_fa_valuations_asset ON fixed_asset_valuations(fixed_asset_id, valuation_date DESC);
 
 -- Sirket ortaklarinin varlik katki defteri
@@ -1827,8 +1849,8 @@ CREATE TABLE IF NOT EXISTS institution_exit_settlements (
     user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE RESTRICT,           -- ayrılan kişi
     exit_kind SMALLINT NOT NULL,  
     governing_country_code SMALLINT NOT NULL,
-    governing_region VARCHAR(50),                                              -- 0 = ÇALIŞAN AYRILIŞI, 1 = ORTAK AYRILIŞI
-    worker_id INTEGER REFERENCES workers(id) ON DELETE RESTRICT,
+    governing_region SMALLINT NOT NULL,                                              -- 0 = ÇALIŞAN AYRILIŞI, 1 = ORTAK AYRILIŞI
+    position_id INTEGER REFERENCES worker_institution_positions(id) ON DELETE RESTRICT,
     shareholder_id INTEGER REFERENCES institution_shareholders(id) ON DELETE RESTRICT,
     exit_approval_id UUID REFERENCES approvals(id) ON DELETE RESTRICT,          -- ortak çıkarma/ayrılma onayı
     currency SMALLINT NOT NULL,
@@ -1844,11 +1866,7 @@ CREATE TABLE IF NOT EXISTS institution_exit_settlements (
     settlement_notes TEXT,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
     completed_at TIMESTAMP WITH TIME ZONE,
-    CONSTRAINT chk_ies_kind CHECK (
-        (exit_kind = 0 AND worker_id IS NOT NULL AND shareholder_id IS NULL AND exit_approval_id IS NULL
-            AND company_value_snapshot IS NULL AND share_percentage_at_exit IS NULL) OR
-        (exit_kind = 1 AND shareholder_id IS NOT NULL AND worker_id IS NULL AND exit_approval_id IS NOT NULL
-            AND company_value_snapshot IS NOT NULL AND share_percentage_at_exit IS NOT NULL)) );
+    CONSTRAINT uq_ies_currency UNIQUE (id, currency) );
 CREATE INDEX IF NOT EXISTS idx_ies_institution_status ON institution_exit_settlements(institution_id, settlement_status);
 CREATE INDEX IF NOT EXISTS idx_ies_user ON institution_exit_settlements(user_id);
 CREATE UNIQUE INDEX IF NOT EXISTS uq_ies_open
@@ -1857,10 +1875,10 @@ CREATE UNIQUE INDEX IF NOT EXISTS uq_ies_open
 -- Sirket ici veya Sirketler arasi anlasmazlik durumlarini tutar
 CREATE TABLE IF NOT EXISTS disputes (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    subject_type VARCHAR(30) NOT NULL,    -- 'exit_settlement', ...
+    subject_type SMALLINT NOT NULL,    -- 'exit_settlement', ...
     subject_id UUID NOT NULL,
     governing_country_code SMALLINT NOT NULL,
-    governing_region VARCHAR(50),
+    governing_region SMALLINT,
     process_rule_id INTEGER REFERENCES jurisdiction_rules(id) ON DELETE RESTRICT, -- uygulanan kuralın o günkü sürümü
     forum_type SMALLINT NOT NULL,         -- 0=ŞİRKET İÇ EKİBİ, 1=PLATFORM EKİBİ, 2=HAKEM HEYETİ, 3=DIŞ MERCİ (sadece kayıt)
     dispute_status SMALLINT NOT NULL DEFAULT 0, -- 0=BAŞVURU, 1=SAVUNMA, 2=ARABULUCULUK, 3=HAKEMLİK, 4=KARAR, 5=KAPANDI, 6=GERİ ÇEKİLDİ
@@ -1875,6 +1893,7 @@ CREATE TABLE IF NOT EXISTS disputes (
     closed_at TIMESTAMP WITH TIME ZONE,
     escrow_id UUID,                              -- itiraz konusu tutarın bloke edildiği emanet kaydı
     escrow_created_at TIMESTAMP WITH TIME ZONE,
+    CONSTRAINT chk_dispute_amount_currency CHECK ((claimed_amount IS NULL) = (currency IS NULL)),
     CONSTRAINT fk_dispute_escrow FOREIGN KEY (escrow_id, escrow_created_at)
         REFERENCES escrow_records (id, created_at) ON DELETE RESTRICT,
     CONSTRAINT chk_dispute_escrow_pair CHECK ((escrow_id IS NULL) = (escrow_created_at IS NULL)) );
@@ -1906,7 +1925,7 @@ CREATE TABLE IF NOT EXISTS dispute_arbitrators (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     dispute_id UUID NOT NULL REFERENCES disputes(id) ON DELETE RESTRICT,
     arbitrator_user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE RESTRICT,
-    panel_role SMALLINT NOT NULL DEFAULT 1,   -- 0=TEK HAKEM, 1=ÜYE, 2=BAŞKAN
+    panel_role SMALLINT NOT NULL DEFAULT 0,   -- 0=TEK HAKEM, 1=ÜYE, 2=BAŞKAN
     appointed_by SMALLINT NOT NULL,           -- 0=DAVACI, 1=DAVALI, 2=ORTAK ANLAŞMA, 3=PLATFORM
     conflict_checked_at TIMESTAMP WITH TIME ZONE,  -- tarafsızlık / çıkar çatışması kontrolü
     accepted_at TIMESTAMP WITH TIME ZONE,
@@ -1934,10 +1953,10 @@ CREATE INDEX IF NOT EXISTS idx_awards_dispute ON dispute_awards(dispute_id);
 CREATE TABLE IF NOT EXISTS institution_exit_settlement_lines (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     settlement_id UUID NOT NULL REFERENCES institution_exit_settlements(id) ON DELETE RESTRICT,
-    line_type SMALLINT NOT NULL,   -- enum_settlement_line_type: 0=ÖDENMEMİŞ MAAŞ, 1=PRİM/KOMİSYON, 2=TAZMİNAT/İZİN, 3=BORÇ/AVANS KESİNTİSİ, 4=HİSSE BEDELİ, 5=AYNİ VARLIK İADESİ, 6=MANUEL DÜZELTME
-    amount DECIMAL(18, 8) NOT NULL CHECK (amount <> 0),  -- (+) ayrılana ödenecek, (−) ayrılandan tahsil edilecek veya ayni iade ile karşılanan
+    line_type SMALLINT NOT NULL,   
+    amount DECIMAL(18, 8) NOT NULL CHECK (amount <> 0),  
     currency SMALLINT NOT NULL,
-    jurisdiction_rule_id INTEGER REFERENCES jurisdiction_rules(id) ON DELETE RESTRICT,  -- hesapta kullanılan kural sürümü
+    jurisdiction_rule_id INTEGER REFERENCES jurisdiction_rules(id) ON DELETE RESTRICT, 
     tax_rule_id INTEGER REFERENCES tax_rates_and_rules(id) ON DELETE RESTRICT,
     dispute_award_id UUID REFERENCES dispute_awards(id) ON DELETE RESTRICT,
     transaction_id UUID,
@@ -1946,15 +1965,19 @@ CREATE TABLE IF NOT EXISTS institution_exit_settlement_lines (
         REFERENCES transactions (id, created_at) ON DELETE RESTRICT,
     CONSTRAINT chk_iesl_tx_pair CHECK ((transaction_id IS NULL) = (transaction_created_at IS NULL)),
     CONSTRAINT chk_iesl_tax CHECK (line_type <> 2 OR (tax_rule_id IS NOT NULL AND amount < 0)),
-    position_id INTEGER REFERENCES worker_institution_positions(id) ON DELETE RESTRICT, -- maaş/prim kalemleri için
+    position_id INTEGER REFERENCES worker_institution_positions(id) ON DELETE RESTRICT, 
     contribution_id UUID REFERENCES institution_capital_contributions(id) ON DELETE RESTRICT,
     fixed_asset_id UUID REFERENCES fixed_assets(id) ON DELETE RESTRICT,
     valuation_id UUID REFERENCES fixed_asset_valuations(id) ON DELETE RESTRICT,         -- iade anındaki değerleme
     supporting_media_asset_id UUID REFERENCES media_assets(id) ON DELETE RESTRICT,      -- hesaplamaya dayanak belge
+    CONSTRAINT fk_iesl_valuation_asset FOREIGN KEY (valuation_id, fixed_asset_id)
+         REFERENCES fixed_asset_valuations (id, fixed_asset_id) ON DELETE RESTRICT,
     due_date DATE,                 -- vadeli/taksitli ödemede
     settled_at TIMESTAMP WITH TIME ZONE,
     description TEXT,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT fk_iesl_currency FOREIGN KEY (settlement_id, currency)
+         REFERENCES institution_exit_settlements (id, currency) ON DELETE RESTRICT,
     CONSTRAINT chk_iesl_asset_return CHECK (
         line_type <> 6 OR (fixed_asset_id IS NOT NULL AND valuation_id IS NOT NULL AND contribution_id IS NOT NULL)),
     CONSTRAINT chk_iesl_adjustment_note CHECK (line_type <> 7 OR description IS NOT NULL) );
@@ -1965,8 +1988,10 @@ CREATE INDEX IF NOT EXISTS idx_iesl_unsettled ON institution_exit_settlement_lin
 CREATE TABLE IF NOT EXISTS institution_exit_wallet_sweeps (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     settlement_id UUID NOT NULL REFERENCES institution_exit_settlements(id) ON DELETE RESTRICT,
-    source_wallet_id UUID NOT NULL REFERENCES wallets(id) ON DELETE RESTRICT,       -- işçi cüzdanı (wallet_type 3)
-    destination_wallet_id UUID NOT NULL REFERENCES wallets(id) ON DELETE RESTRICT,  -- kullanıcının kişisel cüzdanı (wallet_type 1)
+    source_wallet_id UUID NOT NULL REFERENCES wallets(id) ON DELETE RESTRICT, 
+    source_wallet_type SMALLINT NOT NULL,     
+    destination_wallet_id UUID NOT NULL REFERENCES wallets(id) ON DELETE RESTRICT, 
+    destination_wallet_type SMALLINT NOT NULL, 
     currency SMALLINT NOT NULL,
     swept_amount DECIMAL(18, 8) NOT NULL CHECK (swept_amount > 0),
     sweep_status SMALLINT NOT NULL DEFAULT 0,   -- 0=BEKLİYOR, 1=TAMAMLANDI, 2=ENGELLİ (açık hold/escrow var)
@@ -1976,6 +2001,10 @@ CREATE TABLE IF NOT EXISTS institution_exit_wallet_sweeps (
     completed_at TIMESTAMP WITH TIME ZONE,
     CONSTRAINT fk_iews_transaction FOREIGN KEY (transaction_id, transaction_created_at)
         REFERENCES transactions (id, created_at) ON DELETE RESTRICT,
+    CONSTRAINT fk_iews_source_currency FOREIGN KEY (source_wallet_id, source_wallet_type, currency)
+         REFERENCES wallets (id, wallet_type, currency) ON DELETE RESTRICT,
+    CONSTRAINT fk_iews_destinaton_currency FOREIGN KEY (destination_wallet_id, destination_wallet_type, currency)
+         REFERENCES wallets (id, wallet_type, currency) ON DELETE RESTRICT,
     CONSTRAINT chk_iews_tx_pair CHECK ((transaction_id IS NULL) = (transaction_created_at IS NULL)),
     CONSTRAINT chk_iews_wallets CHECK (source_wallet_id <> destination_wallet_id),
     CONSTRAINT unq_iews_source UNIQUE (settlement_id, source_wallet_id) );
@@ -1991,6 +2020,7 @@ CREATE TABLE IF NOT EXISTS institution_closure_applications (
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
     approved_at TIMESTAMP WITH TIME ZONE,
     closed_at TIMESTAMP WITH TIME ZONE,
+    CONSTRAINT uq_ica_institution UNIQUE (id, institution_id),
     CONSTRAINT chk_ica_path CHECK (closure_path IN (0, 1, 2)),
     CONSTRAINT chk_ica_initiator_matches_path CHECK (
         (closure_path = 0 AND initiated_by_user_id IS NOT NULL AND approval_id IS NOT NULL) OR
@@ -2019,6 +2049,8 @@ CREATE TABLE IF NOT EXISTS institution_closure_distribution_log (
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
     CONSTRAINT fk_icdl_transaction FOREIGN KEY (transaction_id, transaction_created_at)
         REFERENCES transactions (id, created_at) ON DELETE RESTRICT,
+    CONSTRAINT fk_icdl_closure_institution FOREIGN KEY (application_id, institution_id)
+         REFERENCES institution_closure_applications (id, institution_id) ON DELETE RESTRICT,
     CONSTRAINT chk_icdl_tx_pair CHECK ((transaction_id IS NULL) = (transaction_created_at IS NULL)),
     CONSTRAINT chk_icdl_asset CHECK (distribution_type = 0 OR (fixed_asset_id IS NOT NULL AND valuation_id IS NOT NULL)),
     CONSTRAINT chk_icdl_recipient CHECK (is_unclaimed OR (shareholder_id IS NOT NULL AND user_id IS NOT NULL)) );
@@ -3302,6 +3334,6 @@ CREATE TABLE IF NOT EXISTS external_read_model_refs (
 CREATE INDEX IF NOT EXISTS idx_external_refs_lookup ON external_read_model_refs (aggregate_type, aggregate_id);
 
 COMMIT;
--- 
+-- user_country_documents
 -- SADECE TEK BASINA LAZIM OLDUGUNDA KULLANILIR COMMIT ICERISINE ASLA EKLENMEMELI 
 -- ACIKLAMA STATUSU DEGISTIRILMEMELI DROP SCHEMA IF EXISTS nolbir_flutter CASCADE;

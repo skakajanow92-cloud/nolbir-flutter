@@ -204,7 +204,6 @@
       "2": "DISPUTE_ARBITRATION"
     },
     "termination_type": {},
-    "position_type": {},
     "partner_type": {},
     "sla_metric_type": {
       "0": "DELIVERY_LATENCY",
@@ -248,7 +247,6 @@
       "0": "PERCENTAGE",
       "1": "FIXED_AMOUNT"
     },
-    "user_badge_level": {},
     "consortium_type": {},
     "consortium_member_role": {
       "0": "MEMBER",
@@ -473,6 +471,176 @@
       "0": "INFO",
       "1": "WARNING",
       "2": "CRITICAL"
+    },
+    "position_type": {
+      "0": "SALARIED_EMPLOYEE",
+      "1": "COMMISSION_WORKER",
+      "2": "EQUITY_PARTNER",
+      "3": "MANAGING_PARTNER"
+    },
+    "user_badge_level": {
+      "0": "STANDARD",
+      "1": "TRUSTED_BUYER",
+      "2": "VIP_CUSTOMER"
+    },
+    "worker_badge_level": {
+      "0": "STANDARD"
+    },
+    "rating_party_type": {
+      "0": "USER",
+      "1": "WORKER",
+      "2": "INSTITUTION"
+    },
+    "rating_status": {
+      "0": "ACTIVE",
+      "1": "PENDING",
+      "2": "HIDDEN"
+    },
+    "partner_application_kind": {
+      "0": "NEW_PARTNER",
+      "1": "CAPITAL_INCREASE"
+    },
+    "employment_application_status": {
+      "0": "PENDING",
+      "1": "APPROVED",
+      "2": "REJECTED"
+    },
+    "partner_exit_type": {
+      "0": "VOLUNTARY",
+      "1": "EXPULSION"
+    },
+    "redistribution_mode": {
+      "0": "PRO_RATA",
+      "1": "COMPANY_BUYBACK"
+    },
+    "asset_type": {
+      "0": "REAL_ESTATE",
+      "1": "VEHICLE",
+      "2": "EQUIPMENT"
+    },
+    "fixed_asset_status": {
+      "0": "ACTIVE",
+      "1": "PLEDGED",
+      "2": "SOLD",
+      "3": "SCRAPPED",
+      "4": "LOST"
+    },
+    "fixed_asset_document_type": {
+      "0": "TITLE_DEED",
+      "1": "REGISTRATION_LICENSE",
+      "2": "APPRAISAL_REPORT",
+      "3": "INSURANCE_POLICY",
+      "4": "INVOICE",
+      "5": "CONTRIBUTION_AGREEMENT"
+    },
+    "valuation_method": {
+      "0": "INDEPENDENT_APPRAISAL",
+      "1": "MARKET_VALUE",
+      "2": "INSURANCE_VALUE"
+    },
+    "contribution_type": {
+      "0": "CASH",
+      "1": "FIXED_ASSET"
+    },
+    "capital_contribution_status": {
+      "0": "PENDING",
+      "1": "ACTIVE",
+      "2": "CANCELLED",
+      "3": "RETURNED"
+    },
+    "exit_kind": {
+      "0": "EMPLOYEE",
+      "1": "PARTNER"
+    },
+    "settlement_status": {
+      "0": "DRAFT",
+      "1": "SUBMITTED",
+      "2": "DISPUTED",
+      "3": "APPROVED",
+      "4": "PAID",
+      "5": "CANCELLED"
+    },
+    "dispute_forum_type": {
+      "0": "COMPANY_TEAM",
+      "1": "PLATFORM_TEAM",
+      "2": "ARBITRATION_PANEL",
+      "3": "EXTERNAL_AUTHORITY"
+    },
+    "dispute_process_status": {
+      "0": "FILED",
+      "1": "DEFENSE",
+      "2": "MEDIATION",
+      "3": "ARBITRATION",
+      "4": "DECISION",
+      "5": "CLOSED",
+      "6": "WITHDRAWN"
+    },
+    "dispute_party_role": {
+      "0": "CLAIMANT",
+      "1": "RESPONDENT"
+    },
+    "dispute_event_type": {
+      "0": "FILED",
+      "1": "DEFENSE",
+      "2": "EVIDENCE",
+      "3": "EXTENSION",
+      "4": "MEDIATION",
+      "5": "APPOINTMENT",
+      "6": "DECISION"
+    },
+    "arbitrator_panel_role": {
+      "0": "MEMBER",
+      "1": "SOLE_ARBITRATOR",
+      "2": "CHAIR"
+    },
+    "arbitrator_appointed_by": {
+      "0": "CLAIMANT",
+      "1": "RESPONDENT",
+      "2": "JOINT_AGREEMENT",
+      "3": "PLATFORM"
+    },
+    "dispute_outcome": {
+      "0": "FULL_ACCEPT",
+      "1": "PARTIAL_ACCEPT",
+      "2": "REJECTED"
+    },
+    "settlement_line_type": {
+      "0": "UNPAID_SALARY",
+      "1": "BONUS_COMMISSION",
+      "2": "TAX_WITHHOLDING",
+      "3": "SEVERANCE_LEAVE",
+      "4": "DEBT_ADVANCE_DEDUCTION",
+      "5": "SHARE_VALUE",
+      "6": "IN_KIND_ASSET_RETURN",
+      "7": "MANUAL_ADJUSTMENT"
+    },
+    "sweep_status": {
+      "0": "PENDING",
+      "1": "COMPLETED",
+      "2": "BLOCKED"
+    },
+    "closure_path": {
+      "0": "PARTNERS_DECISION",
+      "1": "AUTOMATIC_LAST_PARTNER_LEFT",
+      "2": "PLATFORM_FORCED"
+    },
+    "closure_status": {
+      "0": "PENDING_APPROVAL",
+      "1": "IN_PROGRESS",
+      "2": "CLOSED",
+      "3": "REJECTED",
+      "4": "CANCELLED"
+    },
+    "closure_distribution_type": {
+      "0": "CASH",
+      "1": "IN_KIND"
+    },
+    "financial_request_type": {},
+    "financial_request_status": {
+      "0": "PENDING",
+      "1": "APPROVED",
+      "2": "REJECTED",
+      "3": "CANCELLED"
     }
   },
   "columns": {
@@ -649,6 +817,59 @@
     "notification_campaigns.sender_type": "notification_sender_type",
     "notification_campaigns.target_scope": "notification_target_scope",
     "notification_campaigns.target_nationality_codes": "country_code",
-    "notification_campaigns.notification_campaign_severity": "notification_severity"
+    "notification_campaigns.notification_campaign_severity": "notification_severity",
+    "ratings.category_code": "business_category",
+    "ratings.evaluator_type": "rating_party_type",
+    "ratings.rating_status": "rating_status",
+    "user_domain_reputations.category_code": "business_category",
+    "user_domain_reputations.badge_level": "user_badge_level",
+    "worker_domain_reputations.category_code": "business_category",
+    "worker_domain_reputations.badge_level": "worker_badge_level",
+    "institution_domain_reputations.category_code": "business_category",
+    "institution_partner_application_details.currency": "currency_code",
+    "institution_partner_application_details.application_kind": "partner_application_kind",
+    "institution_partner_application_details.position_type": "position_type",
+    "institution_employment_applications.position_type": "position_type",
+    "institution_employment_applications.currency": "currency_code",
+    "institution_employment_applications.institution_employment_application_status": "employment_application_status",
+    "institution_partner_exit_details.exit_type": "partner_exit_type",
+    "institution_partner_exit_details.redistribution_mode": "redistribution_mode",
+    "fixed_assets.asset_type": "asset_type",
+    "fixed_assets.acquisition_currency": "currency_code",
+    "fixed_assets.fixed_asset_status": "fixed_asset_status",
+    "fixed_asset_documents.document_type": "fixed_asset_document_type",
+    "fixed_asset_valuations.currency": "currency_code",
+    "fixed_asset_valuations.valuation_method": "valuation_method",
+    "institution_capital_contributions.contribution_type": "contribution_type",
+    "institution_capital_contributions.cash_currency": "currency_code",
+    "institution_capital_contributions.valuation_currency": "currency_code",
+    "institution_capital_contributions.institution_capital_contribution_status": "capital_contribution_status",
+    "institution_exit_settlements.exit_kind": "exit_kind",
+    "institution_exit_settlements.governing_country_code": "country_code",
+    "institution_exit_settlements.governing_region": "state_or_region",
+    "institution_exit_settlements.currency": "currency_code",
+    "institution_exit_settlements.settlement_status": "settlement_status",
+    "disputes.subject_type": "reference_entity_type",
+    "disputes.governing_country_code": "country_code",
+    "disputes.governing_region": "state_or_region",
+    "disputes.forum_type": "dispute_forum_type",
+    "disputes.dispute_status": "dispute_process_status",
+    "disputes.currency": "currency_code",
+    "dispute_parties.party_role": "dispute_party_role",
+    "dispute_events.event_type": "dispute_event_type",
+    "dispute_arbitrators.panel_role": "arbitrator_panel_role",
+    "dispute_arbitrators.appointed_by": "arbitrator_appointed_by",
+    "dispute_awards.outcome": "dispute_outcome",
+    "dispute_awards.currency": "currency_code",
+    "institution_exit_settlement_lines.line_type": "settlement_line_type",
+    "institution_exit_settlement_lines.currency": "currency_code",
+    "institution_exit_wallet_sweeps.currency": "currency_code",
+    "institution_exit_wallet_sweeps.sweep_status": "sweep_status",
+    "institution_closure_applications.closure_path": "closure_path",
+    "institution_closure_applications.institution_closure_application_status": "closure_status",
+    "institution_closure_distribution_log.distribution_type": "closure_distribution_type",
+    "institution_closure_distribution_log.currency": "currency_code",
+    "financial_requests.request_type": "financial_request_type",
+    "financial_requests.financial_request_status": "financial_request_status"
   }
 }

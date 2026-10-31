@@ -1,0 +1,2 @@
+C:\msys64\ucrt64\bin\ar.exe qc liblitedb_server.a CMakeFiles/litedb_server.dir/src/server/HttpServer.cpp.obj CMakeFiles/litedb_server.dir/src/server/Api.cpp.obj
+C:\msys64\ucrt64\bin\ranlib.exe liblitedb_server.a

@@ -66,11 +66,6 @@
   ],
   "workTargets": [
     {
-      "name": "ai_analysis",
-      "queue": "work.ai_analysis",
-      "binding": "ai_analysis.approvals.insert"
-    },
-    {
       "name": "media_scan",
       "queue": "work.media_scan",
       "binding": "media_scan.media_assets.insert"

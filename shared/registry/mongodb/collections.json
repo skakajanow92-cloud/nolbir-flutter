@@ -446,616 +446,616 @@
             "currency": 1,
             "isActive": 1
           }
+        }
+      ]
+    },
+    {
+      "name": "chart_of_accounts",
+      "table": "chart_of_accounts",
+      "key": {
+        "id": "id"
+      },
+      "exclude": [],
+      "indexes": [
+        {
+          "name": "uq_coa_id",
+          "key": {
+            "id": 1
+          },
+          "unique": true
         },
         {
-          "name": "chart_of_accounts",
-          "table": "chart_of_accounts",
+          "name": "uq_coa_institution_code",
           "key": {
-            "id": "id"
+            "institutionId": 1,
+            "accountCode": 1
           },
-          "exclude": [],
-          "indexes": [
-            {
-              "name": "uq_coa_id",
-              "key": {
-                "id": 1
-              },
-              "unique": true
-            },
-            {
-              "name": "uq_coa_institution_code",
-              "key": {
-                "institutionId": 1,
-                "accountCode": 1
-              },
-              "unique": true
-            },
-            {
-              "name": "ix_coa_category_active",
-              "key": {
-                "institutionId": 1,
-                "accountCategory": 1,
-                "isActive": 1
-              }
-            }
-          ]
+          "unique": true
         },
         {
-          "name": "journal_entries",
-          "table": "journal_entries",
+          "name": "ix_coa_category_active",
           "key": {
-            "id": "id"
+            "institutionId": 1,
+            "accountCategory": 1,
+            "isActive": 1
+          }
+        }
+      ]
+    },
+    {
+      "name": "journal_entries",
+      "table": "journal_entries",
+      "key": {
+        "id": "id"
+      },
+      "exclude": [],
+      "indexes": [
+        {
+          "name": "uq_je_id",
+          "key": {
+            "id": 1
           },
-          "exclude": [],
-          "indexes": [
-            {
-              "name": "uq_je_id",
-              "key": {
-                "id": 1
-              },
-              "unique": true
-            },
-            {
-              "name": "uq_je_institution_number",
-              "key": {
-                "institutionId": 1,
-                "entryNumber": 1
-              },
-              "unique": true
-            },
-            {
-              "name": "ix_je_traceId",
-              "key": {
-                "traceId": 1
-              }
-            },
-            {
-              "name": "ix_je_reference",
-              "key": {
-                "referenceType": 1,
-                "referenceId": 1
-              }
-            },
-            {
-              "name": "ix_je_institution_createdAt",
-              "key": {
-                "institutionId": 1,
-                "createdAt": -1
-              }
-            }
-          ]
+          "unique": true
         },
         {
-          "name": "journal_entry_lines",
-          "table": "journal_entry_lines",
+          "name": "uq_je_institution_number",
           "key": {
-            "id": "id"
+            "institutionId": 1,
+            "entryNumber": 1
           },
-          "exclude": [],
-          "indexes": [
-            {
-              "name": "uq_jel_id",
-              "key": {
-                "id": 1
-              },
-              "unique": true
-            },
-            {
-              "name": "ix_jel_account_statement",
-              "key": {
-                "accountId": 1,
-                "createdAt": -1
-              }
-            },
-            {
-              "name": "ix_jel_entry",
-              "key": {
-                "journalEntryId": 1
-              }
-            },
-            {
-              "name": "ix_jel_institution_createdAt",
-              "key": {
-                "institutionId": 1,
-                "createdAt": -1
-              }
-            }
-          ]
+          "unique": true
         },
         {
-          "name": "user_country_documents",
-          "table": "user_country_documents",
+          "name": "ix_je_traceId",
           "key": {
-            "id": "id"
-          },
-          "exclude": [
-            "document_number",
-            "reviewed_by_user_id"
-          ],
-          "indexes": [
-            {
-              "name": "uq_ucd_id",
-              "key": {
-                "id": 1
-              },
-              "unique": true
-            },
-            {
-              "name": "ix_ucd_user",
-              "key": {
-                "userId": 1,
-                "countryCode": 1,
-                "verificationStatus": 1
-              }
-            },
-            {
-              "name": "ix_ucd_expiry",
-              "key": {
-                "validUntil": 1
-              },
-              "sparse": true
-            }
-          ]
+            "traceId": 1
+          }
         },
         {
-          "name": "wallets",
-          "table": "wallets",
+          "name": "ix_je_reference",
           "key": {
-            "id": "id"
-          },
-          "exclude": [
-            "balance"
-          ],
-          "indexes": [
-            {
-              "name": "uq_wallets_id",
-              "key": {
-                "id": 1
-              },
-              "unique": true
-            },
-            {
-              "name": "uq_wallets_number",
-              "key": {
-                "walletNumber": 1
-              },
-              "unique": true
-            },
-            {
-              "name": "ix_wallets_user",
-              "key": {
-                "userId": 1,
-                "currency": 1
-              },
-              "sparse": true
-            },
-            {
-              "name": "ix_wallets_institution",
-              "key": {
-                "institutionId": 1,
-                "currency": 1
-              },
-              "sparse": true
-            },
-            {
-              "name": "ix_wallets_type_status",
-              "key": {
-                "walletType": 1,
-                "walletStatus": 1
-              }
-            }
-          ]
+            "referenceType": 1,
+            "referenceId": 1
+          }
         },
         {
-          "name": "transactions",
-          "table": "transactions",
+          "name": "ix_je_institution_createdAt",
           "key": {
-            "id": "id"
+            "institutionId": 1,
+            "createdAt": -1
+          }
+        }
+      ]
+    },
+    {
+      "name": "journal_entry_lines",
+      "table": "journal_entry_lines",
+      "key": {
+        "id": "id"
+      },
+      "exclude": [],
+      "indexes": [
+        {
+          "name": "uq_jel_id",
+          "key": {
+            "id": 1
           },
-          "exclude": [],
-          "notes": "Postgres PK (id, created_at) bileşik; outbox aggregate_id yalnızca id'dir (UUID, tekil).",
-          "indexes": [
-            {
-              "name": "uq_tx_id",
-              "key": {
-                "id": 1
-              },
-              "unique": true
-            },
-            {
-              "name": "ix_tx_traceId",
-              "key": {
-                "traceId": 1
-              }
-            },
-            {
-              "name": "ix_tx_sender",
-              "key": {
-                "senderWalletId": 1,
-                "createdAt": -1
-              },
-              "sparse": true
-            },
-            {
-              "name": "ix_tx_receiver",
-              "key": {
-                "receiverWalletId": 1,
-                "createdAt": -1
-              },
-              "sparse": true
-            },
-            {
-              "name": "ix_tx_user",
-              "key": {
-                "initiatedByUserId": 1,
-                "createdAt": -1
-              }
-            },
-            {
-              "name": "ix_tx_type_status",
-              "key": {
-                "txType": 1,
-                "transactionStatus": 1
-              }
-            }
-          ]
+          "unique": true
         },
         {
-          "name": "jurisdiction_rule_types",
-          "table": "jurisdiction_rule_types",
+          "name": "ix_jel_account_statement",
           "key": {
-            "rule_code": "ruleCode"
-          },
-          "exclude": [],
-          "indexes": [
-            {
-              "name": "uq_jrt_code",
-              "key": {
-                "ruleCode": 1
-              },
-              "unique": true
-            }
-          ]
+            "accountId": 1,
+            "createdAt": -1
+          }
         },
         {
-          "name": "jurisdiction_rules",
-          "table": "jurisdiction_rules",
+          "name": "ix_jel_entry",
           "key": {
-            "id": "id"
-          },
-          "exclude": [],
-          "indexes": [
-            {
-              "name": "uq_jr_id",
-              "key": {
-                "id": 1
-              },
-              "unique": true
-            },
-            {
-              "name": "ix_jr_lookup",
-              "key": {
-                "countryCode": 1,
-                "ruleCode": 1,
-                "isActive": 1,
-                "effectiveFrom": -1
-              }
-            }
-          ]
+            "journalEntryId": 1
+          }
         },
         {
-          "name": "institution_shareholders",
-          "table": "institution_shareholders",
+          "name": "ix_jel_institution_createdAt",
           "key": {
-            "id": "id"
+            "institutionId": 1,
+            "createdAt": -1
+          }
+        }
+      ]
+    },
+    {
+      "name": "user_country_documents",
+      "table": "user_country_documents",
+      "key": {
+        "id": "id"
+      },
+      "exclude": [
+        "document_number",
+        "reviewed_by_user_id"
+      ],
+      "indexes": [
+        {
+          "name": "uq_ucd_id",
+          "key": {
+            "id": 1
           },
-          "exclude": [],
-          "indexes": [
-            {
-              "name": "uq_ish_id",
-              "key": {
-                "id": 1
-              },
-              "unique": true
-            },
-            {
-              "name": "uq_ish_active",
-              "key": {
-                "institutionId": 1,
-                "userId": 1
-              },
-              "unique": true,
-              "partialFilterExpression": {
-                "isActive": true
-              }
-            },
-            {
-              "name": "ix_ish_user",
-              "key": {
-                "userId": 1,
-                "isActive": 1
-              }
-            }
-          ]
+          "unique": true
         },
         {
-          "name": "institution_branches",
-          "table": "institution_branches",
+          "name": "ix_ucd_user",
           "key": {
-            "id": "id"
-          },
-          "exclude": [],
-          "computed": {
-            "location": "GeoJSON Point { type: 'Point', coordinates: [longitude, latitude] }; latitude veya longitude NULL ise alan hiç yazılmaz"
-          },
-          "indexes": [
-            {
-              "name": "uq_branch_id",
-              "key": {
-                "id": 1
-              },
-              "unique": true
-            },
-            {
-              "name": "uq_branch_code",
-              "key": {
-                "institutionId": 1,
-                "branchCode": 1
-              },
-              "unique": true
-            },
-            {
-              "name": "ix_branch_institution",
-              "key": {
-                "institutionId": 1,
-                "isActive": 1
-              }
-            },
-            {
-              "name": "ix_branch_geo",
-              "key": {
-                "location": "2dsphere"
-              },
-              "sparse": true
-            }
-          ]
+            "userId": 1,
+            "countryCode": 1,
+            "verificationStatus": 1
+          }
         },
         {
-          "name": "worker_institution_positions",
-          "table": "worker_institution_positions",
+          "name": "ix_ucd_expiry",
           "key": {
-            "id": "id"
+            "validUntil": 1
           },
-          "exclude": [
-            "monthly_salary",
-            "commission_rate",
-            "terminated_by_user_id",
-            "termination_reason"
-          ],
-          "indexes": [
-            {
-              "name": "uq_wip_id",
-              "key": {
-                "id": 1
-              },
-              "unique": true
-            },
-            {
-              "name": "ix_wip_user",
-              "key": {
-                "userId": 1,
-                "isActive": 1
-              }
-            },
-            {
-              "name": "ix_wip_institution",
-              "key": {
-                "institutionId": 1,
-                "isActive": 1
-              }
-            },
-            {
-              "name": "ix_wip_branch",
-              "key": {
-                "branchId": 1
-              },
-              "sparse": true
-            }
-          ]
+          "sparse": true
+        }
+      ]
+    },
+    {
+      "name": "wallets",
+      "table": "wallets",
+      "key": {
+        "id": "id"
+      },
+      "exclude": [
+        "balance"
+      ],
+      "indexes": [
+        {
+          "name": "uq_wallets_id",
+          "key": {
+            "id": 1
+          },
+          "unique": true
         },
         {
-          "name": "identity_verification_sessions",
-          "table": "identity_verification_sessions",
+          "name": "uq_wallets_number",
           "key": {
-            "id": "id"
+            "walletNumber": 1
           },
-          "exclude": [
-            "worker_notes",
-            "conducted_by_user_id"
-          ],
-          "indexes": [
-            {
-              "name": "uq_ivs_id",
-              "key": {
-                "id": 1
-              },
-              "unique": true
-            },
-            {
-              "name": "ix_ivs_user",
-              "key": {
-                "targetUserId": 1,
-                "sessionStatus": 1,
-                "scheduledAt": -1
-              }
-            },
-            {
-              "name": "ix_ivs_branch",
-              "key": {
-                "branchId": 1,
-                "scheduledAt": 1
-              },
-              "sparse": true
-            }
-          ]
+          "unique": true
         },
         {
-          "name": "user_verification_levels",
-          "table": "user_verification_levels",
+          "name": "ix_wallets_user",
           "key": {
-            "id": "id"
+            "userId": 1,
+            "currency": 1
           },
-          "exclude": [
-            "revoked_reason"
-          ],
-          "indexes": [
-            {
-              "name": "uq_uvl_id",
-              "key": {
-                "id": 1
-              },
-              "unique": true
-            },
-            {
-              "name": "uq_uvl_valid",
-              "key": {
-                "userId": 1,
-                "verificationLevel": 1
-              },
-              "unique": true,
-              "partialFilterExpression": {
-                "verificationStatus": 0
-              }
-            },
-            {
-              "name": "ix_uvl_user_status",
-              "key": {
-                "userId": 1,
-                "verificationStatus": 1
-              }
-            },
-            {
-              "name": "ix_uvl_expiry",
-              "key": {
-                "validUntil": 1
-              },
-              "sparse": true
-            }
-          ]
+          "sparse": true
         },
         {
-          "name": "verification_requirements",
-          "table": "verification_requirements",
+          "name": "ix_wallets_institution",
           "key": {
-            "id": "id"
+            "institutionId": 1,
+            "currency": 1
           },
-          "exclude": [],
-          "indexes": [
-            {
-              "name": "uq_vr_id",
-              "key": {
-                "id": 1
-              },
-              "unique": true
-            },
-            {
-              "name": "ix_vr_lookup",
-              "key": {
-                "operationType": 1,
-                "countryCode": 1,
-                "isActive": 1
-              }
-            }
-          ]
+          "sparse": true
         },
         {
-          "name": "promotions",
-          "table": "promotions",
+          "name": "ix_wallets_type_status",
           "key": {
-            "id": "id"
+            "walletType": 1,
+            "walletStatus": 1
+          }
+        }
+      ]
+    },
+    {
+      "name": "transactions",
+      "table": "transactions",
+      "key": {
+        "id": "id"
+      },
+      "exclude": [],
+      "notes": "Postgres PK (id, created_at) bileşik; outbox aggregate_id yalnızca id'dir (UUID, tekil).",
+      "indexes": [
+        {
+          "name": "uq_tx_id",
+          "key": {
+            "id": 1
           },
-          "exclude": [],
-          "indexes": [
-            {
-              "name": "uq_promo_id",
-              "key": {
-                "id": 1
-              },
-              "unique": true
-            },
-            {
-              "name": "uq_promo_code",
-              "key": {
-                "campaignCode": 1
-              },
-              "unique": true
-            },
-            {
-              "name": "ix_promo_active_window",
-              "key": {
-                "isActive": 1,
-                "promotionStartsAt": 1,
-                "promotionExpiresAt": 1
-              }
-            },
-            {
-              "name": "ix_promo_issuer",
-              "key": {
-                "issuerInstitutionId": 1
-              },
-              "sparse": true
-            },
-            {
-              "name": "ix_promo_targets",
-              "key": {
-                "targetInstitutionIds": 1
-              }
-            }
-          ]
+          "unique": true
         },
         {
-          "name": "promotion_redemptions",
-          "table": "promotion_redemptions",
+          "name": "ix_tx_traceId",
           "key": {
-            "id": "id"
+            "traceId": 1
+          }
+        },
+        {
+          "name": "ix_tx_sender",
+          "key": {
+            "senderWalletId": 1,
+            "createdAt": -1
           },
-          "exclude": [],
-          "indexes": [
-            {
-              "name": "uq_pr_id",
-              "key": {
-                "id": 1
-              },
-              "unique": true
-            },
-            {
-              "name": "ix_pr_promo_user",
-              "key": {
-                "promotionId": 1,
-                "userId": 1
-              }
-            },
-            {
-              "name": "ix_pr_user_time",
-              "key": {
-                "userId": 1,
-                "usedAt": -1
-              }
-            },
-            {
-              "name": "ix_pr_institution_time",
-              "key": {
-                "redeemedInstitutionId": 1,
-                "usedAt": -1
-              }
-            },
-            {
-              "name": "ix_pr_tx",
-              "key": {
-                "transactionId": 1
-              }
-            }
-          ]
+          "sparse": true
+        },
+        {
+          "name": "ix_tx_receiver",
+          "key": {
+            "receiverWalletId": 1,
+            "createdAt": -1
+          },
+          "sparse": true
+        },
+        {
+          "name": "ix_tx_user",
+          "key": {
+            "initiatedByUserId": 1,
+            "createdAt": -1
+          }
+        },
+        {
+          "name": "ix_tx_type_status",
+          "key": {
+            "txType": 1,
+            "transactionStatus": 1
+          }
+        }
+      ]
+    },
+    {
+      "name": "jurisdiction_rule_types",
+      "table": "jurisdiction_rule_types",
+      "key": {
+        "rule_code": "ruleCode"
+      },
+      "exclude": [],
+      "indexes": [
+        {
+          "name": "uq_jrt_code",
+          "key": {
+            "ruleCode": 1
+          },
+          "unique": true
+        }
+      ]
+    },
+    {
+      "name": "jurisdiction_rules",
+      "table": "jurisdiction_rules",
+      "key": {
+        "id": "id"
+      },
+      "exclude": [],
+      "indexes": [
+        {
+          "name": "uq_jr_id",
+          "key": {
+            "id": 1
+          },
+          "unique": true
+        },
+        {
+          "name": "ix_jr_lookup",
+          "key": {
+            "countryCode": 1,
+            "ruleCode": 1,
+            "isActive": 1,
+            "effectiveFrom": -1
+          }
+        }
+      ]
+    },
+    {
+      "name": "institution_shareholders",
+      "table": "institution_shareholders",
+      "key": {
+        "id": "id"
+      },
+      "exclude": [],
+      "indexes": [
+        {
+          "name": "uq_ish_id",
+          "key": {
+            "id": 1
+          },
+          "unique": true
+        },
+        {
+          "name": "uq_ish_active",
+          "key": {
+            "institutionId": 1,
+            "userId": 1
+          },
+          "unique": true,
+          "partialFilterExpression": {
+            "isActive": true
+          }
+        },
+        {
+          "name": "ix_ish_user",
+          "key": {
+            "userId": 1,
+            "isActive": 1
+          }
+        }
+      ]
+    },
+    {
+      "name": "institution_branches",
+      "table": "institution_branches",
+      "key": {
+        "id": "id"
+      },
+      "exclude": [],
+      "computed": {
+        "location": "GeoJSON Point { type: 'Point', coordinates: [longitude, latitude] }; latitude veya longitude NULL ise alan hiç yazılmaz"
+      },
+      "indexes": [
+        {
+          "name": "uq_branch_id",
+          "key": {
+            "id": 1
+          },
+          "unique": true
+        },
+        {
+          "name": "uq_branch_code",
+          "key": {
+            "institutionId": 1,
+            "branchCode": 1
+          },
+          "unique": true
+        },
+        {
+          "name": "ix_branch_institution",
+          "key": {
+            "institutionId": 1,
+            "isActive": 1
+          }
+        },
+        {
+          "name": "ix_branch_geo",
+          "key": {
+            "location": "2dsphere"
+          },
+          "sparse": true
+        }
+      ]
+    },
+    {
+      "name": "worker_institution_positions",
+      "table": "worker_institution_positions",
+      "key": {
+        "id": "id"
+      },
+      "exclude": [
+        "monthly_salary",
+        "commission_rate",
+        "terminated_by_user_id",
+        "termination_reason"
+      ],
+      "indexes": [
+        {
+          "name": "uq_wip_id",
+          "key": {
+            "id": 1
+          },
+          "unique": true
+        },
+        {
+          "name": "ix_wip_user",
+          "key": {
+            "userId": 1,
+            "isActive": 1
+          }
+        },
+        {
+          "name": "ix_wip_institution",
+          "key": {
+            "institutionId": 1,
+            "isActive": 1
+          }
+        },
+        {
+          "name": "ix_wip_branch",
+          "key": {
+            "branchId": 1
+          },
+          "sparse": true
+        }
+      ]
+    },
+    {
+      "name": "identity_verification_sessions",
+      "table": "identity_verification_sessions",
+      "key": {
+        "id": "id"
+      },
+      "exclude": [
+        "worker_notes",
+        "conducted_by_user_id"
+      ],
+      "indexes": [
+        {
+          "name": "uq_ivs_id",
+          "key": {
+            "id": 1
+          },
+          "unique": true
+        },
+        {
+          "name": "ix_ivs_user",
+          "key": {
+            "targetUserId": 1,
+            "sessionStatus": 1,
+            "scheduledAt": -1
+          }
+        },
+        {
+          "name": "ix_ivs_branch",
+          "key": {
+            "branchId": 1,
+            "scheduledAt": 1
+          },
+          "sparse": true
+        }
+      ]
+    },
+    {
+      "name": "user_verification_levels",
+      "table": "user_verification_levels",
+      "key": {
+        "id": "id"
+      },
+      "exclude": [
+        "revoked_reason"
+      ],
+      "indexes": [
+        {
+          "name": "uq_uvl_id",
+          "key": {
+            "id": 1
+          },
+          "unique": true
+        },
+        {
+          "name": "uq_uvl_valid",
+          "key": {
+            "userId": 1,
+            "verificationLevel": 1
+          },
+          "unique": true,
+          "partialFilterExpression": {
+            "verificationStatus": 0
+          }
+        },
+        {
+          "name": "ix_uvl_user_status",
+          "key": {
+            "userId": 1,
+            "verificationStatus": 1
+          }
+        },
+        {
+          "name": "ix_uvl_expiry",
+          "key": {
+            "validUntil": 1
+          },
+          "sparse": true
+        }
+      ]
+    },
+    {
+      "name": "verification_requirements",
+      "table": "verification_requirements",
+      "key": {
+        "id": "id"
+      },
+      "exclude": [],
+      "indexes": [
+        {
+          "name": "uq_vr_id",
+          "key": {
+            "id": 1
+          },
+          "unique": true
+        },
+        {
+          "name": "ix_vr_lookup",
+          "key": {
+            "operationType": 1,
+            "countryCode": 1,
+            "isActive": 1
+          }
+        }
+      ]
+    },
+    {
+      "name": "promotions",
+      "table": "promotions",
+      "key": {
+        "id": "id"
+      },
+      "exclude": [],
+      "indexes": [
+        {
+          "name": "uq_promo_id",
+          "key": {
+            "id": 1
+          },
+          "unique": true
+        },
+        {
+          "name": "uq_promo_code",
+          "key": {
+            "campaignCode": 1
+          },
+          "unique": true
+        },
+        {
+          "name": "ix_promo_active_window",
+          "key": {
+            "isActive": 1,
+            "promotionStartsAt": 1,
+            "promotionExpiresAt": 1
+          }
+        },
+        {
+          "name": "ix_promo_issuer",
+          "key": {
+            "issuerInstitutionId": 1
+          },
+          "sparse": true
+        },
+        {
+          "name": "ix_promo_targets",
+          "key": {
+            "targetInstitutionIds": 1
+          }
+        }
+      ]
+    },
+    {
+      "name": "promotion_redemptions",
+      "table": "promotion_redemptions",
+      "key": {
+        "id": "id"
+      },
+      "exclude": [],
+      "indexes": [
+        {
+          "name": "uq_pr_id",
+          "key": {
+            "id": 1
+          },
+          "unique": true
+        },
+        {
+          "name": "ix_pr_promo_user",
+          "key": {
+            "promotionId": 1,
+            "userId": 1
+          }
+        },
+        {
+          "name": "ix_pr_user_time",
+          "key": {
+            "userId": 1,
+            "usedAt": -1
+          }
+        },
+        {
+          "name": "ix_pr_institution_time",
+          "key": {
+            "redeemedInstitutionId": 1,
+            "usedAt": -1
+          }
+        },
+        {
+          "name": "ix_pr_tx",
+          "key": {
+            "transactionId": 1
+          }
         }
       ]
     },
@@ -2337,6 +2337,754 @@
           "key": {
             "userId": 1,
             "isRead": 1,
+            "createdAt": -1
+          }
+        }
+      ]
+    },
+    {
+      "name": "ratings",
+      "table": "ratings",
+      "key": {
+        "id": "id"
+      },
+      "exclude": [],
+      "conditionalExclude": [
+        {
+          "when": {
+            "is_anonymous": true
+          },
+          "exclude": [
+            "evaluator_id",
+            "evaluator_institution_id"
+          ]
+        }
+      ],
+      "indexes": [
+        {
+          "name": "uq_ratings_id",
+          "key": {
+            "id": 1
+          },
+          "unique": true
+        },
+        {
+          "name": "ix_ratings_target_user",
+          "key": {
+            "targetUserId": 1,
+            "createdAt": -1
+          },
+          "sparse": true
+        },
+        {
+          "name": "ix_ratings_target_institution",
+          "key": {
+            "targetInstitutionId": 1,
+            "createdAt": -1
+          },
+          "sparse": true
+        },
+        {
+          "name": "ix_ratings_category_status",
+          "key": {
+            "categoryCode": 1,
+            "ratingStatus": 1
+          }
+        },
+        {
+          "name": "ix_ratings_tx",
+          "key": {
+            "referenceTransactionId": 1
+          },
+          "sparse": true
+        }
+      ]
+    },
+    {
+      "name": "user_domain_reputations",
+      "table": "user_domain_reputations",
+      "key": {
+        "id": "id"
+      },
+      "exclude": [],
+      "indexes": [
+        {
+          "name": "uq_udr_id",
+          "key": {
+            "id": 1
+          },
+          "unique": true
+        },
+        {
+          "name": "uq_udr_user_category",
+          "key": {
+            "userId": 1,
+            "categoryCode": 1
+          },
+          "unique": true
+        }
+      ]
+    },
+    {
+      "name": "worker_domain_reputations",
+      "table": "worker_domain_reputations",
+      "key": {
+        "id": "id"
+      },
+      "exclude": [],
+      "indexes": [
+        {
+          "name": "uq_wdr_id",
+          "key": {
+            "id": 1
+          },
+          "unique": true
+        },
+        {
+          "name": "uq_wdr_user_category",
+          "key": {
+            "userId": 1,
+            "categoryCode": 1
+          },
+          "unique": true
+        }
+      ]
+    },
+    {
+      "name": "institution_domain_reputations",
+      "table": "institution_domain_reputations",
+      "key": {
+        "id": "id"
+      },
+      "exclude": [],
+      "indexes": [
+        {
+          "name": "uq_idrp_id",
+          "key": {
+            "id": 1
+          },
+          "unique": true
+        },
+        {
+          "name": "uq_idrp_institution_category",
+          "key": {
+            "institutionId": 1,
+            "categoryCode": 1
+          },
+          "unique": true
+        }
+      ]
+    },
+    {
+      "name": "institution_partner_application_details",
+      "table": "institution_partner_application_details",
+      "key": {
+        "approval_id": "approvalId"
+      },
+      "exclude": [],
+      "indexes": [
+        {
+          "name": "uq_ipad_approval",
+          "key": {
+            "approvalId": 1
+          },
+          "unique": true
+        },
+        {
+          "name": "ix_ipad_institution_open",
+          "key": {
+            "institutionId": 1,
+            "isOpen": 1
+          }
+        }
+      ]
+    },
+    {
+      "name": "institution_employment_applications",
+      "table": "institution_employment_applications",
+      "key": {
+        "id": "id"
+      },
+      "exclude": [
+        "proposed_monthly_salary",
+        "proposed_commission_rate",
+        "reviewed_by_user_id",
+        "review_note"
+      ],
+      "indexes": [
+        {
+          "name": "uq_iea_id",
+          "key": {
+            "id": 1
+          },
+          "unique": true
+        },
+        {
+          "name": "ix_iea_institution_status",
+          "key": {
+            "institutionId": 1,
+            "institutionEmploymentApplicationStatus": 1
+          }
+        },
+        {
+          "name": "ix_iea_applicant",
+          "key": {
+            "applicantUserId": 1,
+            "createdAt": -1
+          }
+        }
+      ]
+    },
+    {
+      "name": "institution_partner_exit_details",
+      "table": "institution_partner_exit_details",
+      "key": {
+        "approval_id": "approvalId"
+      },
+      "exclude": [],
+      "indexes": [
+        {
+          "name": "uq_iped_approval",
+          "key": {
+            "approvalId": 1
+          },
+          "unique": true
+        },
+        {
+          "name": "ix_iped_shareholder",
+          "key": {
+            "shareholderId": 1
+          }
+        },
+        {
+          "name": "ix_iped_institution_open",
+          "key": {
+            "institutionId": 1,
+            "isOpen": 1
+          }
+        }
+      ]
+    },
+    {
+      "name": "fixed_assets",
+      "table": "fixed_assets",
+      "key": {
+        "id": "id"
+      },
+      "exclude": [
+        "title_deed_no",
+        "address",
+        "latitude",
+        "longitude"
+      ],
+      "indexes": [
+        {
+          "name": "uq_fa_id",
+          "key": {
+            "id": 1
+          },
+          "unique": true
+        },
+        {
+          "name": "ix_fa_institution",
+          "key": {
+            "ownerInstitutionId": 1,
+            "isActive": 1
+          },
+          "sparse": true
+        },
+        {
+          "name": "ix_fa_user",
+          "key": {
+            "ownerUserId": 1,
+            "isActive": 1
+          },
+          "sparse": true
+        },
+        {
+          "name": "ix_fa_branch",
+          "key": {
+            "branchId": 1
+          },
+          "sparse": true
+        },
+        {
+          "name": "ix_fa_type",
+          "key": {
+            "assetType": 1
+          }
+        }
+      ]
+    },
+    {
+      "name": "fixed_asset_documents",
+      "table": "fixed_asset_documents",
+      "key": {
+        "id": "id"
+      },
+      "exclude": [],
+      "indexes": [
+        {
+          "name": "uq_fad_id",
+          "key": {
+            "id": 1
+          },
+          "unique": true
+        },
+        {
+          "name": "ix_fad_asset_type",
+          "key": {
+            "fixedAssetId": 1,
+            "documentType": 1
+          }
+        }
+      ]
+    },
+    {
+      "name": "fixed_asset_valuations",
+      "table": "fixed_asset_valuations",
+      "key": {
+        "id": "id"
+      },
+      "exclude": [],
+      "indexes": [
+        {
+          "name": "uq_fav_id",
+          "key": {
+            "id": 1
+          },
+          "unique": true
+        },
+        {
+          "name": "ix_fav_asset_date",
+          "key": {
+            "fixedAssetId": 1,
+            "valuationDate": -1
+          }
+        }
+      ]
+    },
+    {
+      "name": "institution_capital_contributions",
+      "table": "institution_capital_contributions",
+      "key": {
+        "id": "id"
+      },
+      "exclude": [],
+      "indexes": [
+        {
+          "name": "uq_icc_id",
+          "key": {
+            "id": 1
+          },
+          "unique": true
+        },
+        {
+          "name": "ix_icc_institution_status",
+          "key": {
+            "institutionId": 1,
+            "institutionCapitalContributionStatus": 1
+          }
+        },
+        {
+          "name": "ix_icc_contributor",
+          "key": {
+            "contributorUserId": 1
+          }
+        },
+        {
+          "name": "ix_icc_approval",
+          "key": {
+            "approvalId": 1
+          },
+          "sparse": true
+        }
+      ]
+    },
+    {
+      "name": "institution_exit_settlements",
+      "table": "institution_exit_settlements",
+      "key": {
+        "id": "id"
+      },
+      "exclude": [
+        "prepared_by_user_id",
+        "reviewed_by_user_id",
+        "settlement_notes"
+      ],
+      "indexes": [
+        {
+          "name": "uq_ies_id",
+          "key": {
+            "id": 1
+          },
+          "unique": true
+        },
+        {
+          "name": "ix_ies_institution_status",
+          "key": {
+            "institutionId": 1,
+            "settlementStatus": 1
+          }
+        },
+        {
+          "name": "ix_ies_user",
+          "key": {
+            "userId": 1
+          }
+        }
+      ]
+    },
+    {
+      "name": "disputes",
+      "table": "disputes",
+      "key": {
+        "id": "id"
+      },
+      "exclude": [],
+      "indexes": [
+        {
+          "name": "uq_disputes_id",
+          "key": {
+            "id": 1
+          },
+          "unique": true
+        },
+        {
+          "name": "ix_disputes_subject",
+          "key": {
+            "subjectType": 1,
+            "subjectId": 1
+          }
+        },
+        {
+          "name": "uq_disputes_open",
+          "key": {
+            "subjectType": 1,
+            "subjectId": 1
+          },
+          "unique": true,
+          "partialFilterExpression": {
+            "disputeStatus": {
+              "$lt": 5
+            }
+          }
+        },
+        {
+          "name": "ix_disputes_status_due",
+          "key": {
+            "disputeStatus": 1,
+            "responseDueAt": 1
+          }
+        },
+        {
+          "name": "ix_disputes_filed_by",
+          "key": {
+            "filedByUserId": 1,
+            "filedAt": -1
+          }
+        }
+      ]
+    },
+    {
+      "name": "dispute_parties",
+      "table": "dispute_parties",
+      "key": {
+        "id": "id"
+      },
+      "exclude": [],
+      "indexes": [
+        {
+          "name": "uq_dp_id",
+          "key": {
+            "id": 1
+          },
+          "unique": true
+        },
+        {
+          "name": "ix_dp_dispute",
+          "key": {
+            "disputeId": 1
+          }
+        },
+        {
+          "name": "ix_dp_user",
+          "key": {
+            "userId": 1
+          },
+          "sparse": true
+        },
+        {
+          "name": "ix_dp_institution",
+          "key": {
+            "institutionId": 1
+          },
+          "sparse": true
+        }
+      ]
+    },
+    {
+      "name": "dispute_events",
+      "table": "dispute_events",
+      "key": {
+        "id": "id"
+      },
+      "exclude": [],
+      "indexes": [
+        {
+          "name": "uq_de_id",
+          "key": {
+            "id": 1
+          },
+          "unique": true
+        },
+        {
+          "name": "ix_de_dispute_time",
+          "key": {
+            "disputeId": 1,
+            "occurredAt": 1
+          }
+        }
+      ]
+    },
+    {
+      "name": "dispute_arbitrators",
+      "table": "dispute_arbitrators",
+      "key": {
+        "id": "id"
+      },
+      "exclude": [],
+      "indexes": [
+        {
+          "name": "uq_da_id",
+          "key": {
+            "id": 1
+          },
+          "unique": true
+        },
+        {
+          "name": "uq_da_dispute_arbitrator",
+          "key": {
+            "disputeId": 1,
+            "arbitratorUserId": 1
+          },
+          "unique": true
+        },
+        {
+          "name": "ix_da_arbitrator",
+          "key": {
+            "arbitratorUserId": 1
+          }
+        }
+      ]
+    },
+    {
+      "name": "dispute_awards",
+      "table": "dispute_awards",
+      "key": {
+        "id": "id"
+      },
+      "exclude": [],
+      "indexes": [
+        {
+          "name": "uq_awards_id",
+          "key": {
+            "id": 1
+          },
+          "unique": true
+        },
+        {
+          "name": "ix_awards_dispute",
+          "key": {
+            "disputeId": 1
+          }
+        }
+      ]
+    },
+    {
+      "name": "institution_exit_wallet_sweeps",
+      "table": "institution_exit_wallet_sweeps",
+      "key": {
+        "id": "id"
+      },
+      "exclude": [],
+      "indexes": [
+        {
+          "name": "uq_iews_id",
+          "key": {
+            "id": 1
+          },
+          "unique": true
+        },
+        {
+          "name": "uq_iews_source",
+          "key": {
+            "settlementId": 1,
+            "sourceWalletId": 1
+          },
+          "unique": true
+        },
+        {
+          "name": "ix_iews_status",
+          "key": {
+            "sweepStatus": 1
+          }
+        }
+      ]
+    },
+    {
+      "name": "institution_closure_applications",
+      "table": "institution_closure_applications",
+      "key": {
+        "id": "id"
+      },
+      "exclude": [],
+      "conditionalExclude": [
+        {
+          "when": {
+            "closure_path": 2
+          },
+          "exclude": [
+            "initiated_by_user_id"
+          ]
+        }
+      ],
+      "indexes": [
+        {
+          "name": "uq_ica_id",
+          "key": {
+            "id": 1
+          },
+          "unique": true
+        },
+        {
+          "name": "uq_ica_approval",
+          "key": {
+            "approvalId": 1
+          },
+          "unique": true,
+          "sparse": true
+        },
+        {
+          "name": "uq_ica_open",
+          "key": {
+            "institutionId": 1
+          },
+          "unique": true,
+          "partialFilterExpression": {
+            "institutionClosureApplicationStatus": {
+              "$lt": 2
+            }
+          }
+        },
+        {
+          "name": "ix_ica_institution",
+          "key": {
+            "institutionId": 1
+          }
+        }
+      ]
+    },
+    {
+      "name": "institution_closure_distribution_log",
+      "table": "institution_closure_distribution_log",
+      "key": {
+        "id": "id"
+      },
+      "exclude": [],
+      "indexes": [
+        {
+          "name": "uq_icdl_id",
+          "key": {
+            "id": 1
+          },
+          "unique": true
+        },
+        {
+          "name": "ix_icdl_application",
+          "key": {
+            "applicationId": 1
+          }
+        },
+        {
+          "name": "ix_icdl_institution",
+          "key": {
+            "institutionId": 1
+          }
+        },
+        {
+          "name": "ix_icdl_unclaimed",
+          "key": {
+            "institutionId": 1
+          },
+          "partialFilterExpression": {
+            "isUnclaimed": true
+          }
+        }
+      ]
+    },
+    {
+      "name": "institution_branch_closure_details",
+      "table": "institution_branch_closure_details",
+      "key": {
+        "approval_id": "approvalId"
+      },
+      "exclude": [],
+      "indexes": [
+        {
+          "name": "uq_ibcd_approval",
+          "key": {
+            "approvalId": 1
+          },
+          "unique": true
+        },
+        {
+          "name": "uq_ibcd_open",
+          "key": {
+            "branchId": 1
+          },
+          "unique": true,
+          "partialFilterExpression": {
+            "isOpen": true
+          }
+        },
+        {
+          "name": "ix_ibcd_institution",
+          "key": {
+            "institutionId": 1
+          }
+        }
+      ]
+    },
+    {
+      "name": "financial_requests",
+      "table": "financial_requests",
+      "key": {
+        "id": "id"
+      },
+      "exclude": [
+        "request_details",
+        "processed_by_user_id"
+      ],
+      "indexes": [
+        {
+          "name": "uq_fr_id",
+          "key": {
+            "id": 1
+          },
+          "unique": true
+        },
+        {
+          "name": "ix_fr_user",
+          "key": {
+            "userId": 1,
+            "createdAt": -1
+          }
+        },
+        {
+          "name": "ix_fr_status",
+          "key": {
+            "financialRequestStatus": 1,
             "createdAt": -1
           }
         }

@@ -1,0 +1,14 @@
+C:/Users/User/Desktop/litedb/build/CMakeFiles/litedb.dir
+C:/Users/User/Desktop/litedb/build/CMakeFiles/litedb_server.dir
+C:/Users/User/Desktop/litedb/build/CMakeFiles/litedbd.dir
+C:/Users/User/Desktop/litedb/build/CMakeFiles/litedb-cli.dir
+C:/Users/User/Desktop/litedb/build/CMakeFiles/doc_demo.dir
+C:/Users/User/Desktop/litedb/build/CMakeFiles/graph_demo.dir
+C:/Users/User/Desktop/litedb/build/CMakeFiles/ts_demo.dir
+C:/Users/User/Desktop/litedb/build/CMakeFiles/cache_demo.dir
+C:/Users/User/Desktop/litedb/build/CMakeFiles/engine_demo.dir
+C:/Users/User/Desktop/litedb/build/CMakeFiles/safe_engine_test.dir
+C:/Users/User/Desktop/litedb/build/CMakeFiles/bench_writes.dir
+C:/Users/User/Desktop/litedb/build/CMakeFiles/test.dir
+C:/Users/User/Desktop/litedb/build/CMakeFiles/edit_cache.dir
+C:/Users/User/Desktop/litedb/build/CMakeFiles/rebuild_cache.dir

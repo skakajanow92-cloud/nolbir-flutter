@@ -112,6 +112,23 @@
         "valid_until"
       ],
       "lifecycle": "is_active = true iken vardır. Süre bitimi (valid_until) filtre özelliğidir; geçerlilik okuma anında kontrol edilir."
+    },
+    "RATED": {
+      "from": "User | Institution",
+      "to": "User | Institution",
+      "table": "ratings",
+      "key": [
+        "id"
+      ],
+      "properties": [
+        "id (ratingId)",
+        "category_code",
+        "score",
+        "trust_score",
+        "evaluator_type",
+        "created_at"
+      ],
+      "lifecycle": "Yalnızca rating_status = ACTIVE ve is_anonymous = false iken vardır; gizlenince, beklemeye alınınca veya anonim olunca ilişki silinir. Çalışan değerlendirmeleri de User düğümüne bağlanır (evaluator_type ile ayrışır)."
     }
   },
   "constraints": [
@@ -119,11 +136,13 @@
     "CREATE CONSTRAINT institution_id_unique IF NOT EXISTS FOR (i:Institution) REQUIRE i.institutionId IS UNIQUE",
     "CREATE CONSTRAINT works_at_position_unique IF NOT EXISTS FOR ()-[r:WORKS_AT]-() REQUIRE r.positionId IS UNIQUE",
     "CREATE CONSTRAINT consortium_id_unique IF NOT EXISTS FOR (c:Consortium) REQUIRE c.consortiumId IS UNIQUE",
-    "CREATE CONSTRAINT b2b_agreement_unique IF NOT EXISTS FOR ()-[r:B2B_AGREEMENT]-() REQUIRE r.agreementId IS UNIQUE"
+    "CREATE CONSTRAINT b2b_agreement_unique IF NOT EXISTS FOR ()-[r:B2B_AGREEMENT]-() REQUIRE r.agreementId IS UNIQUE",
+    "CREATE CONSTRAINT rated_rating_unique IF NOT EXISTS FOR ()-[r:RATED]-() REQUIRE r.ratingId IS UNIQUE"
   ],
   "indexes": [
     "CREATE INDEX user_name_idx IF NOT EXISTS FOR (u:User) ON (u.userName)",
     "CREATE INDEX institution_country_idx IF NOT EXISTS FOR (i:Institution) ON (i.countryCode)",
-    "CREATE INDEX shareholder_of_board_idx IF NOT EXISTS FOR ()-[r:SHAREHOLDER_OF]-() ON (r.boardMember)"
+    "CREATE INDEX shareholder_of_board_idx IF NOT EXISTS FOR ()-[r:SHAREHOLDER_OF]-() ON (r.boardMember)",
+    "CREATE INDEX rated_category_idx IF NOT EXISTS FOR ()-[r:RATED]-() ON (r.categoryCode)"
   ]
 }

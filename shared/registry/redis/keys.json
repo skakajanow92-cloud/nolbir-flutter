@@ -139,6 +139,28 @@
       "source": "commission_rules",
       "description": "Aktif komisyon kuralları, gösterim/teklif amaçlı. Geçerlilik tarihi (effectiveFrom/Until) okuma anında uygulanır. Kesilen komisyon her zaman Postgres'te hesaplanır.",
       "invalidate": "commission_rules olayında DEL"
+    },
+    {
+      "pattern": "cache:reputation:user:{userId}",
+      "type": "string(json)",
+      "ttl": "10m",
+      "source": "user_domain_reputations",
+      "description": "Kullanıcının kategori bazlı itibar skorları, gösterim amaçlı. İtibar eşiğine bağlı kararlar (ör. promosyon uygunluğu) Postgres'ten verilir.",
+      "invalidate": "user_domain_reputations olayında ilgili kullanıcının anahtarı DEL"
+    },
+    {
+      "pattern": "cache:reputation:worker:{userId}",
+      "type": "string(json)",
+      "ttl": "10m",
+      "source": "worker_domain_reputations",
+      "invalidate": "worker_domain_reputations olayında DEL"
+    },
+    {
+      "pattern": "cache:reputation:institution:{institutionId}",
+      "type": "string(json)",
+      "ttl": "10m",
+      "source": "institution_domain_reputations",
+      "invalidate": "institution_domain_reputations olayında DEL"
     }
   ]
 }

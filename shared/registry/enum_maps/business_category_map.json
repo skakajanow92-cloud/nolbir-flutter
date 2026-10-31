@@ -1,0 +1,3367 @@
+{
+    "version": 1,
+    "rules": [
+        "business_category = ilan, itibar, komisyon, imtiyaz ve işletme kuralı bağlamında 'ne satılıyor/hangi hizmet' sorusunun cevabıdır. Lisans (license_map) 'şirket ne tür bir işletme' sorusunun cevabıdır; ikisi birbirine karışmaz.",
+        "Kodlar: grup kodu = sıra*100; yaprak kodu = grup kodu + 1..98; her grubun 'Diğer' yaprağı = grup kodu + 99. Bir kodun grubu code - (code % 100) ile bulunur. 0 ve NULL 'tüm kategoriler' anlamında kullanılır, yaprak kodu olarak asla kullanılmaz.",
+        "Her ilan/itibar kaydı TAM BİR yaprak koduna bağlanır; grup kodu yaprak olarak kullanılmaz. Yeni kategori eklenince ilgili grubun boş numarası kullanılır, mevcut kodlar değişmez ve silinmez (pasife alınır).",
+        "Bir kategoriyi hangi lisansların satabileceği grubun 'licenses' listesindedir. Bir ilanın kategorisi, satıcı kurumun lisansları arasında bu listede bulunan bir lisans yoksa yayınlanamaz.",
+        "category_country_rules varsayılan KAPALI kuralı aynen geçerlidir: ülke satırı olmayan kategori yayınlanamaz. 'restricted' işaretli kategoriler ayrıca ülkeye özgü izin ve yaş kuralı ister.",
+        "Eski enum (0=FURNITURE, 1=FOOD) bu haritayla değiştirilir; henüz veri olmadığı için taşıma gerekmez. Karşılıkları: FURNITURE -> HOME_FURNITURE grubu, FOOD -> GROCERY_FOOD_RETAIL / RESTAURANT_FOOD_SERVICE grupları."
+    ],
+    "disambiguation": [
+        "Yeni mi ikinci el mi: item_condition 0 (sıfır) ürün kendi grubunda; item_condition 1/2 (ikinci el/yenilenmiş) ürün SECOND_HAND_AUCTION grubunda. İstisna: araçlar (AUTOMOTIVE: NEW_CAR/USED_CAR ayrı yaprak) ve gayrimenkul (REAL_ESTATE) kendi gruplarında kalır.",
+        "Açık artırma bir satış yöntemidir, ürün türü değil: ürün SECOND_HAND_AUCTION grubundaki *_AUCTION yapraklarından birine, gayrimenkul REAL_ESTATE_AUCTION'a bağlanır.",
+        "Tek yön bilet (otobüs, tren, uçak, feribot) TICKETING; uçak, otel ve tur birlikte paketlenmişse TRAVEL_TOURISM yapraklarından biri. Konaklama tek başına LODGING.",
+        "Kısa dönem (30 günden az) daire ve ev kiralama LODGING/SHORT_STAY_APARTMENT; uzun dönem REAL_ESTATE/RESIDENTIAL_RENT_LONG.",
+        "Paketli ve raflı gıda GROCERY_FOOD_RETAIL; hazır yemek ve içecek hizmeti RESTAURANT_FOOD_SERVICE; üreticinin işlenmemiş ürünü CROP_AGRICULTURE veya LIVESTOCK_FISHERY; fabrikada işlenen ürünün üretici satışı FOOD_MANUFACTURING.",
+        "Yeni kurulum projesi (tesisat, elektrik, iklimlendirme) CONSTRUCTION/MEP_INSTALLATION; mevcut arızanın onarımı HOME_SERVICES_REPAIR.",
+        "Tıbbi cihaz hasta/ev kullanımı PHARMACY_MEDICAL_SUPPLIES; hastane ve klinik ekipmanının kurumlara satışı HOSPITAL_EQUIPMENT_B2B.",
+        "Evcil hayvan maması ve aksesuarı VETERINARY_PET; çiftlik hayvanı yemi LIVESTOCK_FISHERY/ANIMAL_FEED.",
+        "Doğrudan tüketiciye perakende ürün kendi sektör grubunda; aynı ürünün işletmelere toptan satışı WHOLESALE_B2B.",
+        "Sigorta ürünleri tek başına INSURANCE grubundadır; alışveriş, rezervasyon ve seyahat koruması da bu gruptadır, satın alınan ürünün kategorisine bağlanmaz.",
+        "Bağış kampanyası NONPROFIT_DONATION; yatırım amaçlı kitle fonlaması INVESTMENT_WEALTH/CROWDFUNDING_EQUITY."
+    ],
+    "groups": [
+        {
+            "code": 100,
+            "key": "BANKING_CREDIT",
+            "name": "Bankacılık ve Kredi",
+            "kind": "FINANCIAL",
+            "licenses": [
+                "BANKING",
+                "LENDING_LEASING"
+            ]
+        },
+        {
+            "code": 200,
+            "key": "PAYMENTS_FX",
+            "name": "Ödeme ve Döviz",
+            "kind": "FINANCIAL",
+            "licenses": [
+                "PAYMENT_SERVICES",
+                "CURRENCY_EXCHANGE_OFFICE",
+                "CASH_AGENT",
+                "BANKING"
+            ]
+        },
+        {
+            "code": 300,
+            "key": "INVESTMENT_WEALTH",
+            "name": "Yatırım ve Varlık Yönetimi",
+            "kind": "FINANCIAL",
+            "licenses": [
+                "INVESTMENT_PORTFOLIO_MANAGEMENT",
+                "BANKING"
+            ]
+        },
+        {
+            "code": 400,
+            "key": "INSURANCE",
+            "name": "Sigorta",
+            "kind": "FINANCIAL",
+            "licenses": [
+                "INSURANCE_PROVIDER",
+                "INSURANCE_AGENCY"
+            ]
+        },
+        {
+            "code": 500,
+            "key": "GROCERY_FOOD_RETAIL",
+            "name": "Market ve Gıda Perakendesi",
+            "kind": "PHYSICAL_GOODS",
+            "licenses": [
+                "SUPERMARKET_GROCERY",
+                "GENERAL_RETAIL"
+            ]
+        },
+        {
+            "code": 600,
+            "key": "GENERAL_MERCHANDISE",
+            "name": "Genel Ürün Perakendesi",
+            "kind": "PHYSICAL_GOODS",
+            "licenses": [
+                "GENERAL_RETAIL"
+            ]
+        },
+        {
+            "code": 700,
+            "key": "FASHION_PERSONAL_GOODS",
+            "name": "Moda ve Kişisel Ürünler",
+            "kind": "PHYSICAL_GOODS",
+            "licenses": [
+                "FASHION_TEXTILE_RETAIL",
+                "GENERAL_RETAIL"
+            ]
+        },
+        {
+            "code": 800,
+            "key": "ELECTRONICS_APPLIANCES",
+            "name": "Elektronik ve Beyaz Eşya",
+            "kind": "PHYSICAL_GOODS",
+            "licenses": [
+                "ELECTRONICS_RETAIL"
+            ]
+        },
+        {
+            "code": 900,
+            "key": "HOME_FURNITURE",
+            "name": "Ev, Mobilya ve Dekorasyon",
+            "kind": "PHYSICAL_GOODS",
+            "licenses": [
+                "FURNITURE_HOME_GOODS"
+            ]
+        },
+        {
+            "code": 1000,
+            "key": "AUTOMOTIVE",
+            "name": "Otomotiv",
+            "kind": "PHYSICAL_GOODS",
+            "licenses": [
+                "AUTO_DEALER",
+                "REPAIR_AUTO_SERVICE"
+            ]
+        },
+        {
+            "code": 1100,
+            "key": "JEWELRY_LUXURY",
+            "name": "Kuyumculuk ve Lüks",
+            "kind": "PHYSICAL_GOODS",
+            "licenses": [
+                "JEWELRY_PRECIOUS_METALS"
+            ]
+        },
+        {
+            "code": 1200,
+            "key": "SECOND_HAND_AUCTION",
+            "name": "İkinci El ve Açık Artırma",
+            "kind": "PHYSICAL_GOODS",
+            "licenses": [
+                "SECOND_HAND_GOODS",
+                "AUCTION_HOUSE"
+            ]
+        },
+        {
+            "code": 1300,
+            "key": "WHOLESALE_B2B",
+            "name": "Toptan ve B2B",
+            "kind": "PHYSICAL_GOODS",
+            "licenses": [
+                "WHOLESALE_DISTRIBUTION"
+            ]
+        },
+        {
+            "code": 1400,
+            "key": "RESTAURANT_FOOD_SERVICE",
+            "name": "Restoran ve Yemek Hizmeti",
+            "kind": "BOOKING",
+            "licenses": [
+                "RESTAURANT_CAFE",
+                "BAKERY_PATISSERIE",
+                "CATERING_FOOD_SERVICE"
+            ]
+        },
+        {
+            "code": 1500,
+            "key": "EVENT_VENUES",
+            "name": "Etkinlik Mekanları ve Organizasyon",
+            "kind": "BOOKING",
+            "licenses": [
+                "WEDDING_EVENT_VENUE",
+                "CATERING_FOOD_SERVICE"
+            ]
+        },
+        {
+            "code": 1600,
+            "key": "LODGING",
+            "name": "Konaklama",
+            "kind": "BOOKING",
+            "licenses": [
+                "HOTEL_LODGING"
+            ]
+        },
+        {
+            "code": 1700,
+            "key": "TRAVEL_TOURISM",
+            "name": "Seyahat ve Turizm",
+            "kind": "BOOKING",
+            "licenses": [
+                "TRAVEL_AGENCY",
+                "TOUR_OPERATOR"
+            ]
+        },
+        {
+            "code": 1800,
+            "key": "TICKETING",
+            "name": "Bilet",
+            "kind": "TICKET",
+            "licenses": [
+                "TICKETING",
+                "CINEMA",
+                "THEATER_PERFORMING_ARTS",
+                "PASSENGER_TRANSPORT"
+            ]
+        },
+        {
+            "code": 1900,
+            "key": "PASSENGER_TRANSPORT",
+            "name": "Yolcu Taşımacılığı",
+            "kind": "SERVICE",
+            "licenses": [
+                "PASSENGER_TRANSPORT",
+                "TAXI_RIDE_HAILING",
+                "VEHICLE_RENTAL"
+            ]
+        },
+        {
+            "code": 2000,
+            "key": "FREIGHT_CARGO_COURIER",
+            "name": "Kargo, Kurye ve Lojistik",
+            "kind": "LOGISTICS",
+            "licenses": [
+                "FREIGHT_LOGISTICS",
+                "CARGO_SHIPPING",
+                "COURIER_LAST_MILE"
+            ]
+        },
+        {
+            "code": 2100,
+            "key": "NEWS_PUBLISHING",
+            "name": "Haber ve Yayıncılık",
+            "kind": "DIGITAL_CONTENT",
+            "licenses": [
+                "NEWS_MEDIA",
+                "MUSIC_PUBLISHING"
+            ]
+        },
+        {
+            "code": 2200,
+            "key": "VIDEO_STREAMING_FILM",
+            "name": "Video, Film ve Belgesel",
+            "kind": "DIGITAL_CONTENT",
+            "licenses": [
+                "STREAMING_VIDEO",
+                "DOCUMENTARY_PRODUCTION",
+                "CINEMA"
+            ]
+        },
+        {
+            "code": 2300,
+            "key": "PERFORMING_ARTS_MUSIC",
+            "name": "Sahne Sanatları ve Müzik",
+            "kind": "DIGITAL_CONTENT",
+            "licenses": [
+                "THEATER_PERFORMING_ARTS",
+                "MUSIC_PUBLISHING"
+            ]
+        },
+        {
+            "code": 2400,
+            "key": "GAMES_BETTING",
+            "name": "Oyun ve Bahis",
+            "kind": "WAGER",
+            "licenses": [
+                "BETTING_GAMING",
+                "GAMES_ENTERTAINMENT"
+            ]
+        },
+        {
+            "code": 2500,
+            "key": "ADVERTISING_MARKETING",
+            "name": "Reklam ve Pazarlama",
+            "kind": "SERVICE",
+            "licenses": [
+                "ADVERTISING_AGENCY"
+            ]
+        },
+        {
+            "code": 2600,
+            "key": "HEALTHCARE_SERVICES",
+            "name": "Sağlık Hizmetleri",
+            "kind": "BOOKING",
+            "licenses": [
+                "HOSPITAL",
+                "HEALTH_CENTER_CLINIC",
+                "DENTAL_CARE",
+                "DIAGNOSTIC_LAB"
+            ]
+        },
+        {
+            "code": 2700,
+            "key": "PHARMACY_MEDICAL_SUPPLIES",
+            "name": "Eczane ve Tıbbi Ürünler",
+            "kind": "PHYSICAL_GOODS",
+            "licenses": [
+                "PHARMACY",
+                "MEDICAL_DEVICES"
+            ]
+        },
+        {
+            "code": 2800,
+            "key": "VETERINARY_PET",
+            "name": "Veterinerlik ve Evcil Hayvan",
+            "kind": "SERVICE",
+            "licenses": [
+                "VETERINARY",
+                "GENERAL_RETAIL"
+            ]
+        },
+        {
+            "code": 2900,
+            "key": "FITNESS_SPORTS",
+            "name": "Spor ve Fitness",
+            "kind": "BOOKING",
+            "licenses": [
+                "GYM_FITNESS",
+                "SPORTS_CLUB_FACILITY"
+            ]
+        },
+        {
+            "code": 3000,
+            "key": "BEAUTY_PERSONAL_CARE",
+            "name": "Güzellik ve Kişisel Bakım",
+            "kind": "BOOKING",
+            "licenses": [
+                "HAIR_BEAUTY_SALON",
+                "SPA_WELLNESS",
+                "GENERAL_RETAIL"
+            ]
+        },
+        {
+            "code": 3100,
+            "key": "EDUCATION_FORMAL",
+            "name": "Örgün Eğitim",
+            "kind": "SERVICE",
+            "licenses": [
+                "SCHOOL_K12",
+                "HIGHER_EDUCATION",
+                "VOCATIONAL_TRAINING"
+            ]
+        },
+        {
+            "code": 3200,
+            "key": "EDUCATION_NONFORMAL",
+            "name": "Yaygın ve Çevrimiçi Eğitim",
+            "kind": "SERVICE",
+            "licenses": [
+                "COURSES_TUTORING",
+                "ONLINE_EDUCATION",
+                "VOCATIONAL_TRAINING"
+            ]
+        },
+        {
+            "code": 3300,
+            "key": "CROP_AGRICULTURE",
+            "name": "Bitkisel Tarım",
+            "kind": "PHYSICAL_GOODS",
+            "licenses": [
+                "CROP_FARMING",
+                "WHOLESALE_DISTRIBUTION"
+            ]
+        },
+        {
+            "code": 3400,
+            "key": "LIVESTOCK_FISHERY",
+            "name": "Hayvancılık ve Su Ürünleri",
+            "kind": "PHYSICAL_GOODS",
+            "licenses": [
+                "LIVESTOCK",
+                "FISHERY_AQUACULTURE"
+            ]
+        },
+        {
+            "code": 3500,
+            "key": "FOOD_MANUFACTURING",
+            "name": "Gıda Üretimi",
+            "kind": "PHYSICAL_GOODS",
+            "licenses": [
+                "FOOD_PROCESSING",
+                "BAKERY_PATISSERIE"
+            ]
+        },
+        {
+            "code": 3600,
+            "key": "INDUSTRIAL_MANUFACTURING",
+            "name": "Sanayi ve Üretim",
+            "kind": "PHYSICAL_GOODS",
+            "licenses": [
+                "MANUFACTURING"
+            ]
+        },
+        {
+            "code": 3700,
+            "key": "ENERGY_MINING",
+            "name": "Enerji, Altyapı ve Madencilik",
+            "kind": "SERVICE",
+            "licenses": [
+                "ENERGY_UTILITIES",
+                "MINING_QUARRY"
+            ]
+        },
+        {
+            "code": 3800,
+            "key": "CONSTRUCTION",
+            "name": "İnşaat ve Yapı",
+            "kind": "SERVICE",
+            "licenses": [
+                "CONSTRUCTION_CONTRACTOR",
+                "ARCHITECTURE_ENGINEERING",
+                "WHOLESALE_DISTRIBUTION",
+                "GENERAL_RETAIL"
+            ]
+        },
+        {
+            "code": 3900,
+            "key": "REAL_ESTATE",
+            "name": "Gayrimenkul",
+            "kind": "REAL_ESTATE",
+            "licenses": [
+                "REAL_ESTATE_AGENCY",
+                "REAL_ESTATE_DEVELOPER",
+                "PROPERTY_MANAGEMENT",
+                "AUCTION_HOUSE"
+            ]
+        },
+        {
+            "code": 4000,
+            "key": "SOFTWARE_TECH",
+            "name": "Yazılım ve Teknoloji",
+            "kind": "DIGITAL_CONTENT",
+            "licenses": [
+                "SOFTWARE_SAAS",
+                "IT_SERVICES"
+            ]
+        },
+        {
+            "code": 4100,
+            "key": "HOSTING_TELECOM_IOT",
+            "name": "Barındırma, Telekom ve IoT",
+            "kind": "SUBSCRIPTION",
+            "licenses": [
+                "HOSTING_CLOUD_RESOURCES",
+                "TELECOM",
+                "IOT_SMART_DEVICES"
+            ]
+        },
+        {
+            "code": 4200,
+            "key": "PROFESSIONAL_SERVICES",
+            "name": "Profesyonel Hizmetler",
+            "kind": "SERVICE",
+            "licenses": [
+                "CONSULTING",
+                "LEGAL_SERVICES",
+                "ACCOUNTING_AUDIT",
+                "HR_STAFFING"
+            ]
+        },
+        {
+            "code": 4300,
+            "key": "NONPROFIT_DONATION",
+            "name": "Bağış ve Hayır İşleri",
+            "kind": "DONATION",
+            "licenses": [
+                "CHARITY_DONATIONS",
+                "FOUNDATION_NGO"
+            ]
+        },
+        {
+            "code": 4400,
+            "key": "HOME_SERVICES_REPAIR",
+            "name": "Ev Hizmetleri, Tamir ve Güvenlik",
+            "kind": "SERVICE",
+            "licenses": [
+                "CLEANING_MAINTENANCE",
+                "REPAIR_AUTO_SERVICE",
+                "SECURITY_SERVICES"
+            ]
+        },
+        {
+            "code": 4500,
+            "key": "GENERAL_UNCLASSIFIED",
+            "name": "Sınıflandırılmamış",
+            "kind": "SERVICE",
+            "licenses": [
+                "OTHER_BUSINESS"
+            ]
+        }
+    ],
+    "categories": [
+        {
+            "code": 101,
+            "key": "DEMAND_DEPOSIT",
+            "name": "Vadesiz Mevduat",
+            "group": "BANKING_CREDIT"
+        },
+        {
+            "code": 102,
+            "key": "TERM_DEPOSIT",
+            "name": "Vadeli Mevduat",
+            "group": "BANKING_CREDIT"
+        },
+        {
+            "code": 103,
+            "key": "SAVINGS_ACCOUNT",
+            "name": "Tasarruf Hesabı",
+            "group": "BANKING_CREDIT"
+        },
+        {
+            "code": 104,
+            "key": "CONSUMER_LOAN",
+            "name": "İhtiyaç Kredisi",
+            "group": "BANKING_CREDIT"
+        },
+        {
+            "code": 105,
+            "key": "MORTGAGE_LOAN",
+            "name": "Konut Kredisi",
+            "group": "BANKING_CREDIT"
+        },
+        {
+            "code": 106,
+            "key": "VEHICLE_LOAN",
+            "name": "Taşıt Kredisi",
+            "group": "BANKING_CREDIT"
+        },
+        {
+            "code": 107,
+            "key": "BUSINESS_LOAN",
+            "name": "Ticari Kredi",
+            "group": "BANKING_CREDIT"
+        },
+        {
+            "code": 108,
+            "key": "MICROCREDIT",
+            "name": "Mikro Kredi",
+            "group": "BANKING_CREDIT"
+        },
+        {
+            "code": 109,
+            "key": "CREDIT_CARD",
+            "name": "Kredi Kartı",
+            "group": "BANKING_CREDIT"
+        },
+        {
+            "code": 110,
+            "key": "FINANCE_LEASING",
+            "name": "Finansal Kiralama",
+            "group": "BANKING_CREDIT"
+        },
+        {
+            "code": 111,
+            "key": "FACTORING",
+            "name": "Faktoring",
+            "group": "BANKING_CREDIT"
+        },
+        {
+            "code": 112,
+            "key": "GUARANTEE_LETTER_OF_CREDIT",
+            "name": "Teminat Mektubu ve Akreditif",
+            "group": "BANKING_CREDIT"
+        },
+        {
+            "code": 113,
+            "key": "SAFE_DEPOSIT_BOX",
+            "name": "Kiralık Kasa",
+            "group": "BANKING_CREDIT"
+        },
+        {
+            "code": 199,
+            "key": "BANKING_CREDIT_OTHER",
+            "name": "Diğer – Bankacılık ve Kredi",
+            "group": "BANKING_CREDIT"
+        },
+        {
+            "code": 201,
+            "key": "E_MONEY_WALLET",
+            "name": "Elektronik Para ve Cüzdan",
+            "group": "PAYMENTS_FX"
+        },
+        {
+            "code": 202,
+            "key": "MONEY_TRANSFER_DOMESTIC",
+            "name": "Yurt İçi Para Transferi",
+            "group": "PAYMENTS_FX"
+        },
+        {
+            "code": 203,
+            "key": "MONEY_TRANSFER_INTERNATIONAL",
+            "name": "Uluslararası Para Transferi",
+            "group": "PAYMENTS_FX"
+        },
+        {
+            "code": 204,
+            "key": "BILL_PAYMENT",
+            "name": "Fatura ve Aidat Ödeme",
+            "group": "PAYMENTS_FX"
+        },
+        {
+            "code": 205,
+            "key": "MERCHANT_ACQUIRING",
+            "name": "Üye İşyeri Ödeme Alma",
+            "group": "PAYMENTS_FX"
+        },
+        {
+            "code": 206,
+            "key": "CASH_WITHDRAWAL_AGENT",
+            "name": "Nakit Çıkış (Ajan)",
+            "group": "PAYMENTS_FX"
+        },
+        {
+            "code": 207,
+            "key": "CASH_DEPOSIT_AGENT",
+            "name": "Nakit Giriş (Ajan)",
+            "group": "PAYMENTS_FX"
+        },
+        {
+            "code": 208,
+            "key": "CURRENCY_EXCHANGE",
+            "name": "Döviz Alım Satım",
+            "group": "PAYMENTS_FX"
+        },
+        {
+            "code": 209,
+            "key": "PREPAID_VOUCHER",
+            "name": "Ön Ödemeli Kupon",
+            "group": "PAYMENTS_FX"
+        },
+        {
+            "code": 299,
+            "key": "PAYMENTS_FX_OTHER",
+            "name": "Diğer – Ödeme ve Döviz",
+            "group": "PAYMENTS_FX"
+        },
+        {
+            "code": 301,
+            "key": "MUTUAL_FUND",
+            "name": "Yatırım Fonu",
+            "group": "INVESTMENT_WEALTH"
+        },
+        {
+            "code": 302,
+            "key": "EQUITIES_BROKERAGE",
+            "name": "Hisse Senedi Aracılığı",
+            "group": "INVESTMENT_WEALTH"
+        },
+        {
+            "code": 303,
+            "key": "BONDS_SUKUK",
+            "name": "Tahvil ve Sukuk",
+            "group": "INVESTMENT_WEALTH"
+        },
+        {
+            "code": 304,
+            "key": "PRECIOUS_METAL_INVESTMENT",
+            "name": "Değerli Maden Yatırımı",
+            "group": "INVESTMENT_WEALTH"
+        },
+        {
+            "code": 305,
+            "key": "PORTFOLIO_MANAGEMENT",
+            "name": "Portföy Yönetimi",
+            "group": "INVESTMENT_WEALTH"
+        },
+        {
+            "code": 306,
+            "key": "PENSION_RETIREMENT",
+            "name": "Emeklilik Planı",
+            "group": "INVESTMENT_WEALTH"
+        },
+        {
+            "code": 307,
+            "key": "CROWDFUNDING_EQUITY",
+            "name": "Kitle Fonlaması (Ortaklık)",
+            "group": "INVESTMENT_WEALTH"
+        },
+        {
+            "code": 308,
+            "key": "PRIVATE_EQUITY_VENTURE",
+            "name": "Girişim ve Özel Sermaye",
+            "group": "INVESTMENT_WEALTH"
+        },
+        {
+            "code": 309,
+            "key": "INVESTMENT_ADVISORY",
+            "name": "Yatırım Danışmanlığı",
+            "group": "INVESTMENT_WEALTH"
+        },
+        {
+            "code": 399,
+            "key": "INVESTMENT_WEALTH_OTHER",
+            "name": "Diğer – Yatırım ve Varlık Yönetimi",
+            "group": "INVESTMENT_WEALTH"
+        },
+        {
+            "code": 401,
+            "key": "LIFE_INSURANCE",
+            "name": "Hayat Sigortası",
+            "group": "INSURANCE"
+        },
+        {
+            "code": 402,
+            "key": "HEALTH_INSURANCE",
+            "name": "Sağlık Sigortası",
+            "group": "INSURANCE"
+        },
+        {
+            "code": 403,
+            "key": "ACCIDENT_INSURANCE",
+            "name": "Kaza Sigortası",
+            "group": "INSURANCE"
+        },
+        {
+            "code": 404,
+            "key": "MOTOR_INSURANCE",
+            "name": "Araç Sigortası",
+            "group": "INSURANCE"
+        },
+        {
+            "code": 405,
+            "key": "HOME_PROPERTY_INSURANCE",
+            "name": "Konut ve Mülk Sigortası",
+            "group": "INSURANCE"
+        },
+        {
+            "code": 406,
+            "key": "TRAVEL_INSURANCE",
+            "name": "Seyahat Sigortası",
+            "group": "INSURANCE"
+        },
+        {
+            "code": 407,
+            "key": "LIABILITY_INSURANCE",
+            "name": "Sorumluluk Sigortası",
+            "group": "INSURANCE"
+        },
+        {
+            "code": 408,
+            "key": "BUSINESS_PROPERTY_INSURANCE",
+            "name": "İşyeri Sigortası",
+            "group": "INSURANCE"
+        },
+        {
+            "code": 409,
+            "key": "CARGO_INSURANCE",
+            "name": "Nakliyat Sigortası",
+            "group": "INSURANCE"
+        },
+        {
+            "code": 410,
+            "key": "AGRI_INSURANCE",
+            "name": "Tarım Sigortası",
+            "group": "INSURANCE"
+        },
+        {
+            "code": 411,
+            "key": "PURCHASE_PROTECTION",
+            "name": "Alışveriş ve Rezervasyon Koruması",
+            "group": "INSURANCE"
+        },
+        {
+            "code": 412,
+            "key": "INSURANCE_BROKERAGE",
+            "name": "Sigorta Aracılığı",
+            "group": "INSURANCE"
+        },
+        {
+            "code": 499,
+            "key": "INSURANCE_OTHER",
+            "name": "Diğer – Sigorta",
+            "group": "INSURANCE"
+        },
+        {
+            "code": 501,
+            "key": "FRESH_PRODUCE",
+            "name": "Taze Sebze ve Meyve",
+            "group": "GROCERY_FOOD_RETAIL"
+        },
+        {
+            "code": 502,
+            "key": "MEAT_POULTRY",
+            "name": "Et ve Tavuk",
+            "group": "GROCERY_FOOD_RETAIL"
+        },
+        {
+            "code": 503,
+            "key": "SEAFOOD",
+            "name": "Balık ve Deniz Ürünleri",
+            "group": "GROCERY_FOOD_RETAIL"
+        },
+        {
+            "code": 504,
+            "key": "DAIRY_EGGS",
+            "name": "Süt Ürünleri ve Yumurta",
+            "group": "GROCERY_FOOD_RETAIL"
+        },
+        {
+            "code": 505,
+            "key": "BAKERY_BREAD",
+            "name": "Ekmek ve Unlu Mamul",
+            "group": "GROCERY_FOOD_RETAIL"
+        },
+        {
+            "code": 506,
+            "key": "PACKAGED_FOOD",
+            "name": "Paketli Gıda",
+            "group": "GROCERY_FOOD_RETAIL"
+        },
+        {
+            "code": 507,
+            "key": "BEVERAGES_NONALCOHOLIC",
+            "name": "Alkolsüz İçecek",
+            "group": "GROCERY_FOOD_RETAIL"
+        },
+        {
+            "code": 508,
+            "key": "ALCOHOL",
+            "name": "Alkollü İçecek",
+            "group": "GROCERY_FOOD_RETAIL",
+            "restricted": true
+        },
+        {
+            "code": 509,
+            "key": "TOBACCO",
+            "name": "Tütün Ürünleri",
+            "group": "GROCERY_FOOD_RETAIL",
+            "restricted": true
+        },
+        {
+            "code": 510,
+            "key": "BABY_FOOD_FORMULA",
+            "name": "Bebek Maması",
+            "group": "GROCERY_FOOD_RETAIL"
+        },
+        {
+            "code": 511,
+            "key": "ORGANIC_SPECIALTY_FOOD",
+            "name": "Organik ve Özel Gıda",
+            "group": "GROCERY_FOOD_RETAIL"
+        },
+        {
+            "code": 512,
+            "key": "NUTS_SPICES_DRY_GOODS",
+            "name": "Kuruyemiş, Baharat, Bakliyat",
+            "group": "GROCERY_FOOD_RETAIL"
+        },
+        {
+            "code": 513,
+            "key": "FROZEN_FOOD",
+            "name": "Dondurulmuş Gıda",
+            "group": "GROCERY_FOOD_RETAIL"
+        },
+        {
+            "code": 514,
+            "key": "CONFECTIONERY_SNACKS",
+            "name": "Şekerleme ve Atıştırmalık",
+            "group": "GROCERY_FOOD_RETAIL"
+        },
+        {
+            "code": 515,
+            "key": "HOUSEHOLD_CLEANING",
+            "name": "Ev Temizlik Ürünleri",
+            "group": "GROCERY_FOOD_RETAIL"
+        },
+        {
+            "code": 599,
+            "key": "GROCERY_FOOD_RETAIL_OTHER",
+            "name": "Diğer – Market ve Gıda Perakendesi",
+            "group": "GROCERY_FOOD_RETAIL"
+        },
+        {
+            "code": 601,
+            "key": "TOYS_BABY_GEAR",
+            "name": "Oyuncak ve Bebek Ürünleri",
+            "group": "GENERAL_MERCHANDISE"
+        },
+        {
+            "code": 602,
+            "key": "BOOKS_STATIONERY",
+            "name": "Kitap ve Kırtasiye",
+            "group": "GENERAL_MERCHANDISE"
+        },
+        {
+            "code": 603,
+            "key": "SPORTS_OUTDOOR_EQUIPMENT",
+            "name": "Spor ve Outdoor Ekipmanı",
+            "group": "GENERAL_MERCHANDISE"
+        },
+        {
+            "code": 604,
+            "key": "MUSICAL_INSTRUMENTS",
+            "name": "Müzik Aletleri",
+            "group": "GENERAL_MERCHANDISE"
+        },
+        {
+            "code": 605,
+            "key": "GIFTS_FLOWERS",
+            "name": "Hediyelik ve Çiçek",
+            "group": "GENERAL_MERCHANDISE"
+        },
+        {
+            "code": 606,
+            "key": "HOBBY_CRAFT",
+            "name": "Hobi ve El Sanatları",
+            "group": "GENERAL_MERCHANDISE"
+        },
+        {
+            "code": 607,
+            "key": "OFFICE_SUPPLIES",
+            "name": "Ofis Malzemeleri",
+            "group": "GENERAL_MERCHANDISE"
+        },
+        {
+            "code": 608,
+            "key": "PARTY_SUPPLIES",
+            "name": "Parti Malzemeleri",
+            "group": "GENERAL_MERCHANDISE"
+        },
+        {
+            "code": 609,
+            "key": "TRAVEL_LUGGAGE",
+            "name": "Bavul ve Seyahat Ürünleri",
+            "group": "GENERAL_MERCHANDISE"
+        },
+        {
+            "code": 699,
+            "key": "GENERAL_MERCHANDISE_OTHER",
+            "name": "Diğer – Genel Ürün Perakendesi",
+            "group": "GENERAL_MERCHANDISE"
+        },
+        {
+            "code": 701,
+            "key": "WOMENS_CLOTHING",
+            "name": "Kadın Giyim",
+            "group": "FASHION_PERSONAL_GOODS"
+        },
+        {
+            "code": 702,
+            "key": "MENS_CLOTHING",
+            "name": "Erkek Giyim",
+            "group": "FASHION_PERSONAL_GOODS"
+        },
+        {
+            "code": 703,
+            "key": "KIDS_CLOTHING",
+            "name": "Çocuk Giyim",
+            "group": "FASHION_PERSONAL_GOODS"
+        },
+        {
+            "code": 704,
+            "key": "SHOES",
+            "name": "Ayakkabı",
+            "group": "FASHION_PERSONAL_GOODS"
+        },
+        {
+            "code": 705,
+            "key": "BAGS_ACCESSORIES",
+            "name": "Çanta ve Aksesuar",
+            "group": "FASHION_PERSONAL_GOODS"
+        },
+        {
+            "code": 706,
+            "key": "UNDERWEAR_SLEEPWEAR",
+            "name": "İç Giyim ve Ev Giyim",
+            "group": "FASHION_PERSONAL_GOODS"
+        },
+        {
+            "code": 707,
+            "key": "SPORTSWEAR",
+            "name": "Spor Giyim",
+            "group": "FASHION_PERSONAL_GOODS"
+        },
+        {
+            "code": 708,
+            "key": "WORKWEAR_UNIFORM",
+            "name": "İş Giyimi ve Üniforma",
+            "group": "FASHION_PERSONAL_GOODS"
+        },
+        {
+            "code": 709,
+            "key": "EYEWEAR",
+            "name": "Gözlük",
+            "group": "FASHION_PERSONAL_GOODS"
+        },
+        {
+            "code": 710,
+            "key": "FABRIC_BY_METER",
+            "name": "Kumaş ve Metraj Ürünleri",
+            "group": "FASHION_PERSONAL_GOODS"
+        },
+        {
+            "code": 799,
+            "key": "FASHION_PERSONAL_GOODS_OTHER",
+            "name": "Diğer – Moda ve Kişisel Ürünler",
+            "group": "FASHION_PERSONAL_GOODS"
+        },
+        {
+            "code": 801,
+            "key": "PHONES_TABLETS",
+            "name": "Telefon ve Tablet",
+            "group": "ELECTRONICS_APPLIANCES"
+        },
+        {
+            "code": 802,
+            "key": "COMPUTERS_LAPTOPS",
+            "name": "Bilgisayar ve Dizüstü",
+            "group": "ELECTRONICS_APPLIANCES"
+        },
+        {
+            "code": 803,
+            "key": "COMPUTER_PERIPHERALS",
+            "name": "Bilgisayar Çevre Birimleri",
+            "group": "ELECTRONICS_APPLIANCES"
+        },
+        {
+            "code": 804,
+            "key": "TV_AUDIO_VIDEO",
+            "name": "TV, Ses ve Görüntü",
+            "group": "ELECTRONICS_APPLIANCES"
+        },
+        {
+            "code": 805,
+            "key": "WHITE_GOODS",
+            "name": "Beyaz Eşya",
+            "group": "ELECTRONICS_APPLIANCES"
+        },
+        {
+            "code": 806,
+            "key": "SMALL_APPLIANCES",
+            "name": "Küçük Ev Aletleri",
+            "group": "ELECTRONICS_APPLIANCES"
+        },
+        {
+            "code": 807,
+            "key": "CAMERAS",
+            "name": "Kamera ve Fotoğraf",
+            "group": "ELECTRONICS_APPLIANCES"
+        },
+        {
+            "code": 808,
+            "key": "GAMING_HARDWARE",
+            "name": "Oyun Konsolu ve Donanımı",
+            "group": "ELECTRONICS_APPLIANCES"
+        },
+        {
+            "code": 809,
+            "key": "SMART_HOME_DEVICES",
+            "name": "Akıllı Ev Cihazları",
+            "group": "ELECTRONICS_APPLIANCES"
+        },
+        {
+            "code": 810,
+            "key": "WEARABLES",
+            "name": "Giyilebilir Teknoloji",
+            "group": "ELECTRONICS_APPLIANCES"
+        },
+        {
+            "code": 811,
+            "key": "NETWORK_EQUIPMENT",
+            "name": "Ağ Ekipmanları",
+            "group": "ELECTRONICS_APPLIANCES"
+        },
+        {
+            "code": 812,
+            "key": "ELECTRONIC_COMPONENTS",
+            "name": "Elektronik Komponent",
+            "group": "ELECTRONICS_APPLIANCES"
+        },
+        {
+            "code": 813,
+            "key": "ELECTRONICS_ACCESSORIES",
+            "name": "Elektronik Aksesuar",
+            "group": "ELECTRONICS_APPLIANCES"
+        },
+        {
+            "code": 899,
+            "key": "ELECTRONICS_APPLIANCES_OTHER",
+            "name": "Diğer – Elektronik ve Beyaz Eşya",
+            "group": "ELECTRONICS_APPLIANCES"
+        },
+        {
+            "code": 901,
+            "key": "LIVING_ROOM_FURNITURE",
+            "name": "Oturma Odası Mobilyası",
+            "group": "HOME_FURNITURE"
+        },
+        {
+            "code": 902,
+            "key": "BEDROOM_FURNITURE",
+            "name": "Yatak Odası Mobilyası",
+            "group": "HOME_FURNITURE"
+        },
+        {
+            "code": 903,
+            "key": "KITCHEN_DINING_FURNITURE",
+            "name": "Mutfak ve Yemek Odası Mobilyası",
+            "group": "HOME_FURNITURE"
+        },
+        {
+            "code": 904,
+            "key": "OFFICE_FURNITURE",
+            "name": "Ofis Mobilyası",
+            "group": "HOME_FURNITURE"
+        },
+        {
+            "code": 905,
+            "key": "OUTDOOR_GARDEN_FURNITURE",
+            "name": "Bahçe Mobilyası",
+            "group": "HOME_FURNITURE"
+        },
+        {
+            "code": 906,
+            "key": "HOME_TEXTILES",
+            "name": "Ev Tekstili",
+            "group": "HOME_FURNITURE"
+        },
+        {
+            "code": 907,
+            "key": "CARPETS_RUGS",
+            "name": "Halı ve Kilim",
+            "group": "HOME_FURNITURE"
+        },
+        {
+            "code": 908,
+            "key": "LIGHTING",
+            "name": "Aydınlatma",
+            "group": "HOME_FURNITURE"
+        },
+        {
+            "code": 909,
+            "key": "KITCHENWARE",
+            "name": "Mutfak Gereçleri",
+            "group": "HOME_FURNITURE"
+        },
+        {
+            "code": 910,
+            "key": "HOME_DECOR",
+            "name": "Ev Dekorasyonu",
+            "group": "HOME_FURNITURE"
+        },
+        {
+            "code": 911,
+            "key": "GARDEN_PLANTS_SEEDS",
+            "name": "Bahçe, Bitki ve Tohum",
+            "group": "HOME_FURNITURE"
+        },
+        {
+            "code": 912,
+            "key": "CUSTOM_MADE_FURNITURE",
+            "name": "Özel Sipariş Mobilya",
+            "group": "HOME_FURNITURE"
+        },
+        {
+            "code": 999,
+            "key": "HOME_FURNITURE_OTHER",
+            "name": "Diğer – Ev, Mobilya ve Dekorasyon",
+            "group": "HOME_FURNITURE"
+        },
+        {
+            "code": 1001,
+            "key": "NEW_CAR",
+            "name": "Sıfır Otomobil",
+            "group": "AUTOMOTIVE"
+        },
+        {
+            "code": 1002,
+            "key": "USED_CAR",
+            "name": "İkinci El Otomobil",
+            "group": "AUTOMOTIVE"
+        },
+        {
+            "code": 1003,
+            "key": "MOTORCYCLE",
+            "name": "Motosiklet",
+            "group": "AUTOMOTIVE"
+        },
+        {
+            "code": 1004,
+            "key": "COMMERCIAL_VEHICLE",
+            "name": "Ticari Araç ve Kamyon",
+            "group": "AUTOMOTIVE"
+        },
+        {
+            "code": 1005,
+            "key": "BICYCLE_SCOOTER",
+            "name": "Bisiklet ve Scooter",
+            "group": "AUTOMOTIVE"
+        },
+        {
+            "code": 1006,
+            "key": "AUTO_PARTS",
+            "name": "Yedek Parça",
+            "group": "AUTOMOTIVE"
+        },
+        {
+            "code": 1007,
+            "key": "TIRES_WHEELS",
+            "name": "Lastik ve Jant",
+            "group": "AUTOMOTIVE"
+        },
+        {
+            "code": 1008,
+            "key": "AUTO_ACCESSORIES",
+            "name": "Oto Aksesuar",
+            "group": "AUTOMOTIVE"
+        },
+        {
+            "code": 1009,
+            "key": "AUTO_REPAIR_SERVICE",
+            "name": "Oto Tamir ve Bakım",
+            "group": "AUTOMOTIVE"
+        },
+        {
+            "code": 1010,
+            "key": "CAR_WASH_DETAILING",
+            "name": "Oto Yıkama ve Detaylı Temizlik",
+            "group": "AUTOMOTIVE"
+        },
+        {
+            "code": 1011,
+            "key": "VEHICLE_INSPECTION",
+            "name": "Araç Muayene ve Ekspertiz",
+            "group": "AUTOMOTIVE"
+        },
+        {
+            "code": 1012,
+            "key": "MARINE_BOATS",
+            "name": "Tekne ve Deniz Araçları",
+            "group": "AUTOMOTIVE"
+        },
+        {
+            "code": 1099,
+            "key": "AUTOMOTIVE_OTHER",
+            "name": "Diğer – Otomotiv",
+            "group": "AUTOMOTIVE"
+        },
+        {
+            "code": 1101,
+            "key": "GOLD_JEWELRY",
+            "name": "Altın Takı",
+            "group": "JEWELRY_LUXURY"
+        },
+        {
+            "code": 1102,
+            "key": "SILVER_JEWELRY",
+            "name": "Gümüş Takı",
+            "group": "JEWELRY_LUXURY"
+        },
+        {
+            "code": 1103,
+            "key": "GEMSTONES_DIAMONDS",
+            "name": "Değerli Taş ve Elmas",
+            "group": "JEWELRY_LUXURY"
+        },
+        {
+            "code": 1104,
+            "key": "LUXURY_WATCHES",
+            "name": "Lüks Saat",
+            "group": "JEWELRY_LUXURY"
+        },
+        {
+            "code": 1105,
+            "key": "BULLION_COINS",
+            "name": "Külçe ve Sikke",
+            "group": "JEWELRY_LUXURY"
+        },
+        {
+            "code": 1106,
+            "key": "LUXURY_ACCESSORIES",
+            "name": "Lüks Aksesuar",
+            "group": "JEWELRY_LUXURY"
+        },
+        {
+            "code": 1107,
+            "key": "JEWELRY_REPAIR_APPRAISAL",
+            "name": "Takı Tamir ve Ekspertiz",
+            "group": "JEWELRY_LUXURY"
+        },
+        {
+            "code": 1199,
+            "key": "JEWELRY_LUXURY_OTHER",
+            "name": "Diğer – Kuyumculuk ve Lüks",
+            "group": "JEWELRY_LUXURY"
+        },
+        {
+            "code": 1201,
+            "key": "USED_ELECTRONICS",
+            "name": "İkinci El Elektronik",
+            "group": "SECOND_HAND_AUCTION"
+        },
+        {
+            "code": 1202,
+            "key": "USED_FURNITURE_HOME",
+            "name": "İkinci El Mobilya ve Ev Eşyası",
+            "group": "SECOND_HAND_AUCTION"
+        },
+        {
+            "code": 1203,
+            "key": "USED_CLOTHING",
+            "name": "İkinci El Giyim",
+            "group": "SECOND_HAND_AUCTION"
+        },
+        {
+            "code": 1204,
+            "key": "USED_BOOKS_MEDIA",
+            "name": "İkinci El Kitap ve Medya",
+            "group": "SECOND_HAND_AUCTION"
+        },
+        {
+            "code": 1205,
+            "key": "USED_SPORTS_EQUIPMENT",
+            "name": "İkinci El Spor Ekipmanı",
+            "group": "SECOND_HAND_AUCTION"
+        },
+        {
+            "code": 1206,
+            "key": "ANTIQUES_COLLECTIBLES",
+            "name": "Antika ve Koleksiyon",
+            "group": "SECOND_HAND_AUCTION"
+        },
+        {
+            "code": 1207,
+            "key": "ART_AUCTION",
+            "name": "Sanat Eseri Açık Artırması",
+            "group": "SECOND_HAND_AUCTION"
+        },
+        {
+            "code": 1208,
+            "key": "GENERAL_AUCTION",
+            "name": "Genel Açık Artırma",
+            "group": "SECOND_HAND_AUCTION"
+        },
+        {
+            "code": 1209,
+            "key": "VEHICLE_AUCTION",
+            "name": "Araç Açık Artırması",
+            "group": "SECOND_HAND_AUCTION"
+        },
+        {
+            "code": 1299,
+            "key": "SECOND_HAND_AUCTION_OTHER",
+            "name": "Diğer – İkinci El ve Açık Artırma",
+            "group": "SECOND_HAND_AUCTION"
+        },
+        {
+            "code": 1301,
+            "key": "WHOLESALE_FOOD",
+            "name": "Toptan Gıda",
+            "group": "WHOLESALE_B2B"
+        },
+        {
+            "code": 1302,
+            "key": "WHOLESALE_TEXTILE",
+            "name": "Toptan Tekstil",
+            "group": "WHOLESALE_B2B"
+        },
+        {
+            "code": 1303,
+            "key": "WHOLESALE_ELECTRONICS",
+            "name": "Toptan Elektronik",
+            "group": "WHOLESALE_B2B"
+        },
+        {
+            "code": 1304,
+            "key": "WHOLESALE_CONSTRUCTION_MATERIALS",
+            "name": "Toptan Yapı Malzemesi",
+            "group": "WHOLESALE_B2B"
+        },
+        {
+            "code": 1305,
+            "key": "WHOLESALE_AGRI_INPUTS",
+            "name": "Toptan Tarım Girdisi",
+            "group": "WHOLESALE_B2B"
+        },
+        {
+            "code": 1306,
+            "key": "WHOLESALE_CHEMICALS",
+            "name": "Toptan Kimyasal",
+            "group": "WHOLESALE_B2B"
+        },
+        {
+            "code": 1307,
+            "key": "WHOLESALE_MEDICAL",
+            "name": "Toptan Tıbbi Ürün",
+            "group": "WHOLESALE_B2B",
+            "restricted": true
+        },
+        {
+            "code": 1308,
+            "key": "INDUSTRIAL_SUPPLIES",
+            "name": "Endüstriyel Malzeme",
+            "group": "WHOLESALE_B2B"
+        },
+        {
+            "code": 1309,
+            "key": "PACKAGING_MATERIALS",
+            "name": "Ambalaj Malzemeleri",
+            "group": "WHOLESALE_B2B"
+        },
+        {
+            "code": 1310,
+            "key": "RAW_MATERIALS_TRADE",
+            "name": "Hammadde Ticareti",
+            "group": "WHOLESALE_B2B"
+        },
+        {
+            "code": 1399,
+            "key": "WHOLESALE_B2B_OTHER",
+            "name": "Diğer – Toptan ve B2B",
+            "group": "WHOLESALE_B2B"
+        },
+        {
+            "code": 1401,
+            "key": "DINE_IN_RESTAURANT",
+            "name": "Restoranda Yemek",
+            "group": "RESTAURANT_FOOD_SERVICE"
+        },
+        {
+            "code": 1402,
+            "key": "FAST_FOOD",
+            "name": "Fast Food",
+            "group": "RESTAURANT_FOOD_SERVICE"
+        },
+        {
+            "code": 1403,
+            "key": "CAFE_COFFEE",
+            "name": "Kafe ve Kahve",
+            "group": "RESTAURANT_FOOD_SERVICE"
+        },
+        {
+            "code": 1404,
+            "key": "BAKERY_PATISSERIE_PRODUCTS",
+            "name": "Fırın ve Pastane Ürünleri",
+            "group": "RESTAURANT_FOOD_SERVICE"
+        },
+        {
+            "code": 1405,
+            "key": "BAR_PUB",
+            "name": "Bar ve Pub",
+            "group": "RESTAURANT_FOOD_SERVICE",
+            "restricted": true
+        },
+        {
+            "code": 1406,
+            "key": "FOOD_DELIVERY_MEAL",
+            "name": "Paket ve Teslimat Yemek",
+            "group": "RESTAURANT_FOOD_SERVICE"
+        },
+        {
+            "code": 1407,
+            "key": "MEAL_PREP_SUBSCRIPTION",
+            "name": "Abonelikli Yemek",
+            "group": "RESTAURANT_FOOD_SERVICE"
+        },
+        {
+            "code": 1408,
+            "key": "CATERING_CORPORATE",
+            "name": "Kurumsal Catering",
+            "group": "RESTAURANT_FOOD_SERVICE"
+        },
+        {
+            "code": 1409,
+            "key": "STREET_FOOD_KIOSK",
+            "name": "Büfe ve Sokak Lezzetleri",
+            "group": "RESTAURANT_FOOD_SERVICE"
+        },
+        {
+            "code": 1410,
+            "key": "TABLE_RESERVATION",
+            "name": "Masa Rezervasyonu",
+            "group": "RESTAURANT_FOOD_SERVICE"
+        },
+        {
+            "code": 1499,
+            "key": "RESTAURANT_FOOD_SERVICE_OTHER",
+            "name": "Diğer – Restoran ve Yemek Hizmeti",
+            "group": "RESTAURANT_FOOD_SERVICE"
+        },
+        {
+            "code": 1501,
+            "key": "WEDDING_HALL",
+            "name": "Düğün Salonu",
+            "group": "EVENT_VENUES"
+        },
+        {
+            "code": 1502,
+            "key": "CONFERENCE_MEETING_ROOM",
+            "name": "Toplantı ve Konferans Salonu",
+            "group": "EVENT_VENUES"
+        },
+        {
+            "code": 1503,
+            "key": "PARTY_EVENT_SPACE",
+            "name": "Parti ve Özel Etkinlik Mekanı",
+            "group": "EVENT_VENUES"
+        },
+        {
+            "code": 1504,
+            "key": "WEDDING_PLANNING",
+            "name": "Düğün ve Organizasyon Planlama",
+            "group": "EVENT_VENUES"
+        },
+        {
+            "code": 1505,
+            "key": "PHOTO_VIDEO_EVENT",
+            "name": "Etkinlik Foto ve Video",
+            "group": "EVENT_VENUES"
+        },
+        {
+            "code": 1506,
+            "key": "DECORATION_FLORAL",
+            "name": "Süsleme ve Çiçek",
+            "group": "EVENT_VENUES"
+        },
+        {
+            "code": 1507,
+            "key": "EVENT_EQUIPMENT_RENTAL",
+            "name": "Etkinlik Ekipman Kiralama",
+            "group": "EVENT_VENUES"
+        },
+        {
+            "code": 1508,
+            "key": "EVENT_ENTERTAINMENT_BOOKING",
+            "name": "Etkinlik Eğlence ve Sanatçı Kiralama",
+            "group": "EVENT_VENUES"
+        },
+        {
+            "code": 1599,
+            "key": "EVENT_VENUES_OTHER",
+            "name": "Diğer – Etkinlik Mekanları ve Organizasyon",
+            "group": "EVENT_VENUES"
+        },
+        {
+            "code": 1601,
+            "key": "HOTEL_ROOM",
+            "name": "Otel Odası",
+            "group": "LODGING"
+        },
+        {
+            "code": 1602,
+            "key": "HOSTEL",
+            "name": "Pansiyon ve Hostel",
+            "group": "LODGING"
+        },
+        {
+            "code": 1603,
+            "key": "SHORT_STAY_APARTMENT",
+            "name": "Kısa Dönem Daire Kiralama",
+            "group": "LODGING"
+        },
+        {
+            "code": 1604,
+            "key": "VILLA_HOLIDAY_HOME",
+            "name": "Villa ve Tatil Evi",
+            "group": "LODGING"
+        },
+        {
+            "code": 1605,
+            "key": "CAMPING_GLAMPING",
+            "name": "Kamp ve Glamping",
+            "group": "LODGING"
+        },
+        {
+            "code": 1606,
+            "key": "RESORT_ALL_INCLUSIVE",
+            "name": "Resort ve Her Şey Dahil",
+            "group": "LODGING"
+        },
+        {
+            "code": 1607,
+            "key": "BED_AND_BREAKFAST",
+            "name": "Butik Konaklama ve Kahvaltı",
+            "group": "LODGING"
+        },
+        {
+            "code": 1699,
+            "key": "LODGING_OTHER",
+            "name": "Diğer – Konaklama",
+            "group": "LODGING"
+        },
+        {
+            "code": 1701,
+            "key": "PACKAGE_TOUR",
+            "name": "Paket Tur",
+            "group": "TRAVEL_TOURISM"
+        },
+        {
+            "code": 1702,
+            "key": "DAY_TOUR_EXCURSION",
+            "name": "Günübirlik Tur",
+            "group": "TRAVEL_TOURISM"
+        },
+        {
+            "code": 1703,
+            "key": "BUNDLED_FLIGHT_HOTEL",
+            "name": "Uçak + Otel Paketi",
+            "group": "TRAVEL_TOURISM"
+        },
+        {
+            "code": 1704,
+            "key": "VISA_TRAVEL_DOCS",
+            "name": "Vize ve Seyahat Evrakı",
+            "group": "TRAVEL_TOURISM"
+        },
+        {
+            "code": 1705,
+            "key": "CRUISE",
+            "name": "Kruvaziyer",
+            "group": "TRAVEL_TOURISM"
+        },
+        {
+            "code": 1706,
+            "key": "RELIGIOUS_TOUR",
+            "name": "İnanç Turizmi",
+            "group": "TRAVEL_TOURISM"
+        },
+        {
+            "code": 1707,
+            "key": "MEDICAL_TOURISM",
+            "name": "Sağlık Turizmi",
+            "group": "TRAVEL_TOURISM"
+        },
+        {
+            "code": 1708,
+            "key": "TOUR_GUIDE_SERVICE",
+            "name": "Rehberlik",
+            "group": "TRAVEL_TOURISM"
+        },
+        {
+            "code": 1709,
+            "key": "ADVENTURE_ACTIVITY",
+            "name": "Macera ve Aktivite",
+            "group": "TRAVEL_TOURISM"
+        },
+        {
+            "code": 1799,
+            "key": "TRAVEL_TOURISM_OTHER",
+            "name": "Diğer – Seyahat ve Turizm",
+            "group": "TRAVEL_TOURISM"
+        },
+        {
+            "code": 1801,
+            "key": "BUS_TICKET",
+            "name": "Otobüs Bileti",
+            "group": "TICKETING"
+        },
+        {
+            "code": 1802,
+            "key": "TRAIN_TICKET",
+            "name": "Tren Bileti",
+            "group": "TICKETING"
+        },
+        {
+            "code": 1803,
+            "key": "AIR_TICKET",
+            "name": "Uçak Bileti",
+            "group": "TICKETING"
+        },
+        {
+            "code": 1804,
+            "key": "FERRY_TICKET",
+            "name": "Feribot ve Deniz Bileti",
+            "group": "TICKETING"
+        },
+        {
+            "code": 1805,
+            "key": "CONCERT_TICKET",
+            "name": "Konser Bileti",
+            "group": "TICKETING"
+        },
+        {
+            "code": 1806,
+            "key": "SPORTS_EVENT_TICKET",
+            "name": "Spor Müsabaka Bileti",
+            "group": "TICKETING"
+        },
+        {
+            "code": 1807,
+            "key": "CINEMA_TICKET",
+            "name": "Sinema Bileti",
+            "group": "TICKETING"
+        },
+        {
+            "code": 1808,
+            "key": "THEATER_TICKET",
+            "name": "Tiyatro Bileti",
+            "group": "TICKETING"
+        },
+        {
+            "code": 1809,
+            "key": "MUSEUM_ATTRACTION_TICKET",
+            "name": "Müze ve Gezi Yeri Bileti",
+            "group": "TICKETING"
+        },
+        {
+            "code": 1810,
+            "key": "FESTIVAL_EXPO_TICKET",
+            "name": "Festival ve Fuar Bileti",
+            "group": "TICKETING"
+        },
+        {
+            "code": 1899,
+            "key": "TICKETING_OTHER",
+            "name": "Diğer – Bilet",
+            "group": "TICKETING"
+        },
+        {
+            "code": 1901,
+            "key": "TAXI_RIDE",
+            "name": "Taksi ve Araç Çağırma",
+            "group": "PASSENGER_TRANSPORT"
+        },
+        {
+            "code": 1902,
+            "key": "INTERCITY_RIDE_SHARING",
+            "name": "Şehirlerarası Yolculuk Paylaşımı",
+            "group": "PASSENGER_TRANSPORT"
+        },
+        {
+            "code": 1903,
+            "key": "BUS_CHARTER",
+            "name": "Otobüs ve Midibüs Kiralama",
+            "group": "PASSENGER_TRANSPORT"
+        },
+        {
+            "code": 1904,
+            "key": "AIRPORT_TRANSFER",
+            "name": "Havalimanı Transfer",
+            "group": "PASSENGER_TRANSPORT"
+        },
+        {
+            "code": 1905,
+            "key": "CAR_RENTAL",
+            "name": "Araç Kiralama",
+            "group": "PASSENGER_TRANSPORT"
+        },
+        {
+            "code": 1906,
+            "key": "CHAUFFEUR_SERVICE",
+            "name": "Şoförlü Araç",
+            "group": "PASSENGER_TRANSPORT"
+        },
+        {
+            "code": 1907,
+            "key": "MICROMOBILITY_SHARING",
+            "name": "Scooter ve Bisiklet Paylaşımı",
+            "group": "PASSENGER_TRANSPORT"
+        },
+        {
+            "code": 1908,
+            "key": "STAFF_SCHOOL_SHUTTLE",
+            "name": "Personel ve Okul Servisi",
+            "group": "PASSENGER_TRANSPORT"
+        },
+        {
+            "code": 1999,
+            "key": "PASSENGER_TRANSPORT_OTHER",
+            "name": "Diğer – Yolcu Taşımacılığı",
+            "group": "PASSENGER_TRANSPORT"
+        },
+        {
+            "code": 2001,
+            "key": "DOMESTIC_PARCEL",
+            "name": "Yurt İçi Kargo",
+            "group": "FREIGHT_CARGO_COURIER"
+        },
+        {
+            "code": 2002,
+            "key": "INTERNATIONAL_PARCEL",
+            "name": "Uluslararası Kargo",
+            "group": "FREIGHT_CARGO_COURIER"
+        },
+        {
+            "code": 2003,
+            "key": "EXPRESS_COURIER",
+            "name": "Ekspres Kurye",
+            "group": "FREIGHT_CARGO_COURIER"
+        },
+        {
+            "code": 2004,
+            "key": "SAME_DAY_CITY_COURIER",
+            "name": "Aynı Gün Şehir İçi Kurye",
+            "group": "FREIGHT_CARGO_COURIER"
+        },
+        {
+            "code": 2005,
+            "key": "FREIGHT_ROAD",
+            "name": "Karayolu Yük",
+            "group": "FREIGHT_CARGO_COURIER"
+        },
+        {
+            "code": 2006,
+            "key": "FREIGHT_SEA",
+            "name": "Denizyolu Yük",
+            "group": "FREIGHT_CARGO_COURIER"
+        },
+        {
+            "code": 2007,
+            "key": "FREIGHT_AIR",
+            "name": "Havayolu Yük",
+            "group": "FREIGHT_CARGO_COURIER"
+        },
+        {
+            "code": 2008,
+            "key": "FREIGHT_RAIL",
+            "name": "Demiryolu Yük",
+            "group": "FREIGHT_CARGO_COURIER"
+        },
+        {
+            "code": 2009,
+            "key": "WAREHOUSING_FULFILLMENT",
+            "name": "Depolama ve Fulfillment",
+            "group": "FREIGHT_CARGO_COURIER"
+        },
+        {
+            "code": 2010,
+            "key": "MOVING_RELOCATION",
+            "name": "Evden Eve ve Ofis Taşıma",
+            "group": "FREIGHT_CARGO_COURIER"
+        },
+        {
+            "code": 2011,
+            "key": "COLD_CHAIN",
+            "name": "Soğuk Zincir",
+            "group": "FREIGHT_CARGO_COURIER"
+        },
+        {
+            "code": 2012,
+            "key": "CUSTOMS_BROKERAGE",
+            "name": "Gümrük Müşavirliği",
+            "group": "FREIGHT_CARGO_COURIER"
+        },
+        {
+            "code": 2013,
+            "key": "HEAVY_OVERSIZED_CARGO",
+            "name": "Ağır ve Gabari Dışı Yük",
+            "group": "FREIGHT_CARGO_COURIER"
+        },
+        {
+            "code": 2099,
+            "key": "FREIGHT_CARGO_COURIER_OTHER",
+            "name": "Diğer – Kargo, Kurye ve Lojistik",
+            "group": "FREIGHT_CARGO_COURIER"
+        },
+        {
+            "code": 2101,
+            "key": "NEWS_SUBSCRIPTION",
+            "name": "Haber Aboneliği",
+            "group": "NEWS_PUBLISHING"
+        },
+        {
+            "code": 2102,
+            "key": "MAGAZINE",
+            "name": "Dergi",
+            "group": "NEWS_PUBLISHING"
+        },
+        {
+            "code": 2103,
+            "key": "BOOK_EBOOK_PUBLISHING",
+            "name": "Kitap ve E-Kitap Yayıncılığı",
+            "group": "NEWS_PUBLISHING"
+        },
+        {
+            "code": 2104,
+            "key": "AUDIOBOOK_PODCAST",
+            "name": "Sesli Kitap ve Podcast",
+            "group": "NEWS_PUBLISHING"
+        },
+        {
+            "code": 2199,
+            "key": "NEWS_PUBLISHING_OTHER",
+            "name": "Diğer – Haber ve Yayıncılık",
+            "group": "NEWS_PUBLISHING"
+        },
+        {
+            "code": 2201,
+            "key": "SVOD_SUBSCRIPTION",
+            "name": "Abonelikli Video Yayını",
+            "group": "VIDEO_STREAMING_FILM"
+        },
+        {
+            "code": 2202,
+            "key": "PAY_PER_VIEW_FILM",
+            "name": "İzleme Başı Ödemeli Film",
+            "group": "VIDEO_STREAMING_FILM"
+        },
+        {
+            "code": 2203,
+            "key": "DOCUMENTARY_CONTENT",
+            "name": "Belgesel",
+            "group": "VIDEO_STREAMING_FILM"
+        },
+        {
+            "code": 2204,
+            "key": "SERIES_TV",
+            "name": "Dizi ve TV Programı",
+            "group": "VIDEO_STREAMING_FILM"
+        },
+        {
+            "code": 2205,
+            "key": "LIVE_BROADCAST",
+            "name": "Canlı Yayın",
+            "group": "VIDEO_STREAMING_FILM"
+        },
+        {
+            "code": 2206,
+            "key": "FILM_PRODUCTION_SERVICE",
+            "name": "Film ve Video Yapım Hizmeti",
+            "group": "VIDEO_STREAMING_FILM"
+        },
+        {
+            "code": 2299,
+            "key": "VIDEO_STREAMING_FILM_OTHER",
+            "name": "Diğer – Video, Film ve Belgesel",
+            "group": "VIDEO_STREAMING_FILM"
+        },
+        {
+            "code": 2301,
+            "key": "THEATER_PRODUCTION",
+            "name": "Tiyatro Prodüksiyonu",
+            "group": "PERFORMING_ARTS_MUSIC"
+        },
+        {
+            "code": 2302,
+            "key": "CONCERT_PERFORMANCE",
+            "name": "Konser ve Canlı Performans",
+            "group": "PERFORMING_ARTS_MUSIC"
+        },
+        {
+            "code": 2303,
+            "key": "MUSIC_STREAMING",
+            "name": "Müzik Yayını ve Satışı",
+            "group": "PERFORMING_ARTS_MUSIC"
+        },
+        {
+            "code": 2304,
+            "key": "ART_GALLERY_EXHIBITION",
+            "name": "Sanat Galerisi ve Sergi",
+            "group": "PERFORMING_ARTS_MUSIC"
+        },
+        {
+            "code": 2305,
+            "key": "CIRCUS_SHOW",
+            "name": "Gösteri ve Sirk",
+            "group": "PERFORMING_ARTS_MUSIC"
+        },
+        {
+            "code": 2399,
+            "key": "PERFORMING_ARTS_MUSIC_OTHER",
+            "name": "Diğer – Sahne Sanatları ve Müzik",
+            "group": "PERFORMING_ARTS_MUSIC"
+        },
+        {
+            "code": 2401,
+            "key": "SPORTS_BETTING",
+            "name": "Spor Bahsi",
+            "group": "GAMES_BETTING",
+            "restricted": true
+        },
+        {
+            "code": 2402,
+            "key": "CASINO_GAMES",
+            "name": "Casino Oyunları",
+            "group": "GAMES_BETTING",
+            "restricted": true
+        },
+        {
+            "code": 2403,
+            "key": "LOTTERY",
+            "name": "Piyango ve Çekiliş",
+            "group": "GAMES_BETTING",
+            "restricted": true
+        },
+        {
+            "code": 2404,
+            "key": "DIGITAL_GAMES",
+            "name": "Dijital Oyun",
+            "group": "GAMES_BETTING"
+        },
+        {
+            "code": 2405,
+            "key": "IN_GAME_ITEMS_CREDITS",
+            "name": "Oyun İçi Ürün ve Kredi",
+            "group": "GAMES_BETTING"
+        },
+        {
+            "code": 2406,
+            "key": "ESPORTS_TOURNAMENT",
+            "name": "E-Spor Turnuvası",
+            "group": "GAMES_BETTING"
+        },
+        {
+            "code": 2407,
+            "key": "AMUSEMENT_ARCADE",
+            "name": "Eğlence Merkezi ve Atari Salonu",
+            "group": "GAMES_BETTING"
+        },
+        {
+            "code": 2499,
+            "key": "GAMES_BETTING_OTHER",
+            "name": "Diğer – Oyun ve Bahis",
+            "group": "GAMES_BETTING"
+        },
+        {
+            "code": 2501,
+            "key": "DIGITAL_ADS",
+            "name": "Dijital Reklam",
+            "group": "ADVERTISING_MARKETING"
+        },
+        {
+            "code": 2502,
+            "key": "OUTDOOR_ADS",
+            "name": "Açık Hava Reklamı",
+            "group": "ADVERTISING_MARKETING"
+        },
+        {
+            "code": 2503,
+            "key": "PRINT_BROADCAST_ADS",
+            "name": "Basılı ve Yayın Reklamı",
+            "group": "ADVERTISING_MARKETING"
+        },
+        {
+            "code": 2504,
+            "key": "SOCIAL_MEDIA_MANAGEMENT",
+            "name": "Sosyal Medya Yönetimi",
+            "group": "ADVERTISING_MARKETING"
+        },
+        {
+            "code": 2505,
+            "key": "BRANDING_DESIGN",
+            "name": "Marka ve Tasarım",
+            "group": "ADVERTISING_MARKETING"
+        },
+        {
+            "code": 2506,
+            "key": "MARKET_RESEARCH",
+            "name": "Pazar Araştırması",
+            "group": "ADVERTISING_MARKETING"
+        },
+        {
+            "code": 2507,
+            "key": "PR_COMMUNICATIONS",
+            "name": "Halkla İlişkiler ve İletişim",
+            "group": "ADVERTISING_MARKETING"
+        },
+        {
+            "code": 2508,
+            "key": "PROMOTIONAL_PRODUCTS",
+            "name": "Promosyon Ürünleri",
+            "group": "ADVERTISING_MARKETING"
+        },
+        {
+            "code": 2509,
+            "key": "PHOTO_VIDEO_PRODUCTION",
+            "name": "Foto ve Video Prodüksiyon",
+            "group": "ADVERTISING_MARKETING"
+        },
+        {
+            "code": 2599,
+            "key": "ADVERTISING_MARKETING_OTHER",
+            "name": "Diğer – Reklam ve Pazarlama",
+            "group": "ADVERTISING_MARKETING"
+        },
+        {
+            "code": 2601,
+            "key": "INPATIENT_HOSPITAL",
+            "name": "Yatarak Tedavi",
+            "group": "HEALTHCARE_SERVICES"
+        },
+        {
+            "code": 2602,
+            "key": "OUTPATIENT_CONSULTATION",
+            "name": "Poliklinik Muayene",
+            "group": "HEALTHCARE_SERVICES"
+        },
+        {
+            "code": 2603,
+            "key": "EMERGENCY_AMBULANCE",
+            "name": "Acil ve Ambulans",
+            "group": "HEALTHCARE_SERVICES"
+        },
+        {
+            "code": 2604,
+            "key": "SURGERY_PROCEDURE",
+            "name": "Cerrahi ve Girişim",
+            "group": "HEALTHCARE_SERVICES"
+        },
+        {
+            "code": 2605,
+            "key": "DENTAL_TREATMENT",
+            "name": "Diş Tedavisi",
+            "group": "HEALTHCARE_SERVICES"
+        },
+        {
+            "code": 2606,
+            "key": "LAB_TESTS",
+            "name": "Laboratuvar Tetkik",
+            "group": "HEALTHCARE_SERVICES"
+        },
+        {
+            "code": 2607,
+            "key": "RADIOLOGY_IMAGING",
+            "name": "Radyoloji ve Görüntüleme",
+            "group": "HEALTHCARE_SERVICES"
+        },
+        {
+            "code": 2608,
+            "key": "PHYSIOTHERAPY_REHAB",
+            "name": "Fizik Tedavi ve Rehabilitasyon",
+            "group": "HEALTHCARE_SERVICES"
+        },
+        {
+            "code": 2609,
+            "key": "MENTAL_HEALTH_COUNSELING",
+            "name": "Ruh Sağlığı ve Danışmanlık",
+            "group": "HEALTHCARE_SERVICES"
+        },
+        {
+            "code": 2610,
+            "key": "HOME_HEALTHCARE",
+            "name": "Evde Sağlık",
+            "group": "HEALTHCARE_SERVICES"
+        },
+        {
+            "code": 2611,
+            "key": "TELEMEDICINE",
+            "name": "Uzaktan Sağlık",
+            "group": "HEALTHCARE_SERVICES"
+        },
+        {
+            "code": 2612,
+            "key": "VACCINATION_PREVENTIVE",
+            "name": "Aşı ve Koruyucu Sağlık",
+            "group": "HEALTHCARE_SERVICES"
+        },
+        {
+            "code": 2613,
+            "key": "ELDERLY_CARE_NURSING",
+            "name": "Yaşlı Bakımı ve Hemşirelik",
+            "group": "HEALTHCARE_SERVICES"
+        },
+        {
+            "code": 2614,
+            "key": "OPTICAL_EYE_CARE",
+            "name": "Göz Sağlığı",
+            "group": "HEALTHCARE_SERVICES"
+        },
+        {
+            "code": 2615,
+            "key": "ALTERNATIVE_MEDICINE",
+            "name": "Tamamlayıcı ve Alternatif Tıp",
+            "group": "HEALTHCARE_SERVICES"
+        },
+        {
+            "code": 2699,
+            "key": "HEALTHCARE_SERVICES_OTHER",
+            "name": "Diğer – Sağlık Hizmetleri",
+            "group": "HEALTHCARE_SERVICES"
+        },
+        {
+            "code": 2701,
+            "key": "PRESCRIPTION_MEDICINE",
+            "name": "Reçeteli İlaç",
+            "group": "PHARMACY_MEDICAL_SUPPLIES",
+            "restricted": true
+        },
+        {
+            "code": 2702,
+            "key": "OTC_MEDICINE",
+            "name": "Reçetesiz İlaç",
+            "group": "PHARMACY_MEDICAL_SUPPLIES"
+        },
+        {
+            "code": 2703,
+            "key": "SUPPLEMENTS_VITAMINS",
+            "name": "Vitamin ve Takviye",
+            "group": "PHARMACY_MEDICAL_SUPPLIES"
+        },
+        {
+            "code": 2704,
+            "key": "HOME_MEDICAL_DEVICES",
+            "name": "Evde Kullanım Tıbbi Cihaz",
+            "group": "PHARMACY_MEDICAL_SUPPLIES"
+        },
+        {
+            "code": 2705,
+            "key": "MEDICAL_CONSUMABLES",
+            "name": "Tıbbi Sarf Malzeme",
+            "group": "PHARMACY_MEDICAL_SUPPLIES"
+        },
+        {
+            "code": 2706,
+            "key": "ORTHOPEDIC_PROSTHETICS",
+            "name": "Ortopedi ve Protez",
+            "group": "PHARMACY_MEDICAL_SUPPLIES"
+        },
+        {
+            "code": 2707,
+            "key": "DERMOCOSMETICS",
+            "name": "Dermokozmetik",
+            "group": "PHARMACY_MEDICAL_SUPPLIES"
+        },
+        {
+            "code": 2708,
+            "key": "HEALTH_MONITORING_DEVICES",
+            "name": "Sağlık İzleme Cihazları",
+            "group": "PHARMACY_MEDICAL_SUPPLIES"
+        },
+        {
+            "code": 2709,
+            "key": "HOSPITAL_EQUIPMENT_B2B",
+            "name": "Hastane Ekipmanı (B2B)",
+            "group": "PHARMACY_MEDICAL_SUPPLIES"
+        },
+        {
+            "code": 2799,
+            "key": "PHARMACY_MEDICAL_SUPPLIES_OTHER",
+            "name": "Diğer – Eczane ve Tıbbi Ürünler",
+            "group": "PHARMACY_MEDICAL_SUPPLIES"
+        },
+        {
+            "code": 2801,
+            "key": "VET_CLINIC_SERVICE",
+            "name": "Veteriner Klinik Hizmeti",
+            "group": "VETERINARY_PET"
+        },
+        {
+            "code": 2802,
+            "key": "PET_MEDICINE",
+            "name": "Evcil Hayvan İlacı",
+            "group": "VETERINARY_PET"
+        },
+        {
+            "code": 2803,
+            "key": "PET_FOOD",
+            "name": "Evcil Hayvan Maması",
+            "group": "VETERINARY_PET"
+        },
+        {
+            "code": 2804,
+            "key": "PET_ACCESSORIES",
+            "name": "Evcil Hayvan Aksesuarı",
+            "group": "VETERINARY_PET"
+        },
+        {
+            "code": 2805,
+            "key": "PET_GROOMING_BOARDING",
+            "name": "Bakım ve Pansiyon",
+            "group": "VETERINARY_PET"
+        },
+        {
+            "code": 2806,
+            "key": "PET_ADOPTION_BREEDING",
+            "name": "Evcil Hayvan Satış ve Sahiplendirme",
+            "group": "VETERINARY_PET",
+            "restricted": true
+        },
+        {
+            "code": 2807,
+            "key": "LIVESTOCK_VET",
+            "name": "Çiftlik Hayvanı Veterinerliği",
+            "group": "VETERINARY_PET"
+        },
+        {
+            "code": 2899,
+            "key": "VETERINARY_PET_OTHER",
+            "name": "Diğer – Veterinerlik ve Evcil Hayvan",
+            "group": "VETERINARY_PET"
+        },
+        {
+            "code": 2901,
+            "key": "GYM_MEMBERSHIP",
+            "name": "Spor Salonu Üyeliği",
+            "group": "FITNESS_SPORTS"
+        },
+        {
+            "code": 2902,
+            "key": "PERSONAL_TRAINING",
+            "name": "Kişisel Antrenörlük",
+            "group": "FITNESS_SPORTS"
+        },
+        {
+            "code": 2903,
+            "key": "GROUP_CLASSES",
+            "name": "Grup Dersleri (Yoga, Pilates vb.)",
+            "group": "FITNESS_SPORTS"
+        },
+        {
+            "code": 2904,
+            "key": "SWIMMING_POOL",
+            "name": "Yüzme ve Havuz",
+            "group": "FITNESS_SPORTS"
+        },
+        {
+            "code": 2905,
+            "key": "FIELD_COURT_RENTAL",
+            "name": "Saha ve Kort Kiralama",
+            "group": "FITNESS_SPORTS"
+        },
+        {
+            "code": 2906,
+            "key": "SPORTS_CLUB_MEMBERSHIP",
+            "name": "Spor Kulübü Üyeliği",
+            "group": "FITNESS_SPORTS"
+        },
+        {
+            "code": 2907,
+            "key": "SPORTS_ACADEMY_KIDS",
+            "name": "Çocuk Spor Akademisi",
+            "group": "FITNESS_SPORTS"
+        },
+        {
+            "code": 2908,
+            "key": "MARTIAL_ARTS",
+            "name": "Dövüş Sporları",
+            "group": "FITNESS_SPORTS"
+        },
+        {
+            "code": 2909,
+            "key": "OUTDOOR_SPORT_ACTIVITY",
+            "name": "Doğa Sporları",
+            "group": "FITNESS_SPORTS"
+        },
+        {
+            "code": 2999,
+            "key": "FITNESS_SPORTS_OTHER",
+            "name": "Diğer – Spor ve Fitness",
+            "group": "FITNESS_SPORTS"
+        },
+        {
+            "code": 3001,
+            "key": "WOMENS_HAIR_STYLING",
+            "name": "Kadın Kuaförü",
+            "group": "BEAUTY_PERSONAL_CARE"
+        },
+        {
+            "code": 3002,
+            "key": "BARBER_MENS",
+            "name": "Erkek Berberi",
+            "group": "BEAUTY_PERSONAL_CARE"
+        },
+        {
+            "code": 3003,
+            "key": "HAIR_COLOR_TREATMENT",
+            "name": "Saç Boyama ve Bakım",
+            "group": "BEAUTY_PERSONAL_CARE"
+        },
+        {
+            "code": 3004,
+            "key": "NAIL_CARE",
+            "name": "Tırnak Bakımı",
+            "group": "BEAUTY_PERSONAL_CARE"
+        },
+        {
+            "code": 3005,
+            "key": "SKIN_CARE_FACIAL",
+            "name": "Cilt Bakımı",
+            "group": "BEAUTY_PERSONAL_CARE"
+        },
+        {
+            "code": 3006,
+            "key": "MAKEUP_BRIDAL",
+            "name": "Makyaj ve Gelin Hazırlığı",
+            "group": "BEAUTY_PERSONAL_CARE"
+        },
+        {
+            "code": 3007,
+            "key": "MASSAGE_SPA",
+            "name": "Masaj ve Spa",
+            "group": "BEAUTY_PERSONAL_CARE"
+        },
+        {
+            "code": 3008,
+            "key": "HAMMAM_SAUNA",
+            "name": "Hamam ve Sauna",
+            "group": "BEAUTY_PERSONAL_CARE"
+        },
+        {
+            "code": 3009,
+            "key": "LASER_HAIR_REMOVAL",
+            "name": "Lazer Epilasyon",
+            "group": "BEAUTY_PERSONAL_CARE"
+        },
+        {
+            "code": 3010,
+            "key": "COSMETICS_PRODUCTS",
+            "name": "Kozmetik Ürünleri",
+            "group": "BEAUTY_PERSONAL_CARE"
+        },
+        {
+            "code": 3011,
+            "key": "PERFUME_FRAGRANCE",
+            "name": "Parfüm",
+            "group": "BEAUTY_PERSONAL_CARE"
+        },
+        {
+            "code": 3012,
+            "key": "HAIR_CARE_PRODUCTS",
+            "name": "Saç Bakım Ürünleri",
+            "group": "BEAUTY_PERSONAL_CARE"
+        },
+        {
+            "code": 3099,
+            "key": "BEAUTY_PERSONAL_CARE_OTHER",
+            "name": "Diğer – Güzellik ve Kişisel Bakım",
+            "group": "BEAUTY_PERSONAL_CARE"
+        },
+        {
+            "code": 3101,
+            "key": "KINDERGARTEN_PRESCHOOL",
+            "name": "Anaokulu ve Okul Öncesi",
+            "group": "EDUCATION_FORMAL"
+        },
+        {
+            "code": 3102,
+            "key": "PRIMARY_SCHOOL",
+            "name": "İlkokul",
+            "group": "EDUCATION_FORMAL"
+        },
+        {
+            "code": 3103,
+            "key": "SECONDARY_SCHOOL",
+            "name": "Ortaokul",
+            "group": "EDUCATION_FORMAL"
+        },
+        {
+            "code": 3104,
+            "key": "HIGH_SCHOOL",
+            "name": "Lise",
+            "group": "EDUCATION_FORMAL"
+        },
+        {
+            "code": 3105,
+            "key": "UNIVERSITY_UNDERGRAD",
+            "name": "Lisans",
+            "group": "EDUCATION_FORMAL"
+        },
+        {
+            "code": 3106,
+            "key": "UNIVERSITY_POSTGRAD",
+            "name": "Yüksek Lisans ve Doktora",
+            "group": "EDUCATION_FORMAL"
+        },
+        {
+            "code": 3107,
+            "key": "VOCATIONAL_DIPLOMA",
+            "name": "Meslek Yüksekokulu ve Diploma",
+            "group": "EDUCATION_FORMAL"
+        },
+        {
+            "code": 3108,
+            "key": "CERTIFICATION_PROGRAM",
+            "name": "Sertifika Programı",
+            "group": "EDUCATION_FORMAL"
+        },
+        {
+            "code": 3109,
+            "key": "SPECIAL_EDUCATION",
+            "name": "Özel Eğitim",
+            "group": "EDUCATION_FORMAL"
+        },
+        {
+            "code": 3110,
+            "key": "BOARDING_DORMITORY",
+            "name": "Yurt ve Pansiyon",
+            "group": "EDUCATION_FORMAL"
+        },
+        {
+            "code": 3199,
+            "key": "EDUCATION_FORMAL_OTHER",
+            "name": "Diğer – Örgün Eğitim",
+            "group": "EDUCATION_FORMAL"
+        },
+        {
+            "code": 3201,
+            "key": "LANGUAGE_COURSE",
+            "name": "Dil Kursu",
+            "group": "EDUCATION_NONFORMAL"
+        },
+        {
+            "code": 3202,
+            "key": "TEST_PREP",
+            "name": "Sınav Hazırlık",
+            "group": "EDUCATION_NONFORMAL"
+        },
+        {
+            "code": 3203,
+            "key": "PRIVATE_TUTORING",
+            "name": "Özel Ders",
+            "group": "EDUCATION_NONFORMAL"
+        },
+        {
+            "code": 3204,
+            "key": "MUSIC_ARTS_LESSONS",
+            "name": "Müzik ve Sanat Dersleri",
+            "group": "EDUCATION_NONFORMAL"
+        },
+        {
+            "code": 3205,
+            "key": "DRIVING_SCHOOL",
+            "name": "Sürücü Kursu",
+            "group": "EDUCATION_NONFORMAL"
+        },
+        {
+            "code": 3206,
+            "key": "CODING_BOOTCAMP",
+            "name": "Yazılım Kampı",
+            "group": "EDUCATION_NONFORMAL"
+        },
+        {
+            "code": 3207,
+            "key": "CORPORATE_TRAINING",
+            "name": "Kurumsal Eğitim",
+            "group": "EDUCATION_NONFORMAL"
+        },
+        {
+            "code": 3208,
+            "key": "ONLINE_COURSE_VIDEO",
+            "name": "Çevrimiçi Video Kurs",
+            "group": "EDUCATION_NONFORMAL"
+        },
+        {
+            "code": 3209,
+            "key": "DIGITAL_LEARNING_MATERIALS",
+            "name": "Dijital Eğitim Materyali",
+            "group": "EDUCATION_NONFORMAL"
+        },
+        {
+            "code": 3210,
+            "key": "CHILD_ACTIVITY_PROGRAMS",
+            "name": "Çocuk Gelişim Etkinlikleri",
+            "group": "EDUCATION_NONFORMAL"
+        },
+        {
+            "code": 3299,
+            "key": "EDUCATION_NONFORMAL_OTHER",
+            "name": "Diğer – Yaygın ve Çevrimiçi Eğitim",
+            "group": "EDUCATION_NONFORMAL"
+        },
+        {
+            "code": 3301,
+            "key": "GRAINS_CEREALS",
+            "name": "Tahıl ve Hububat",
+            "group": "CROP_AGRICULTURE"
+        },
+        {
+            "code": 3302,
+            "key": "FARM_VEGETABLES_FRUITS",
+            "name": "Çiftlikten Sebze ve Meyve (üretici satışı)",
+            "group": "CROP_AGRICULTURE"
+        },
+        {
+            "code": 3303,
+            "key": "INDUSTRIAL_CROPS",
+            "name": "Endüstriyel Bitkiler",
+            "group": "CROP_AGRICULTURE"
+        },
+        {
+            "code": 3304,
+            "key": "SEEDS_SEEDLINGS",
+            "name": "Tohum ve Fide",
+            "group": "CROP_AGRICULTURE"
+        },
+        {
+            "code": 3305,
+            "key": "FERTILIZER_PESTICIDE",
+            "name": "Gübre ve İlaç",
+            "group": "CROP_AGRICULTURE"
+        },
+        {
+            "code": 3306,
+            "key": "AGRI_MACHINERY_SALE",
+            "name": "Tarım Makinesi Satışı",
+            "group": "CROP_AGRICULTURE"
+        },
+        {
+            "code": 3307,
+            "key": "AGRI_MACHINERY_RENTAL",
+            "name": "Tarım Makinesi Kiralama",
+            "group": "CROP_AGRICULTURE"
+        },
+        {
+            "code": 3308,
+            "key": "IRRIGATION_GREENHOUSE",
+            "name": "Sulama ve Sera",
+            "group": "CROP_AGRICULTURE"
+        },
+        {
+            "code": 3309,
+            "key": "AGRI_LAND_LEASE",
+            "name": "Tarım Arazisi Kiralama",
+            "group": "CROP_AGRICULTURE"
+        },
+        {
+            "code": 3310,
+            "key": "AGRI_CONTRACT_SERVICES",
+            "name": "Tarımsal Hizmet İşleri",
+            "group": "CROP_AGRICULTURE"
+        },
+        {
+            "code": 3399,
+            "key": "CROP_AGRICULTURE_OTHER",
+            "name": "Diğer – Bitkisel Tarım",
+            "group": "CROP_AGRICULTURE"
+        },
+        {
+            "code": 3401,
+            "key": "CATTLE_DAIRY",
+            "name": "Büyükbaş ve Süt",
+            "group": "LIVESTOCK_FISHERY"
+        },
+        {
+            "code": 3402,
+            "key": "SHEEP_GOAT",
+            "name": "Küçükbaş",
+            "group": "LIVESTOCK_FISHERY"
+        },
+        {
+            "code": 3403,
+            "key": "POULTRY_EGGS",
+            "name": "Kümes Hayvanları ve Yumurta",
+            "group": "LIVESTOCK_FISHERY"
+        },
+        {
+            "code": 3404,
+            "key": "BEEKEEPING_HONEY",
+            "name": "Arıcılık ve Bal",
+            "group": "LIVESTOCK_FISHERY"
+        },
+        {
+            "code": 3405,
+            "key": "ANIMAL_FEED",
+            "name": "Hayvan Yemi",
+            "group": "LIVESTOCK_FISHERY"
+        },
+        {
+            "code": 3406,
+            "key": "LIVE_ANIMAL_TRADE",
+            "name": "Canlı Hayvan Ticareti",
+            "group": "LIVESTOCK_FISHERY"
+        },
+        {
+            "code": 3407,
+            "key": "AQUACULTURE_FISH",
+            "name": "Balık Çiftliği",
+            "group": "LIVESTOCK_FISHERY"
+        },
+        {
+            "code": 3408,
+            "key": "FISHING_CATCH",
+            "name": "Avcılık ve Balıkçılık",
+            "group": "LIVESTOCK_FISHERY"
+        },
+        {
+            "code": 3409,
+            "key": "LIVESTOCK_EQUIPMENT",
+            "name": "Hayvancılık Ekipmanı",
+            "group": "LIVESTOCK_FISHERY"
+        },
+        {
+            "code": 3499,
+            "key": "LIVESTOCK_FISHERY_OTHER",
+            "name": "Diğer – Hayvancılık ve Su Ürünleri",
+            "group": "LIVESTOCK_FISHERY"
+        },
+        {
+            "code": 3501,
+            "key": "MEAT_PROCESSING",
+            "name": "Et İşleme",
+            "group": "FOOD_MANUFACTURING"
+        },
+        {
+            "code": 3502,
+            "key": "DAIRY_PRODUCTION",
+            "name": "Süt Ürünleri Üretimi",
+            "group": "FOOD_MANUFACTURING"
+        },
+        {
+            "code": 3503,
+            "key": "MILLING_BAKERY_PRODUCTION",
+            "name": "Un ve Fırın Üretimi",
+            "group": "FOOD_MANUFACTURING"
+        },
+        {
+            "code": 3504,
+            "key": "BEVERAGE_PRODUCTION",
+            "name": "İçecek Üretimi",
+            "group": "FOOD_MANUFACTURING"
+        },
+        {
+            "code": 3505,
+            "key": "CANNING_PRESERVES",
+            "name": "Konserve ve Turşu",
+            "group": "FOOD_MANUFACTURING"
+        },
+        {
+            "code": 3506,
+            "key": "CONFECTIONERY_PRODUCTION",
+            "name": "Şekerleme Üretimi",
+            "group": "FOOD_MANUFACTURING"
+        },
+        {
+            "code": 3507,
+            "key": "OIL_PRODUCTION",
+            "name": "Yağ Üretimi",
+            "group": "FOOD_MANUFACTURING"
+        },
+        {
+            "code": 3508,
+            "key": "CONTRACT_FOOD_PACKAGING",
+            "name": "Fason Gıda Paketleme",
+            "group": "FOOD_MANUFACTURING"
+        },
+        {
+            "code": 3599,
+            "key": "FOOD_MANUFACTURING_OTHER",
+            "name": "Diğer – Gıda Üretimi",
+            "group": "FOOD_MANUFACTURING"
+        },
+        {
+            "code": 3601,
+            "key": "TEXTILE_GARMENT_PRODUCTION",
+            "name": "Tekstil ve Konfeksiyon Üretimi",
+            "group": "INDUSTRIAL_MANUFACTURING"
+        },
+        {
+            "code": 3602,
+            "key": "FURNITURE_PRODUCTION",
+            "name": "Mobilya Üretimi",
+            "group": "INDUSTRIAL_MANUFACTURING"
+        },
+        {
+            "code": 3603,
+            "key": "METAL_MACHINERY",
+            "name": "Metal ve Makine İmalatı",
+            "group": "INDUSTRIAL_MANUFACTURING"
+        },
+        {
+            "code": 3604,
+            "key": "ELECTRONICS_MANUFACTURING",
+            "name": "Elektronik Üretimi",
+            "group": "INDUSTRIAL_MANUFACTURING"
+        },
+        {
+            "code": 3605,
+            "key": "PLASTICS_CHEMICALS",
+            "name": "Plastik ve Kimya",
+            "group": "INDUSTRIAL_MANUFACTURING"
+        },
+        {
+            "code": 3606,
+            "key": "AUTOMOTIVE_PARTS_MANUFACTURING",
+            "name": "Otomotiv Yan Sanayi",
+            "group": "INDUSTRIAL_MANUFACTURING"
+        },
+        {
+            "code": 3607,
+            "key": "CONSTRUCTION_MATERIALS_MANUFACTURING",
+            "name": "Yapı Malzemesi Üretimi",
+            "group": "INDUSTRIAL_MANUFACTURING"
+        },
+        {
+            "code": 3608,
+            "key": "PACKAGING_PRINTING",
+            "name": "Ambalaj ve Baskı",
+            "group": "INDUSTRIAL_MANUFACTURING"
+        },
+        {
+            "code": 3609,
+            "key": "CUSTOM_ORDER_PRODUCTION",
+            "name": "Özel Sipariş Üretim",
+            "group": "INDUSTRIAL_MANUFACTURING"
+        },
+        {
+            "code": 3610,
+            "key": "CONTRACT_MANUFACTURING",
+            "name": "Fason Üretim",
+            "group": "INDUSTRIAL_MANUFACTURING"
+        },
+        {
+            "code": 3611,
+            "key": "INDUSTRIAL_MACHINERY_SALE",
+            "name": "Sanayi Makinesi Satışı",
+            "group": "INDUSTRIAL_MANUFACTURING"
+        },
+        {
+            "code": 3699,
+            "key": "INDUSTRIAL_MANUFACTURING_OTHER",
+            "name": "Diğer – Sanayi ve Üretim",
+            "group": "INDUSTRIAL_MANUFACTURING"
+        },
+        {
+            "code": 3701,
+            "key": "ELECTRICITY_SUPPLY",
+            "name": "Elektrik Tedariği",
+            "group": "ENERGY_MINING"
+        },
+        {
+            "code": 3702,
+            "key": "NATURAL_GAS_FUEL",
+            "name": "Doğalgaz ve Akaryakıt Tedariği",
+            "group": "ENERGY_MINING"
+        },
+        {
+            "code": 3703,
+            "key": "FUEL_STATION",
+            "name": "Akaryakıt İstasyonu",
+            "group": "ENERGY_MINING"
+        },
+        {
+            "code": 3704,
+            "key": "SOLAR_RENEWABLE_INSTALL",
+            "name": "Güneş ve Yenilenebilir Enerji Kurulumu",
+            "group": "ENERGY_MINING"
+        },
+        {
+            "code": 3705,
+            "key": "WATER_SUPPLY_UTILITY",
+            "name": "Su Hizmetleri",
+            "group": "ENERGY_MINING"
+        },
+        {
+            "code": 3706,
+            "key": "WASTE_RECYCLING",
+            "name": "Atık ve Geri Dönüşüm",
+            "group": "ENERGY_MINING"
+        },
+        {
+            "code": 3707,
+            "key": "EV_CHARGING",
+            "name": "Elektrikli Araç Şarj",
+            "group": "ENERGY_MINING"
+        },
+        {
+            "code": 3708,
+            "key": "MINING_METALS",
+            "name": "Metal Madenciliği",
+            "group": "ENERGY_MINING"
+        },
+        {
+            "code": 3709,
+            "key": "QUARRY_AGGREGATES",
+            "name": "Taş Ocağı ve Agrega",
+            "group": "ENERGY_MINING"
+        },
+        {
+            "code": 3799,
+            "key": "ENERGY_MINING_OTHER",
+            "name": "Diğer – Enerji, Altyapı ve Madencilik",
+            "group": "ENERGY_MINING"
+        },
+        {
+            "code": 3801,
+            "key": "BUILDING_CONSTRUCTION",
+            "name": "Bina İnşaatı",
+            "group": "CONSTRUCTION"
+        },
+        {
+            "code": 3802,
+            "key": "RENOVATION_FITOUT",
+            "name": "Tadilat ve İç Mekan Uygulama",
+            "group": "CONSTRUCTION"
+        },
+        {
+            "code": 3803,
+            "key": "INFRASTRUCTURE_ROAD",
+            "name": "Altyapı ve Yol",
+            "group": "CONSTRUCTION"
+        },
+        {
+            "code": 3804,
+            "key": "MEP_INSTALLATION",
+            "name": "Elektrik, Tesisat ve İklimlendirme Kurulumu",
+            "group": "CONSTRUCTION"
+        },
+        {
+            "code": 3805,
+            "key": "ARCHITECTURE_DESIGN",
+            "name": "Mimari Tasarım",
+            "group": "CONSTRUCTION"
+        },
+        {
+            "code": 3806,
+            "key": "ENGINEERING_SURVEY",
+            "name": "Mühendislik ve Etüt",
+            "group": "CONSTRUCTION"
+        },
+        {
+            "code": 3807,
+            "key": "PROJECT_MANAGEMENT_SUPERVISION",
+            "name": "Proje Yönetimi ve Denetim",
+            "group": "CONSTRUCTION"
+        },
+        {
+            "code": 3808,
+            "key": "CONSTRUCTION_EQUIPMENT_RENTAL",
+            "name": "İş Makinesi Kiralama",
+            "group": "CONSTRUCTION"
+        },
+        {
+            "code": 3809,
+            "key": "CONSTRUCTION_MATERIALS_RETAIL",
+            "name": "Yapı Malzemesi Satışı",
+            "group": "CONSTRUCTION"
+        },
+        {
+            "code": 3810,
+            "key": "HAND_POWER_TOOLS",
+            "name": "El ve Güç Aletleri",
+            "group": "CONSTRUCTION"
+        },
+        {
+            "code": 3811,
+            "key": "PAINT_FLOORING_FINISHES",
+            "name": "Boya ve Zemin Kaplama",
+            "group": "CONSTRUCTION"
+        },
+        {
+            "code": 3812,
+            "key": "SANITARY_PLUMBING_MATERIALS",
+            "name": "Sıhhi Tesisat Malzemesi",
+            "group": "CONSTRUCTION"
+        },
+        {
+            "code": 3813,
+            "key": "INTERIOR_DESIGN",
+            "name": "İç Mimarlık",
+            "group": "CONSTRUCTION"
+        },
+        {
+            "code": 3899,
+            "key": "CONSTRUCTION_OTHER",
+            "name": "Diğer – İnşaat ve Yapı",
+            "group": "CONSTRUCTION"
+        },
+        {
+            "code": 3901,
+            "key": "RESIDENTIAL_SALE",
+            "name": "Konut Satış",
+            "group": "REAL_ESTATE"
+        },
+        {
+            "code": 3902,
+            "key": "RESIDENTIAL_RENT_LONG",
+            "name": "Konut Uzun Dönem Kiralama",
+            "group": "REAL_ESTATE"
+        },
+        {
+            "code": 3903,
+            "key": "COMMERCIAL_SALE",
+            "name": "İşyeri Satış",
+            "group": "REAL_ESTATE"
+        },
+        {
+            "code": 3904,
+            "key": "COMMERCIAL_RENT",
+            "name": "İşyeri Kiralama",
+            "group": "REAL_ESTATE"
+        },
+        {
+            "code": 3905,
+            "key": "LAND_PLOT_SALE",
+            "name": "Arsa ve Arazi Satış",
+            "group": "REAL_ESTATE"
+        },
+        {
+            "code": 3906,
+            "key": "OFF_PLAN_PROJECT_SALE",
+            "name": "Proje Aşamasında Satış",
+            "group": "REAL_ESTATE"
+        },
+        {
+            "code": 3907,
+            "key": "PROPERTY_MANAGEMENT_SERVICE",
+            "name": "Mülk ve Site Yönetimi",
+            "group": "REAL_ESTATE"
+        },
+        {
+            "code": 3908,
+            "key": "REAL_ESTATE_VALUATION",
+            "name": "Gayrimenkul Değerleme",
+            "group": "REAL_ESTATE"
+        },
+        {
+            "code": 3909,
+            "key": "REAL_ESTATE_AUCTION",
+            "name": "Gayrimenkul Açık Artırması",
+            "group": "REAL_ESTATE"
+        },
+        {
+            "code": 3910,
+            "key": "PARKING_STORAGE_RENT",
+            "name": "Otopark ve Depo Kiralama",
+            "group": "REAL_ESTATE"
+        },
+        {
+            "code": 3999,
+            "key": "REAL_ESTATE_OTHER",
+            "name": "Diğer – Gayrimenkul",
+            "group": "REAL_ESTATE"
+        },
+        {
+            "code": 4001,
+            "key": "SAAS_SUBSCRIPTION",
+            "name": "SaaS Aboneliği",
+            "group": "SOFTWARE_TECH"
+        },
+        {
+            "code": 4002,
+            "key": "SOFTWARE_LICENSE",
+            "name": "Yazılım Lisansı",
+            "group": "SOFTWARE_TECH"
+        },
+        {
+            "code": 4003,
+            "key": "MOBILE_APP",
+            "name": "Mobil Uygulama",
+            "group": "SOFTWARE_TECH"
+        },
+        {
+            "code": 4004,
+            "key": "CUSTOM_SOFTWARE_DEVELOPMENT",
+            "name": "Özel Yazılım Geliştirme",
+            "group": "SOFTWARE_TECH"
+        },
+        {
+            "code": 4005,
+            "key": "WEB_DESIGN_DEV",
+            "name": "Web Tasarım ve Geliştirme",
+            "group": "SOFTWARE_TECH"
+        },
+        {
+            "code": 4006,
+            "key": "DATA_AI_ANALYTICS",
+            "name": "Veri, Yapay Zeka ve Analitik",
+            "group": "SOFTWARE_TECH"
+        },
+        {
+            "code": 4007,
+            "key": "CYBERSECURITY_SERVICE",
+            "name": "Siber Güvenlik",
+            "group": "SOFTWARE_TECH"
+        },
+        {
+            "code": 4008,
+            "key": "IT_SUPPORT_MANAGED",
+            "name": "BT Destek ve Yönetilen Hizmet",
+            "group": "SOFTWARE_TECH"
+        },
+        {
+            "code": 4009,
+            "key": "ERP_CRM",
+            "name": "ERP ve CRM",
+            "group": "SOFTWARE_TECH"
+        },
+        {
+            "code": 4010,
+            "key": "DIGITAL_ASSETS_TEMPLATES",
+            "name": "Dijital Varlık ve Şablon",
+            "group": "SOFTWARE_TECH"
+        },
+        {
+            "code": 4099,
+            "key": "SOFTWARE_TECH_OTHER",
+            "name": "Diğer – Yazılım ve Teknoloji",
+            "group": "SOFTWARE_TECH"
+        },
+        {
+            "code": 4101,
+            "key": "CLOUD_COMPUTE",
+            "name": "Bulut İşlem Kaynağı",
+            "group": "HOSTING_TELECOM_IOT"
+        },
+        {
+            "code": 4102,
+            "key": "STORAGE_BACKUP",
+            "name": "Depolama ve Yedekleme",
+            "group": "HOSTING_TELECOM_IOT"
+        },
+        {
+            "code": 4103,
+            "key": "DOMAIN_HOSTING",
+            "name": "Alan Adı ve Web Barındırma",
+            "group": "HOSTING_TELECOM_IOT"
+        },
+        {
+            "code": 4104,
+            "key": "CDN_NETWORK",
+            "name": "CDN ve Ağ Hizmeti",
+            "group": "HOSTING_TELECOM_IOT"
+        },
+        {
+            "code": 4105,
+            "key": "MOBILE_PLAN",
+            "name": "Mobil Hat ve Tarife",
+            "group": "HOSTING_TELECOM_IOT"
+        },
+        {
+            "code": 4106,
+            "key": "INTERNET_SERVICE",
+            "name": "İnternet Hizmeti",
+            "group": "HOSTING_TELECOM_IOT"
+        },
+        {
+            "code": 4107,
+            "key": "VOIP_MESSAGING",
+            "name": "Sesli ve Mesajlaşma Hizmeti",
+            "group": "HOSTING_TELECOM_IOT"
+        },
+        {
+            "code": 4108,
+            "key": "IOT_PLATFORM_SUBSCRIPTION",
+            "name": "IoT Platform Aboneliği",
+            "group": "HOSTING_TELECOM_IOT"
+        },
+        {
+            "code": 4109,
+            "key": "SMART_BUILDING_SERVICE",
+            "name": "Akıllı Bina Hizmeti",
+            "group": "HOSTING_TELECOM_IOT"
+        },
+        {
+            "code": 4110,
+            "key": "VEHICLE_TELEMATICS",
+            "name": "Akıllı Araç ve Filo Takibi",
+            "group": "HOSTING_TELECOM_IOT"
+        },
+        {
+            "code": 4199,
+            "key": "HOSTING_TELECOM_IOT_OTHER",
+            "name": "Diğer – Barındırma, Telekom ve IoT",
+            "group": "HOSTING_TELECOM_IOT"
+        },
+        {
+            "code": 4201,
+            "key": "MANAGEMENT_CONSULTING",
+            "name": "Yönetim Danışmanlığı",
+            "group": "PROFESSIONAL_SERVICES"
+        },
+        {
+            "code": 4202,
+            "key": "LEGAL_COUNSEL",
+            "name": "Hukuki Danışmanlık ve Temsil",
+            "group": "PROFESSIONAL_SERVICES"
+        },
+        {
+            "code": 4203,
+            "key": "NOTARY_CONTRACTS",
+            "name": "Noter ve Sözleşme Hizmeti",
+            "group": "PROFESSIONAL_SERVICES"
+        },
+        {
+            "code": 4204,
+            "key": "ACCOUNTING_BOOKKEEPING",
+            "name": "Muhasebe ve Defter Tutma",
+            "group": "PROFESSIONAL_SERVICES"
+        },
+        {
+            "code": 4205,
+            "key": "TAX_ADVISORY",
+            "name": "Vergi Danışmanlığı",
+            "group": "PROFESSIONAL_SERVICES"
+        },
+        {
+            "code": 4206,
+            "key": "AUDIT_ASSURANCE",
+            "name": "Denetim ve Güvence",
+            "group": "PROFESSIONAL_SERVICES"
+        },
+        {
+            "code": 4207,
+            "key": "HR_RECRUITMENT",
+            "name": "İşe Alım",
+            "group": "PROFESSIONAL_SERVICES"
+        },
+        {
+            "code": 4208,
+            "key": "STAFFING_OUTSOURCING",
+            "name": "Personel Tedariği",
+            "group": "PROFESSIONAL_SERVICES"
+        },
+        {
+            "code": 4209,
+            "key": "TRANSLATION_INTERPRETING",
+            "name": "Çeviri ve Tercümanlık",
+            "group": "PROFESSIONAL_SERVICES"
+        },
+        {
+            "code": 4210,
+            "key": "BUSINESS_SETUP_ADVISORY",
+            "name": "Şirket Kuruluş Danışmanlığı",
+            "group": "PROFESSIONAL_SERVICES"
+        },
+        {
+            "code": 4299,
+            "key": "PROFESSIONAL_SERVICES_OTHER",
+            "name": "Diğer – Profesyonel Hizmetler",
+            "group": "PROFESSIONAL_SERVICES"
+        },
+        {
+            "code": 4301,
+            "key": "GENERAL_DONATION",
+            "name": "Genel Bağış",
+            "group": "NONPROFIT_DONATION"
+        },
+        {
+            "code": 4302,
+            "key": "RELIGIOUS_CHARITY",
+            "name": "Dini Hayır ve Zekat",
+            "group": "NONPROFIT_DONATION"
+        },
+        {
+            "code": 4303,
+            "key": "DISASTER_RELIEF",
+            "name": "Afet Yardımı",
+            "group": "NONPROFIT_DONATION"
+        },
+        {
+            "code": 4304,
+            "key": "EDUCATION_SCHOLARSHIP_DONATION",
+            "name": "Eğitim ve Burs Bağışı",
+            "group": "NONPROFIT_DONATION"
+        },
+        {
+            "code": 4305,
+            "key": "HEALTH_AID_DONATION",
+            "name": "Sağlık Yardımı Bağışı",
+            "group": "NONPROFIT_DONATION"
+        },
+        {
+            "code": 4306,
+            "key": "ANIMAL_WELFARE",
+            "name": "Hayvan Hakları ve Barınak",
+            "group": "NONPROFIT_DONATION"
+        },
+        {
+            "code": 4307,
+            "key": "ENVIRONMENT_CAUSES",
+            "name": "Çevre Projeleri",
+            "group": "NONPROFIT_DONATION"
+        },
+        {
+            "code": 4308,
+            "key": "FOOD_AID",
+            "name": "Gıda Yardımı",
+            "group": "NONPROFIT_DONATION"
+        },
+        {
+            "code": 4309,
+            "key": "MEMBERSHIP_DUES",
+            "name": "Üyelik ve Aidat",
+            "group": "NONPROFIT_DONATION"
+        },
+        {
+            "code": 4310,
+            "key": "CAUSE_CROWDFUNDING",
+            "name": "Amaç Odaklı Bağış Kampanyası",
+            "group": "NONPROFIT_DONATION"
+        },
+        {
+            "code": 4399,
+            "key": "NONPROFIT_DONATION_OTHER",
+            "name": "Diğer – Bağış ve Hayır İşleri",
+            "group": "NONPROFIT_DONATION"
+        },
+        {
+            "code": 4401,
+            "key": "HOME_CLEANING",
+            "name": "Ev Temizliği",
+            "group": "HOME_SERVICES_REPAIR"
+        },
+        {
+            "code": 4402,
+            "key": "COMMERCIAL_CLEANING",
+            "name": "İşyeri Temizliği",
+            "group": "HOME_SERVICES_REPAIR"
+        },
+        {
+            "code": 4403,
+            "key": "PEST_CONTROL",
+            "name": "Haşere İlaçlama",
+            "group": "HOME_SERVICES_REPAIR"
+        },
+        {
+            "code": 4404,
+            "key": "PLUMBING_ELECTRIC_REPAIR",
+            "name": "Tesisat ve Elektrik Tamiri",
+            "group": "HOME_SERVICES_REPAIR"
+        },
+        {
+            "code": 4405,
+            "key": "APPLIANCE_REPAIR",
+            "name": "Beyaz Eşya Tamiri",
+            "group": "HOME_SERVICES_REPAIR"
+        },
+        {
+            "code": 4406,
+            "key": "ELECTRONICS_REPAIR",
+            "name": "Elektronik Tamiri",
+            "group": "HOME_SERVICES_REPAIR"
+        },
+        {
+            "code": 4407,
+            "key": "LAUNDRY_DRY_CLEANING",
+            "name": "Çamaşırhane ve Kuru Temizleme",
+            "group": "HOME_SERVICES_REPAIR"
+        },
+        {
+            "code": 4408,
+            "key": "SECURITY_GUARD",
+            "name": "Güvenlik Görevlisi",
+            "group": "HOME_SERVICES_REPAIR"
+        },
+        {
+            "code": 4409,
+            "key": "ALARM_CCTV",
+            "name": "Alarm ve Kamera Sistemi",
+            "group": "HOME_SERVICES_REPAIR"
+        },
+        {
+            "code": 4410,
+            "key": "LOCKSMITH",
+            "name": "Çilingir",
+            "group": "HOME_SERVICES_REPAIR"
+        },
+        {
+            "code": 4411,
+            "key": "GARDENING_LANDSCAPING",
+            "name": "Bahçe ve Peyzaj",
+            "group": "HOME_SERVICES_REPAIR"
+        },
+        {
+            "code": 4412,
+            "key": "HANDYMAN_HELP",
+            "name": "Usta ve Yardım Hizmeti",
+            "group": "HOME_SERVICES_REPAIR"
+        },
+        {
+            "code": 4413,
+            "key": "TAILORING_ALTERATION",
+            "name": "Terzi ve Tadilat",
+            "group": "HOME_SERVICES_REPAIR"
+        },
+        {
+            "code": 4499,
+            "key": "HOME_SERVICES_REPAIR_OTHER",
+            "name": "Diğer – Ev Hizmetleri, Tamir ve Güvenlik",
+            "group": "HOME_SERVICES_REPAIR"
+        },
+        {
+            "code": 4501,
+            "key": "UNCLASSIFIED_PRODUCT",
+            "name": "Sınıflandırılmamış Ürün",
+            "group": "GENERAL_UNCLASSIFIED"
+        },
+        {
+            "code": 4502,
+            "key": "UNCLASSIFIED_SERVICE",
+            "name": "Sınıflandırılmamış Hizmet",
+            "group": "GENERAL_UNCLASSIFIED"
+        },
+        {
+            "code": 4599,
+            "key": "GENERAL_UNCLASSIFIED_OTHER",
+            "name": "Diğer – Sınıflandırılmamış",
+            "group": "GENERAL_UNCLASSIFIED"
+        }
+    ]
+}

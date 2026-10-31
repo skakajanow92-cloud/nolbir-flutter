@@ -1,0 +1,2 @@
+C:\msys64\ucrt64\bin\ar.exe qc liblitedb.a CMakeFiles/litedb.dir/src/core/Database.cpp.obj CMakeFiles/litedb.dir/src/core/Statement.cpp.obj CMakeFiles/litedb.dir/src/doc/DocumentStore.cpp.obj CMakeFiles/litedb.dir/src/graph/GraphStore.cpp.obj CMakeFiles/litedb.dir/src/ts/TimeSeriesStore.cpp.obj CMakeFiles/litedb.dir/src/cache/CacheStore.cpp.obj
+C:\msys64\ucrt64\bin\ranlib.exe liblitedb.a

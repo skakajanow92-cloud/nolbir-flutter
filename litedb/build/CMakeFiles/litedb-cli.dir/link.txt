@@ -1,0 +1,3 @@
+"C:\Program Files\CMake\bin\cmake.exe" -E rm -f CMakeFiles\litedb-cli.dir/objects.a
+C:\msys64\ucrt64\bin\ar.exe qc CMakeFiles\litedb-cli.dir/objects.a @CMakeFiles\litedb-cli.dir\objects1.rsp
+C:\msys64\ucrt64\bin\c++.exe -O3 -DNDEBUG -Wl,--whole-archive CMakeFiles\litedb-cli.dir/objects.a -Wl,--no-whole-archive -o litedb-cli.exe -Wl,--out-implib,liblitedb-cli.dll.a -Wl,--major-image-version,0,--minor-image-version,0 @CMakeFiles\litedb-cli.dir\linkLibs.rsp

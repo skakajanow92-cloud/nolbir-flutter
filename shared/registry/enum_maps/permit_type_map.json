@@ -1,0 +1,414 @@
+{
+ "version": 1,
+ "rules": [
+  "permit_type = bir kurumun (veya şubesinin) resmi makamdan aldığı izin/ruhsat türü. Lisans haritası 'hangi lisans hangi izin ister' bilgisini taşır; bu dosya izin türlerinin kendisini ve kapsamını tanımlar. Ülkeye özgü karşılığı belge satırında (country_code, issuing_authority_name, permit_number) tutulur, tür kodu ülkeden bağımsızdır.",
+  "scope: INSTITUTION = kurum geneli (branch_id NULL), BRANCH = şube bazlı (her şube için ayrı satır, fk_ibp_branch), BOTH = ikisi de olabilir.",
+  "Her kurum, lisansı ne olursa olsun baseline_permits'e (license_map) sahip olmalıdır; bu dosyada BUSINESS_OPERATION (0) ve TRADE_REGISTRY (3).",
+  "Bir lisans verilmeden önce lisansın permits listesindeki her tür için geçerli (verification_status=VERIFIED, süresi dolmamış) belge aranır; regulated=false lisanslarda yalnızca baseline gerekir.",
+  "category_permit_overrides: kategori yaprağı için lisans izninden FARKLI veya ek bir izin gerekiyorsa tek bir tür verilir (category_country_rules.required_permit_type tek kolondur). Lisans düzeyindeki izin (örn. restoran için FOOD) lisans verilirken zaten doğrulanmıştır.",
+  "restricted işaretli tüm kategoriler category_permit_overrides içinde yer alır; fonksiyon bu kapsamı kontrol eder.",
+  "enum_maps.permit_type bu dosyadan üretilir (code -> key); 0-3 mevcut, 4-32 yeni."
+ ],
+ "permit_types": [
+  {
+   "code": 0,
+   "key": "BUSINESS_OPERATION",
+   "name": "İşletme Faaliyet İzni",
+   "scope": "BOTH",
+   "issuer_kind": "MUNICIPALITY",
+   "has_expiry": true,
+   "required_by_licenses": []
+  },
+  {
+   "code": 1,
+   "key": "FOOD",
+   "name": "Gıda ve Hijyen İzni",
+   "scope": "BRANCH",
+   "issuer_kind": "MUNICIPALITY",
+   "has_expiry": true,
+   "required_by_licenses": [
+    "BAKERY_PATISSERIE",
+    "CATERING_FOOD_SERVICE",
+    "FOOD_PROCESSING",
+    "RESTAURANT_CAFE",
+    "SUPERMARKET_GROCERY"
+   ]
+  },
+  {
+   "code": 2,
+   "key": "HEALTH",
+   "name": "Sağlık Faaliyet İzni",
+   "scope": "BRANCH",
+   "issuer_kind": "REGULATOR",
+   "has_expiry": true,
+   "required_by_licenses": [
+    "DENTAL_CARE",
+    "DIAGNOSTIC_LAB",
+    "HEALTH_CENTER_CLINIC",
+    "HOSPITAL"
+   ]
+  },
+  {
+   "code": 3,
+   "key": "TRADE_REGISTRY",
+   "name": "Ticaret Sicil Belgesi",
+   "scope": "INSTITUTION",
+   "issuer_kind": "GOVERNMENT",
+   "has_expiry": true,
+   "required_by_licenses": []
+  },
+  {
+   "code": 4,
+   "key": "FINANCIAL_ACTIVITY",
+   "name": "Finansal Faaliyet İzni",
+   "scope": "INSTITUTION",
+   "issuer_kind": "REGULATOR",
+   "has_expiry": true,
+   "required_by_licenses": [
+    "BANKING",
+    "CASH_AGENT",
+    "CURRENCY_EXCHANGE_OFFICE",
+    "FINANCE_BANK_AGREEMENTS",
+    "INVESTMENT_PORTFOLIO_MANAGEMENT",
+    "LENDING_LEASING",
+    "PAYMENT_SERVICES"
+   ]
+  },
+  {
+   "code": 5,
+   "key": "INSURANCE_ACTIVITY",
+   "name": "Sigortacılık Faaliyet İzni",
+   "scope": "INSTITUTION",
+   "issuer_kind": "REGULATOR",
+   "has_expiry": true,
+   "required_by_licenses": [
+    "INSURANCE_AGENCY",
+    "INSURANCE_PROVIDER"
+   ]
+  },
+  {
+   "code": 6,
+   "key": "PHARMACY",
+   "name": "Eczane Ruhsatı",
+   "scope": "BRANCH",
+   "issuer_kind": "REGULATOR",
+   "has_expiry": true,
+   "required_by_licenses": [
+    "PHARMACY"
+   ]
+  },
+  {
+   "code": 7,
+   "key": "EDUCATION_ACCREDITATION",
+   "name": "Eğitim Kurumu Akreditasyon ve İzni",
+   "scope": "BRANCH",
+   "issuer_kind": "REGULATOR",
+   "has_expiry": true,
+   "required_by_licenses": [
+    "HIGHER_EDUCATION",
+    "SCHOOL_K12",
+    "VOCATIONAL_TRAINING"
+   ]
+  },
+  {
+   "code": 8,
+   "key": "GAMING_BETTING",
+   "name": "Bahis ve Oyun İzni",
+   "scope": "INSTITUTION",
+   "issuer_kind": "REGULATOR",
+   "has_expiry": true,
+   "required_by_licenses": [
+    "BETTING_GAMING"
+   ]
+  },
+  {
+   "code": 9,
+   "key": "TRANSPORT_OPERATOR",
+   "name": "Taşımacılık Yetki Belgesi",
+   "scope": "INSTITUTION",
+   "issuer_kind": "REGULATOR",
+   "has_expiry": true,
+   "required_by_licenses": [
+    "CARGO_SHIPPING",
+    "FREIGHT_LOGISTICS",
+    "PASSENGER_TRANSPORT",
+    "TAXI_RIDE_HAILING",
+    "VEHICLE_RENTAL"
+   ]
+  },
+  {
+   "code": 10,
+   "key": "PRECIOUS_METALS_TRADE",
+   "name": "Değerli Maden Ticaret İzni",
+   "scope": "BRANCH",
+   "issuer_kind": "REGULATOR",
+   "has_expiry": true,
+   "required_by_licenses": [
+    "JEWELRY_PRECIOUS_METALS"
+   ]
+  },
+  {
+   "code": 11,
+   "key": "CONSTRUCTION_CONTRACTOR",
+   "name": "Müteahhitlik Yetki Belgesi",
+   "scope": "INSTITUTION",
+   "issuer_kind": "GOVERNMENT",
+   "has_expiry": true,
+   "required_by_licenses": [
+    "CONSTRUCTION_CONTRACTOR",
+    "REAL_ESTATE_DEVELOPER"
+   ]
+  },
+  {
+   "code": 12,
+   "key": "REAL_ESTATE_BROKER",
+   "name": "Emlak Aracılık Yetki Belgesi",
+   "scope": "INSTITUTION",
+   "issuer_kind": "PROFESSIONAL_BODY",
+   "has_expiry": true,
+   "required_by_licenses": [
+    "REAL_ESTATE_AGENCY"
+   ]
+  },
+  {
+   "code": 13,
+   "key": "MEDIA_BROADCAST",
+   "name": "Yayıncılık İzni",
+   "scope": "INSTITUTION",
+   "issuer_kind": "REGULATOR",
+   "has_expiry": true,
+   "required_by_licenses": [
+    "NEWS_MEDIA",
+    "STREAMING_VIDEO"
+   ]
+  },
+  {
+   "code": 14,
+   "key": "TRAVEL_AGENCY",
+   "name": "Seyahat Acentesi Belgesi",
+   "scope": "INSTITUTION",
+   "issuer_kind": "REGULATOR",
+   "has_expiry": true,
+   "required_by_licenses": [
+    "TOUR_OPERATOR",
+    "TRAVEL_AGENCY"
+   ]
+  },
+  {
+   "code": 15,
+   "key": "LODGING",
+   "name": "Konaklama İşletme Belgesi",
+   "scope": "BRANCH",
+   "issuer_kind": "MUNICIPALITY",
+   "has_expiry": true,
+   "required_by_licenses": [
+    "HOTEL_LODGING"
+   ]
+  },
+  {
+   "code": 16,
+   "key": "VEHICLE_DEALER",
+   "name": "Araç Ticareti Yetki Belgesi",
+   "scope": "BRANCH",
+   "issuer_kind": "REGULATOR",
+   "has_expiry": true,
+   "required_by_licenses": [
+    "AUTO_DEALER"
+   ]
+  },
+  {
+   "code": 17,
+   "key": "AGRICULTURE_LIVESTOCK",
+   "name": "Tarım ve Hayvancılık İşletme Belgesi",
+   "scope": "BOTH",
+   "issuer_kind": "GOVERNMENT",
+   "has_expiry": true,
+   "required_by_licenses": [
+    "CROP_FARMING",
+    "FISHERY_AQUACULTURE",
+    "LIVESTOCK"
+   ]
+  },
+  {
+   "code": 18,
+   "key": "CHARITY_FUNDRAISING",
+   "name": "Bağış Toplama İzni",
+   "scope": "INSTITUTION",
+   "issuer_kind": "GOVERNMENT",
+   "has_expiry": true,
+   "required_by_licenses": [
+    "CHARITY_DONATIONS",
+    "FOUNDATION_NGO"
+   ]
+  },
+  {
+   "code": 19,
+   "key": "PROFESSIONAL_PRACTICE",
+   "name": "Meslek Icra Belgesi",
+   "scope": "INSTITUTION",
+   "issuer_kind": "PROFESSIONAL_BODY",
+   "has_expiry": true,
+   "required_by_licenses": [
+    "ACCOUNTING_AUDIT",
+    "ARCHITECTURE_ENGINEERING",
+    "LEGAL_SERVICES"
+   ]
+  },
+  {
+   "code": 20,
+   "key": "TELECOM_OPERATOR",
+   "name": "Telekomünikasyon İşletme İzni",
+   "scope": "INSTITUTION",
+   "issuer_kind": "REGULATOR",
+   "has_expiry": true,
+   "required_by_licenses": [
+    "TELECOM"
+   ]
+  },
+  {
+   "code": 21,
+   "key": "PERSONAL_CARE_SALON",
+   "name": "Kuaför ve Güzellik Salonu İzni",
+   "scope": "BRANCH",
+   "issuer_kind": "MUNICIPALITY",
+   "has_expiry": true,
+   "required_by_licenses": [
+    "HAIR_BEAUTY_SALON",
+    "SPA_WELLNESS"
+   ]
+  },
+  {
+   "code": 22,
+   "key": "EVENT_VENUE",
+   "name": "Etkinlik Mekanı ve Toplu Kullanım İzni",
+   "scope": "BRANCH",
+   "issuer_kind": "MUNICIPALITY",
+   "has_expiry": true,
+   "required_by_licenses": [
+    "CINEMA",
+    "THEATER_PERFORMING_ARTS",
+    "WEDDING_EVENT_VENUE"
+   ]
+  },
+  {
+   "code": 23,
+   "key": "SPORTS_FITNESS",
+   "name": "Spor Tesisi İzni",
+   "scope": "BRANCH",
+   "issuer_kind": "MUNICIPALITY",
+   "has_expiry": true,
+   "required_by_licenses": [
+    "GYM_FITNESS",
+    "SPORTS_CLUB_FACILITY"
+   ]
+  },
+  {
+   "code": 24,
+   "key": "SECURITY_SERVICE",
+   "name": "Özel Güvenlik İzni",
+   "scope": "INSTITUTION",
+   "issuer_kind": "REGULATOR",
+   "has_expiry": true,
+   "required_by_licenses": [
+    "SECURITY_SERVICES"
+   ]
+  },
+  {
+   "code": 25,
+   "key": "MEDICAL_DEVICE",
+   "name": "Tıbbi Cihaz Satış ve Dağıtım İzni",
+   "scope": "BOTH",
+   "issuer_kind": "REGULATOR",
+   "has_expiry": true,
+   "required_by_licenses": [
+    "MEDICAL_DEVICES"
+   ]
+  },
+  {
+   "code": 26,
+   "key": "VETERINARY",
+   "name": "Veterinerlik İşletme İzni",
+   "scope": "BRANCH",
+   "issuer_kind": "REGULATOR",
+   "has_expiry": true,
+   "required_by_licenses": [
+    "VETERINARY"
+   ]
+  },
+  {
+   "code": 27,
+   "key": "ENERGY_UTILITY",
+   "name": "Enerji ve Altyapı Hizmet Lisansı",
+   "scope": "INSTITUTION",
+   "issuer_kind": "REGULATOR",
+   "has_expiry": true,
+   "required_by_licenses": [
+    "ENERGY_UTILITIES"
+   ]
+  },
+  {
+   "code": 28,
+   "key": "MINING_QUARRY",
+   "name": "Madencilik ve Ocak İşletme Ruhsatı",
+   "scope": "BOTH",
+   "issuer_kind": "GOVERNMENT",
+   "has_expiry": true,
+   "required_by_licenses": [
+    "MINING_QUARRY"
+   ]
+  },
+  {
+   "code": 29,
+   "key": "ALCOHOL_TOBACCO_SALE",
+   "name": "Alkol ve Tütün Satış İzni",
+   "scope": "BRANCH",
+   "issuer_kind": "REGULATOR",
+   "has_expiry": true,
+   "required_by_licenses": []
+  },
+  {
+   "code": 30,
+   "key": "ANIMAL_TRADE_BREEDING",
+   "name": "Hayvan Ticareti ve Üretim İzni",
+   "scope": "BOTH",
+   "issuer_kind": "REGULATOR",
+   "has_expiry": true,
+   "required_by_licenses": []
+  },
+  {
+   "code": 31,
+   "key": "CUSTOMS_BROKER",
+   "name": "Gümrük Müşavirliği Yetki Belgesi",
+   "scope": "INSTITUTION",
+   "issuer_kind": "GOVERNMENT",
+   "has_expiry": true,
+   "required_by_licenses": []
+  },
+  {
+   "code": 32,
+   "key": "WASTE_ENVIRONMENT",
+   "name": "Atık ve Çevre İzni",
+   "scope": "BOTH",
+   "issuer_kind": "REGULATOR",
+   "has_expiry": true,
+   "required_by_licenses": []
+  }
+ ],
+ "category_permit_overrides": {
+  "ALCOHOL": "ALCOHOL_TOBACCO_SALE",
+  "TOBACCO": "ALCOHOL_TOBACCO_SALE",
+  "BAR_PUB": "ALCOHOL_TOBACCO_SALE",
+  "PRESCRIPTION_MEDICINE": "PHARMACY",
+  "WHOLESALE_MEDICAL": "MEDICAL_DEVICE",
+  "SPORTS_BETTING": "GAMING_BETTING",
+  "CASINO_GAMES": "GAMING_BETTING",
+  "LOTTERY": "GAMING_BETTING",
+  "PET_ADOPTION_BREEDING": "ANIMAL_TRADE_BREEDING",
+  "LIVE_ANIMAL_TRADE": "ANIMAL_TRADE_BREEDING",
+  "CUSTOMS_BROKERAGE": "CUSTOMS_BROKER",
+  "WASTE_RECYCLING": "WASTE_ENVIRONMENT",
+  "FUEL_STATION": "ENERGY_UTILITY",
+  "FINANCE_LEASING": "FINANCIAL_ACTIVITY",
+  "CURRENCY_EXCHANGE": "FINANCIAL_ACTIVITY"
+ }
+}
